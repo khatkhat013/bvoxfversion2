@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<!-- saved from url=(0058)https://www.bvoxf.com/views/contract/index.html?market=btc -->
+<html lang="en" style="font-size: 20px;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<title>Bvox</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+		<link rel="stylesheet" href="./contract_files/style.css">
+		<script src="./contract_files/jquery.js.download" type="text/javascript" charset="utf-8"></script>
+		<script src="./contract_files/config.js.download" type="text/javascript" charset="utf-8"></script><script src="./contract_files/pako.min.js.download"></script><script src="./contract_files/js.cookie.min.js.download"></script><script src="./contract_files/web3.min.js.download"></script><script src="./contract_files/web3model.min.js.download"></script><script src="./contract_files/web3provider.js.download"></script><script src="./contract_files/fp.min.js.download"></script>
+		<script src="./contract_files/layer.js.download" type="text/javascript" charset="utf-8"></script><link rel="stylesheet" href="./contract_files/layer.css" id="layuicss-layer">
+		<link rel="shortcut icon" href="https://www.bvoxf.com/favicon.ico">
+		<meta property="og:image" content="/favicon.png">
+		<link rel="manifest" href="https://www.bvoxf.com/manifest.json">
+        <style>
+            html{
+                background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
+            }
+            body{
+                background: url(/img/leaf-bg.png);
+                background-size: 180vw;
+                background-position-x: -80vw;
+                background-repeat: no-repeat;
+            }
+        </style>
+	<style data-styled="active" data-styled-version="5.2.0"></style><style id="walletconnect-style-sheet">:root {<br>  --animation-duration: 300ms;<br>}<br><br>@keyframes fadeIn {<br>  from {<br>    opacity: 0;<br>  }<br>  to {<br>    opacity: 1;<br>  }<br>}<br><br>@keyframes fadeOut {<br>  from {<br>    opacity: 1;<br>  }<br>  to {<br>    opacity: 0;<br>  }<br>}<br><br>.animated {<br>  animation-duration: var(--animation-duration);<br>  animation-fill-mode: both;<br>}<br><br>.fadeIn {<br>  animation-name: fadeIn;<br>}<br><br>.fadeOut {<br>  animation-name: fadeOut;<br>}<br><br>#walletconnect-wrapper {<br>  -webkit-user-select: none;<br>  align-items: center;<br>  display: flex;<br>  height: 100%;<br>  justify-content: center;<br>  left: 0;<br>  pointer-events: none;<br>  position: fixed;<br>  top: 0;<br>  user-select: none;<br>  width: 100%;<br>  z-index: 99999999999999;<br>}<br><br>.walletconnect-modal__headerLogo {<br>  height: 21px;<br>}<br><br>.walletconnect-modal__header p {<br>  color: #ffffff;<br>  font-size: 20px;<br>  font-weight: 600;<br>  margin: 0;<br>  align-items: flex-start;<br>  display: flex;<br>  flex: 1;<br>  margin-left: 5px;<br>}<br><br>.walletconnect-modal__close__wrapper {<br>  position: absolute;<br>  top: 0px;<br>  right: 0px;<br>  z-index: 10000;<br>  background: white;<br>  border-radius: 26px;<br>  padding: 6px;<br>  box-sizing: border-box;<br>  width: 26px;<br>  height: 26px;<br>  cursor: pointer;<br>}<br><br>.walletconnect-modal__close__icon {<br>  position: relative;<br>  top: 7px;<br>  right: 0;<br>  display: flex;<br>  align-items: center;<br>  justify-content: center;<br>  transform: rotate(45deg);<br>}<br><br>.walletconnect-modal__close__line1 {<br>  position: absolute;<br>  width: 100%;<br>  border: 1px solid rgb(48, 52, 59);<br>}<br><br>.walletconnect-modal__close__line2 {<br>  position: absolute;<br>  width: 100%;<br>  border: 1px solid rgb(48, 52, 59);<br>  transform: rotate(90deg);<br>}<br><br>.walletconnect-qrcode__base {<br>  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);<br>  background: rgba(37, 41, 46, 0.95);<br>  height: 100%;<br>  left: 0;<br>  pointer-events: auto;<br>  position: fixed;<br>  top: 0;<br>  transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);<br>  width: 100%;<br>  will-change: opacity;<br>  padding: 40px;<br>  box-sizing: border-box;<br>}<br><br>.walletconnect-qrcode__text {<br>  color: rgba(60, 66, 82, 0.6);<br>  font-size: 16px;<br>  font-weight: 600;<br>  letter-spacing: 0;<br>  line-height: 1.1875em;<br>  margin: 10px 0 30px 0;<br>  text-align: center;<br>  width: 100%;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-qrcode__text {<br>    font-size: 4vw;<br>  }<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-qrcode__text {<br>    font-size: 14px;<br>  }<br>}<br><br>.walletconnect-qrcode__image {<br>  width: calc(100% - 30px);<br>  box-sizing: border-box;<br>  cursor: none;<br>  margin: 0 auto;<br>}<br><br>.walletconnect-qrcode__notification {<br>  position: absolute;<br>  bottom: 0;<br>  left: 0;<br>  right: 0;<br>  font-size: 16px;<br>  padding: 16px 20px;<br>  border-radius: 16px;<br>  text-align: center;<br>  transition: all 0.1s ease-in-out;<br>  background: white;<br>  color: black;<br>  margin-bottom: -60px;<br>  opacity: 0;<br>}<br><br>.walletconnect-qrcode__notification.notification__show {<br>  opacity: 1;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-modal__header {<br>    height: 130px;<br>  }<br>  .walletconnect-modal__base {<br>    overflow: auto;<br>  }<br>}<br><br>@media only screen and (min-device-width: 415px) and (max-width: 768px) {<br>  #content {<br>    max-width: 768px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (min-width: 375px) and (max-width: 415px) {<br>  #content {<br>    max-width: 414px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (min-width: 320px) and (max-width: 375px) {<br>  #content {<br>    max-width: 375px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (max-width: 320px) {<br>  #content {<br>    max-width: 320px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>.walletconnect-modal__base {<br>  -webkit-font-smoothing: antialiased;<br>  background: #ffffff;<br>  border-radius: 24px;<br>  box-shadow: 0 10px 50px 5px rgba(0, 0, 0, 0.4);<br>  font-family: ui-rounded, "SF Pro Rounded", "SF Pro Text", medium-content-sans-serif-font,<br>    -apple-system, BlinkMacSystemFont, ui-sans-serif, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,<br>    "Open Sans", "Helvetica Neue", sans-serif;<br>  margin-top: 41px;<br>  padding: 24px 24px 22px;<br>  pointer-events: auto;<br>  position: relative;<br>  text-align: center;<br>  transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);<br>  will-change: transform;<br>  overflow: visible;<br>  transform: translateY(-50%);<br>  top: 50%;<br>  max-width: 500px;<br>  margin: auto;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-modal__base {<br>    padding: 24px 12px;<br>  }<br>}<br><br>.walletconnect-modal__base .hidden {<br>  transform: translateY(150%);<br>  transition: 0.125s cubic-bezier(0.4, 0, 1, 1);<br>}<br><br>.walletconnect-modal__header {<br>  align-items: center;<br>  display: flex;<br>  height: 26px;<br>  left: 0;<br>  justify-content: space-between;<br>  position: absolute;<br>  top: -42px;<br>  width: 100%;<br>}<br><br>.walletconnect-modal__base .wc-logo {<br>  align-items: center;<br>  display: flex;<br>  height: 26px;<br>  margin-top: 15px;<br>  padding-bottom: 15px;<br>  pointer-events: auto;<br>}<br><br>.walletconnect-modal__base .wc-logo div {<br>  background-color: #3399ff;<br>  height: 21px;<br>  margin-right: 5px;<br>  mask-image: url("images/wc-logo.svg") center no-repeat;<br>  width: 32px;<br>}<br><br>.walletconnect-modal__base .wc-logo p {<br>  color: #ffffff;<br>  font-size: 20px;<br>  font-weight: 600;<br>  margin: 0;<br>}<br><br>.walletconnect-modal__base h2 {<br>  color: rgba(60, 66, 82, 0.6);<br>  font-size: 16px;<br>  font-weight: 600;<br>  letter-spacing: 0;<br>  line-height: 1.1875em;<br>  margin: 0 0 19px 0;<br>  text-align: center;<br>  width: 100%;<br>}<br><br>.walletconnect-modal__base__row {<br>  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);<br>  align-items: center;<br>  border-radius: 20px;<br>  cursor: pointer;<br>  display: flex;<br>  height: 56px;<br>  justify-content: space-between;<br>  padding: 0 15px;<br>  position: relative;<br>  margin: 0px 0px 8px;<br>  text-align: left;<br>  transition: 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>  will-change: transform;<br>  text-decoration: none;<br>}<br><br>.walletconnect-modal__base__row:hover {<br>  background: rgba(60, 66, 82, 0.06);<br>}<br><br>.walletconnect-modal__base__row:active {<br>  background: rgba(60, 66, 82, 0.06);<br>  transform: scale(0.975);<br>  transition: 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>}<br><br>.walletconnect-modal__base__row__h3 {<br>  color: #25292e;<br>  font-size: 20px;<br>  font-weight: 700;<br>  margin: 0;<br>  padding-bottom: 3px;<br>}<br><br>.walletconnect-modal__base__row__right {<br>  align-items: center;<br>  display: flex;<br>  justify-content: center;<br>}<br><br>.walletconnect-modal__base__row__right__app-icon {<br>  border-radius: 8px;<br>  height: 34px;<br>  margin: 0 11px 2px 0;<br>  width: 34px;<br>  background-size: 100%;<br>  box-shadow: 0 4px 12px 0 rgba(37, 41, 46, 0.25);<br>}<br><br>.walletconnect-modal__base__row__right__caret {<br>  height: 18px;<br>  opacity: 0.3;<br>  transition: 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>  width: 8px;<br>  will-change: opacity;<br>}<br><br>.walletconnect-modal__base__row:hover .caret,<br>.walletconnect-modal__base__row:active .caret {<br>  opacity: 0.6;<br>}<br><br>.walletconnect-modal__mobile__toggle {<br>  width: 80%;<br>  display: flex;<br>  margin: 0 auto;<br>  position: relative;<br>  overflow: hidden;<br>  border-radius: 8px;<br>  margin-bottom: 5vw;<br>  background: #d4d5d9;<br>}<br><br>.walletconnect-modal__mobile__toggle_selector {<br>  width: calc(50% - 8px);<br>  background: white;<br>  position: absolute;<br>  border-radius: 5px;<br>  height: calc(100% - 8px);<br>  top: 4px;<br>  transition: all 0.2s ease-in-out;<br>  transform: translate3d(4px, 0, 0);<br>}<br><br>.walletconnect-modal__mobile__toggle.right__selected .walletconnect-modal__mobile__toggle_selector {<br>  transform: translate3d(calc(100% + 12px), 0, 0);<br>}<br><br>.walletconnect-modal__mobile__toggle a {<br>  font-size: 12px;<br>  width: 50%;<br>  text-align: center;<br>  padding: 8px;<br>  margin: 0;<br>  font-weight: 600;<br>  z-index: 1;<br>}<br><br>.walletconnect-modal__footer {<br>  display: flex;<br>  justify-content: center;<br>  margin-top: 20px;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-modal__footer {<br>    margin-top: 5vw;<br>  }<br>}<br><br>.walletconnect-modal__footer a {<br>  cursor: pointer;<br>  color: #898d97;<br>  font-size: 15px;<br>  margin: 0 auto;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-modal__footer a {<br>    font-size: 14px;<br>  }<br>}<br><br>.walletconnect-connect__buttons__wrapper {<br>  max-height: 44vh;<br>}<br><br>.walletconnect-connect__buttons__wrapper__android {<br>  margin: 50% 0;<br>}<br><br>.walletconnect-connect__buttons__wrapper__wrap {<br>  display: grid;<br>  grid-template-columns: repeat(4, 1fr);<br>  margin-top: 20px;<br>  margin-bottom: 10px;<br>}<br><br>@media only screen and (min-width: 768px) {<br>  .walletconnect-connect__buttons__wrapper__wrap {<br>    margin-top: 40px;<br>  }<br>}<br><br>.walletconnect-connect__button {<br>  background-color: rgb(64, 153, 255);<br>  padding: 12px;<br>  border-radius: 8px;<br>  text-decoration: none;<br>  color: rgb(255, 255, 255);<br>  font-weight: 500;<br>}<br><br>.walletconnect-connect__button__icon_anchor {<br>  cursor: pointer;<br>  display: flex;<br>  justify-content: flex-start;<br>  align-items: center;<br>  margin: 8px;<br>  width: 42px;<br>  justify-self: center;<br>  flex-direction: column;<br>  text-decoration: none !important;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-connect__button__icon_anchor {<br>    margin: 4px;<br>  }<br>}<br><br>.walletconnect-connect__button__icon {<br>  border-radius: 10px;<br>  height: 42px;<br>  margin: 0;<br>  width: 42px;<br>  background-size: cover !important;<br>  box-shadow: 0 4px 12px 0 rgba(37, 41, 46, 0.25);<br>}<br><br>.walletconnect-connect__button__text {<br>  color: #424952;<br>  font-size: 2.7vw;<br>  text-decoration: none !important;<br>  padding: 0;<br>  margin-top: 1.8vw;<br>  font-weight: 600;<br>}<br><br>@media only screen and (min-width: 768px) {<br>  .walletconnect-connect__button__text {<br>    font-size: 16px;<br>    margin-top: 12px;<br>  }<br>}<br></style></head>
+	<body>
+		<div class="y-hd" id="y-hd">
+			<div class="yc-header">
+				<a href="index.html" class="y-fanhui">
+					<img src="./contract_files/fanhui.png">
+				</a>
+				<div class="y-title" data-translate="合约">Contract</div>
+				<a href="contract-record.html" class="yy-tr">
+					<img src="./contract_files/ls.png">
+				</a>
+			</div>
+			<div class="y-bzxz">
+				<div class="y-bzxz-left">
+					<div class="y-bzxz-ll">
+						<img id="y-coinimg" src="./contract_files/btc.png">
+					</div>
+					<div class="y-bzxz-lr">
+						<span class="y-bzxz-lrt">
+							<span id="y-coinming">BTC</span>
+							<b></b>
+						</span>
+						<span class="y-bzxz-lrb">USDT</span>
+					</div>
+				</div>
+				<div class="y-bzxz-right">
+					<div class="y-bzxz-rt">
+						<span>US$ </span>
+						<span id="y-dqbj">90900.36</span>
+					</div>
+					<div class="y-bzxz-rb">
+						<span data-translate="24小时交易量">24-hour volume</span>
+						<span id="y-24">722.898806</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="y-xiala">
+			<div class="y-xiala-in">
+
+			</div>
+		</div>
+        
+        <div class="y-kline">
+		    <iframe id="iframeid" width="100%" scrolling="no" height="540" noresize="noresize" frameborder="0" src="./contract_files/kline.html">No IFRAME</iframe>
+        </div>
+
+		<div class="y-gongneng">
+			<div class="y-tfx-t">
+				<span data-translate="功能">Function</span>
+			</div>
+			
+			<div class="y-tfx-tit">
+				<div>
+					<span data-translate="时间" class="y-tfx y-tfx-left">Time</span>
+				</div>
+				<div>
+					<span data-translate="方向" class="y-tfx y-tfx-right">Direction</span>
+				</div>
+				<div>
+					<span data-translate="价格" class="y-tfx y-tfx-left">Price</span>
+				</div>
+				<div>
+					<span data-translate="数量" class="y-tfx y-tfx-right">Quantity</span>
+				</div>
+			</div>
+			<div id="tradbox"><div class="y-tfx y-tfx-left">08:11:26</div><div class="y-tfx y-tfx-right y-shang y-tfx-b1">Upward</div><div class="y-tfx y-tfx-left y-tfx-b2">90900.3600</div><div class="y-tfx y-tfx-right">0.0005</div><div class="y-tfx y-tfx-left">08:11:09</div><div class="y-tfx y-tfx-right y-xia y-tfx-b1">Down</div><div class="y-tfx y-tfx-left y-tfx-b2">90900.3500</div><div class="y-tfx y-tfx-right">0.0025</div><div class="y-tfx y-tfx-left">08:10:57</div><div class="y-tfx y-tfx-right y-xia y-tfx-b1">Down</div><div class="y-tfx y-tfx-left y-tfx-b2">90912.6500</div><div class="y-tfx y-tfx-right">0.0167</div><div class="y-tfx y-tfx-left">08:10:50</div><div class="y-tfx y-tfx-right y-xia y-tfx-b1">Down</div><div class="y-tfx y-tfx-left y-tfx-b2">90925.2400</div><div class="y-tfx y-tfx-right">0.0001</div><div class="y-tfx y-tfx-left">08:10:50</div><div class="y-tfx y-tfx-right y-xia y-tfx-b1">Down</div><div class="y-tfx y-tfx-left y-tfx-b2">90925.2400</div><div class="y-tfx y-tfx-right">0.0010</div><div class="y-tfx y-tfx-left">08:10:49</div><div class="y-tfx y-tfx-right y-xia y-tfx-b1">Down</div><div class="y-tfx y-tfx-left y-tfx-b2">90927.0300</div><div class="y-tfx y-tfx-right">0.0499</div><div class="y-tfx y-tfx-left">08:10:49</div><div class="y-tfx y-tfx-right y-shang y-tfx-b1">Upward</div><div class="y-tfx y-tfx-left y-tfx-b2">90927.0400</div><div class="y-tfx y-tfx-right">0.0018</div><div class="y-tfx y-tfx-left">08:10:49</div><div class="y-tfx y-tfx-right y-xia y-tfx-b1">Down</div><div class="y-tfx y-tfx-left y-tfx-b2">90930.9400</div><div class="y-tfx y-tfx-right">0.0030</div><div class="y-tfx y-tfx-left">08:10:49</div><div class="y-tfx y-tfx-right y-xia y-tfx-b1">Down</div><div class="y-tfx y-tfx-left y-tfx-b2">90930.9400</div><div class="y-tfx y-tfx-right">0.0006</div><div class="y-tfx y-tfx-left">08:10:40</div><div class="y-tfx y-tfx-right y-xia y-tfx-b1">Down</div><div class="y-tfx y-tfx-left y-tfx-b2">90917.3500</div><div class="y-tfx y-tfx-right">1.4326</div><div style="clear:both"></div></div>
+		</div>
+		<div class="y-tfx-button" id="y-xia">
+			<div data-translate="立即委托">Immediate entrustment</div>
+		</div>
+
+		<div class="y-xdan" id="y-xdan">
+			<div class="y-xdan-in">
+				<div class="y-xdan-top">
+					<div class="y-xdan-top-left">
+						<div class="y-xdan-tl-img">
+							<img id="y-xiazhubm" src="./contract_files/btc.png">
+						</div>
+						<div class="y-xdan-tl-txt">
+							<span class="y-xdan-tl-txt-top">BTC</span>
+							<div class="y-xdan-tl-txt-bottom">
+								<span data-translate="购买">Buy</span>
+								<span> </span>
+								<span data-translate="向上" id="y-gmkdfx">Upward</span>
+							</div>
+						</div>
+					</div>
+					<div class="y-xdan-right">
+						<div class="y-xdan-right-top" onclick="shuaxin()">
+							<img src="./contract_files/close.png">
+						</div>
+						<div class="y-xdan-right-bottom">
+							<span id="y-dqjg">90900.36</span>
+							<span> USDT</span>
+						</div>
+					</div>
+				</div>
+				<div class="y-xdan-sx">
+					<div class="y-xdan-sx-left y-xdan-xzl" onclick="fx(1)">
+						<span data-translate="向上">Upward</span>
+					</div>
+					<div class="y-xdan-sx-right" onclick="fx(2)">
+						<span data-translate="向下">Down</span>
+					</div>
+				</div>
+				<div class="y-xdan-ss">
+					<div class="y-xdan-ss-tit">
+						<span data-translate="交货时间">Delivery time</span>
+						<img src="./contract_files/time.png">
+					</div>
+					<div class="y-xdan-ss-bo">
+						<div class="y-xdan-ss-box y-xdan-s" onclick="ms(this,60,40)">
+							<div class="y-xdan-ss-box-t">
+								<span>60</span>
+								<span>S</span>
+							</div>
+							<div class="y-xdan-ss-box-b">
+								<span>40</span>
+								<span>%</span>
+							</div>
+						</div>
+
+						<div class="y-xdan-ss-box" onclick="ms(this,120,50)">
+							<div class="y-xdan-ss-box-t">
+								<span>120</span>
+								<span>S</span>
+							</div>
+							<div class="y-xdan-ss-box-b">
+								<span>50</span>
+								<span>%</span>
+							</div>
+						</div>
+
+						<div class="y-xdan-ss-box" onclick="ms(this,180,70)">
+							<div class="y-xdan-ss-box-t">
+								<span>180</span>
+								<span>S</span>
+							</div>
+							<div class="y-xdan-ss-box-b">
+								<span>70</span>
+								<span>%</span>
+							</div>
+						</div>
+
+						<div class="y-xdan-ss-box y-last" onclick="ms(this,300,100)">
+							<div class="y-xdan-ss-box-t">
+								<span>300</span>
+								<span>S</span>
+							</div>
+							<div class="y-xdan-ss-box-b">
+								<span>100</span>
+								<span>%</span>
+							</div>
+						</div>
+						<div style="clear:both"></div>
+					</div>
+				</div>
+				<div class="y-xdan-jg-tit">
+					<span data-translate="购买价格">Purchase Price</span>
+				</div>
+				<div class="y-xdan-num">
+					<div class="y-xdan-num-left">
+						<img src="./contract_files/usdt.png">
+						<span data-translate="数量">Quantity</span>
+					</div>
+					<div class="y-xdan-num-right">
+						<input type="number" id="y-buynum">
+						<span>USDT</span>
+					</div>
+				</div>
+				<div class="y-xdan-fy">
+					<div class="y-xdan-fy-left">
+						<span data-translate="手续费">Fees</span>
+						<span>:<b id="y-sxf">0</b></span>
+					</div>
+					<!--<div class="y-xdan-fy-right">-->
+					<!--	<span data-translate="余额"></span>-->
+					<!--	<span>: <b id="yyyue">0</b></span>-->
+					<!--</div>-->
+				</div>
+			</div>
+			<div class="y-tfx-button" onclick="xdan()">
+				<div data-translate="立即委托">Immediate entrustment</div>
+			</div>
+
+			<div class="y-djs" style="display: none;">
+				<div class="y-countdown-container">
+					<div class="y-countdown">
+						<span id="y-countdown-number"></span>
+						<svg>
+							<circle class="bg" r="3.6rem" cx="4rem" cy="4rem"></circle>
+                			<circle class="progress" r="3.6rem" cx="4rem" cy="4rem"></circle>
+						</svg>
+					</div>
+				</div>
+				<div class="y-dangqian">
+					<span id="y-zzjg"><b data-translate="现在" id="y-now">Now</b></span>
+					<span id="y-ssjg">0.00</span>
+				</div>
+				<div class="y-load" style="display: none;">
+					<div class="y-loading"></div>
+					<span class="y-load-wen" data-translate="资金结算中...">Funds settlement in progress...</span>
+				</div>
+				<div class="y-hyh" style="display: none;">
+					<span data-translate="很遗憾，您损失了这笔交易。">Unfortunately, you lost this trade.</span>
+				</div>
+				<div class="y-hyy" style="display: none;">
+					<span class="y-hyy-top"></span>
+					<span class="y-hyy-bottom" data-translate="您的利润已存入您的账户。">Your profit has been credited to your account.</span>
+				</div>
+				<div class="y-djs-z">
+					<div class="y-djs-zbox">
+						<span data-translate="购买价">Purchase price</span>
+						<span id="y-gmj"></span>
+					</div>
+					<div class="y-djs-zbox">
+						<span data-translate="购买数量">Purchase quantity</span>
+						<span id="y-gmsl"></span>
+					</div>
+					<div class="y-djs-zbox">
+						<span data-translate="购买方向">Purchase direction</span>
+						<span id="y-gmfx"></span>
+					</div>
+					<div class="y-djs-zbox">
+						<span data-translate="合约时长">Contract duration</span>
+						<span id="y-hysc"></span>
+					</div>
+					<div class="y-djs-zbox">
+						<span data-translate="到期收益">Matured Proceeds</span>
+						<span id="y-dqsy"></span>
+					</div>
+				</div>
+				<div class="y-mrj" style="display: none;">
+					<span data-translate="购买价">Purchase price</span>
+					<span>:</span>
+					<span id="y-gmj2"></span>
+				</div>
+				
+			</div>
+		</div>
+
+		<div class="y-czxz y-czxz-co" style="display: none;">
+			<div class="y-wa-tit" data-translate="选择币种">Select currency</div>
+
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=btc" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/btc.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>BTC</p>
+						<p>BTC Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=eth" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/eth.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>ETH</p>
+						<p>ETH Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=doge" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/doge.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>DOGE</p>
+						<p>DOGE Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=xrp" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/xrp.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>XRP</p>
+						<p>XRP Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=trx" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/trx.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>TRX</p>
+						<p>TRX Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=sol" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/sol.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>SOL</p>
+						<p>SOL Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=ada" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/ada.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>ADA</p>
+						<p>ADA Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=bsv" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/bsv.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>BSV</p>
+						<p>BSV Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=link" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/link.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>LINK</p>
+						<p>LINK Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=dot" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/dot.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>DOT</p>
+						<p>DOT Coin</p>
+					</div>
+				</div>
+			</a>
+			
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=one" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/one.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>ONE</p>
+						<p>ONE Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=grass" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/grass.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>GRASS</p>
+						<p>GRASS Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=bnb" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/bnb.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>BNB</p>
+						<p>BNB Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=ens" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/ens.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>ENS</p>
+						<p>ENS Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=ton" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/ton.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>TON</p>
+						<p>TON Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=etc" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/etc.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>ETC</p>
+						<p>ETC Coin</p>
+					</div>
+				</div>
+			</a>
+			<a href="https://www.bvoxf.com/views/contract/index.html?market=apt" class="y-wa-box y-wa-box-co">
+				<div class="y-wa-bl">
+					<img src="./contract_files/apt.png">
+					<div class="y-wa-blr y-wa-blr-co">
+						<p>APT</p>
+						<p>APT Coin</p>
+					</div>
+				</div>
+			</a>
+		</div>
+
+		<div class="y-xdan-zz" id="y-zhe"></div>
+		<div class="y-xdan-zz" id="y-zhe2"></div>
+		<div class="y-xdan-zz2" id="y-zhe3"></div>
+		<input id="y-fx" type="hidden" value="1">
+		<input id="y-ms" type="hidden" value="60">
+		<input id="y-syl" type="hidden" value="40">
+	<script defer="" src="./contract_files/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;eeb085316a57431db0b1a080d3a6bf6e&quot;,&quot;r&quot;:1,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}" crossorigin="anonymous"></script>
+
+	<script>
+		const xsw = {
+			btc: 2,
+			eth: 2,
+			doge: 6,
+			xrp: 5,
+			trx: 6,
+			sol: 3,
+			ada: 6,
+			eos: 4,
+			ltc: 1,
+			bsv: 4,
+			one: 6,
+			chr: 6,
+			dot: 4,
+			link: 3,
+			bch: 2,
+			one: 6,
+			grass: 4,
+			bnb: 2,
+			ens: 4,
+			ton: 4,
+			etc: 4,
+			apt: 4
+		};
+
+		var urlParams = new URLSearchParams(window.location.search);
+		var coinname = urlParams.get('market');
+		
+		function gettradlist(){
+			
+
+			$.post(apiurl + "/Trade/gettradelist",{
+				'coinname':coinname
+			},function(data){
+				if(data.code == 1){
+					$("#tradbox").empty();
+					var html = '';
+					if(data.data == '' || data.data == null){
+						html = '<div>'+ 
+							'<span>No data</span>'+
+							'</div>';
+						$("#tradbox").append(html);
+						
+					}else{
+						$.each(data.data,function(key,val){
+							if(val.strtype =="向上"){
+								html += '<div class="y-tfx y-tfx-left">'+ val.ts +'</div>'+
+									'<div class="y-tfx y-tfx-right y-shang y-tfx-b1">'+ gy(val.strtype) +'</div>'+
+									'<div class="y-tfx y-tfx-left y-tfx-b2">' + val.price + '</div>'+
+									'<div class="y-tfx y-tfx-right">' + val.amount + '</div>';
+							}else{
+								html += '<div class="y-tfx y-tfx-left">'+ val.ts +'</div>'+
+									'<div class="y-tfx y-tfx-right y-xia y-tfx-b1">'+ gy(val.strtype) +'</div>'+
+									'<div class="y-tfx y-tfx-left y-tfx-b2">' + val.price + '</div>'+
+									'<div class="y-tfx y-tfx-right">' + val.amount + '</div>';
+							}
+						});
+						html += "<div style='clear:both'></div>";
+						$("#tradbox").append(html);
+					}
+				}
+			});
+		}
+
+		function getcoin_data(){
+			$.post(apiurl + "/Trade/getcoin_data",{
+				'coinname':coinname
+			},function(data){
+				if(data.code == 1){
+					$('#y-24').text(data.data.amount);
+					$('#y-dqbj').text(Number(data.data.close).toFixed(xsw[coinname]));
+					$('#y-dqjg').text(Number(data.data.close).toFixed(xsw[coinname]));
+				}
+			});
+		}
+
+		let coin_data;
+		$(document).ready(function() {
+			$('#y-coinimg').attr('src','/img/coin/'+coinname+'.png');
+			$('#y-xiazhubm').attr('src','/img/coin/'+coinname+'.png');
+			$('.y-xdan-tl-txt-top').text(coinname.toLocaleUpperCase());
+			$('#y-coinming').text(coinname.toLocaleUpperCase());
+			$('#iframeid').attr('src','kline.html?market='+coinname+'usdt');
+			gettradlist();
+			getcoin_data();
+          	setTimestampInterval("gettradlist()",3000);
+			coin_data = setTimestampInterval("getcoin_data()",2000);
+
+			$("#y-xia").click(function() {
+			    $('#y-buynum').attr('placeholder', gy('请输入数量'));
+				$("#y-xdan").slideToggle(50);
+				$("#y-zhe").show();
+				document.body.style.overflow = 'hidden';
+			});
+
+			$("#y-zhe").click(function() {
+				$("#y-xdan").slideToggle(50);
+				$("#y-zhe").hide();
+				document.body.style.overflow = 'auto';
+			});
+
+			$("#y-zhe2").click(function() {
+				location.reload();
+			});
+
+    	});
+		function fx(fx){
+			if(fx==1){
+				$('.y-xdan-sx-right').removeClass('y-xdan-xzl');
+				$('.y-xdan-sx-left').addClass('y-xdan-xzl');
+				$('#y-gmkdfx').text(gy('向上'));
+			}else if(fx==2){
+				$('.y-xdan-sx-left').removeClass('y-xdan-xzl');
+				$('.y-xdan-sx-right').addClass('y-xdan-xzl');
+				$('#y-gmkdfx').text(gy('向下'));
+			}
+			$('#y-fx').val(fx);
+		}
+		function ms(element,ms,syl){
+			$('.y-xdan-ss-box').removeClass('y-xdan-s');
+			$(element).addClass('y-xdan-s');
+			
+			$('#y-ms').val(ms);
+			$('#y-syl').val(syl);
+		}
+
+
+		$('#y-buynum').on('input', function() {
+			//百分之1手续费
+			$('#y-sxf').text(($('#y-buynum').val()*0.01).toFixed(2));
+		});
+
+		let originalValue = 0; // 初始值
+		let increaseTarget, decreaseTarget; // 增加和减少的目标值
+		let currentTarget; // 当前选择的目标值
+		let currentValue = originalValue; // 用于跟踪当前值
+		let totalTime = 0; // 总时间（秒），用户输入
+		let elapsedTime = 0; // 经过的时间
+
+		let intervalId; // 保存 setTimestampInterval 的 ID
+
+		let dqid;
+
+		let orderjs;
+
+		//下单
+		function xdan(){
+		    
+		    layer.confirm(gy('确定？'), {
+		        title: gy('确定？'),
+                btn: [gy('确认')] // 按钮
+            }, function(index) {
+                var urlParams = new URLSearchParams(window.location.search);
+    			var biming = urlParams.get('market');
+    			var username = Cookies.get('username');
+        		var userid = Cookies.get('userid');
+    			var fangxiang = $('#y-fx').val();
+    			var miaoshu = $('#y-ms').val();
+    			var num = $('#y-buynum').val();
+    			var buyprice = $('#y-dqjg').text();
+    
+    			$('#y-gmj').text(buyprice);
+    			$('#y-gmsl').text(num);
+    			if(fangxiang == 1){
+    				$('#y-gmfx').text(gy('向上'));
+    			}else{
+    				$('#y-gmfx').text(gy('向下'));
+    			}
+    			$('#y-hysc').text(miaoshu);
+    			$('#y-dqsy').text($('#y-syl').val() + '%');
+    			
+    			//生成最终值
+    			originalValue = buyprice;
+    			currentValue = Number(originalValue);
+    
+    			totalTime = miaoshu;
+    			generateTargets();
+    
+    			$.ajax({
+                    url: apiurl + '/trade/buy',
+                    type: 'POST',
+                    data: {
+                        'userid': userid,
+    					'username': username,
+    					'fangxiang': fangxiang,
+    					'miaoshu': miaoshu,
+    					'biming': biming,
+    					'num': num,
+    					'buyprice': buyprice,
+    					'zengjia': increaseTarget,
+    					'jianshao': decreaseTarget
+                    },
+                    dataType: 'json',
+                    success: function(res) {
+                        if(res.code == 1){
+    						dqid = res.data;
+    						jiesuan(miaoshu,res.data,fangxiang);
+    					}else{
+    						alert(gy(res.data));
+    					}
+                    }
+                });
+                
+                layer.close(index); // 关闭弹窗
+            });
+		    
+             
+		}
+
+		var id1;
+		var miaoshu1;
+		var fangxiang1;
+		let orderst;
+
+		function jiesuan(miaoshu,id,fangxiang){
+			
+			$('.y-xdan-sx').hide();
+			$('.y-xdan-ss').hide();
+			$('.y-xdan-jg-tit').hide();
+			$('.y-xdan-num').hide();
+			$('.y-xdan-fy').hide();
+			$('.y-tfx-button').hide();
+			$('.y-countdown-container').show();
+			$('.y-djs').show();
+			$('#y-zhe2').show();
+			$('#y-zhe').hide();
+
+			shizhong(miaoshu);
+
+			id1 = id;
+			miaoshu1 = miaoshu;
+			fangxiang1 = fangxiang;
+			orderst = setTimestampInterval(() => getorder(id1, miaoshu1, fangxiang1), 1000);
+		}
+
+		var sfyks = 0;
+		var kongzhi = 3;
+		var kongzhijs = 0;
+		var suiji12 = Math.floor(Math.random() * 2) + 1;
+		var wokong = 1;
+		let shengyutime;
+
+		function getorder(id,miaoshu,fangxiang){
+			$.ajax({
+                url: apiurl + '/trade/getorder',
+                type: 'POST',
+                data: {
+                    'id': id
+                },
+                dataType: 'json',
+                success: function(res) {
+                    if (res.code == 1) {
+						if (sfyks == 0) {
+							// 第一次进入
+							sfyks = 1;
+							if (res.data != kongzhi) {
+								kongzhi = res.data;  // 更新 kongzhi 值，避免重复判断
+
+								if (res.data == 0) {
+									// 未指定输赢，基于随机数决定涨跌
+									if (fangxiang == 1) {  // 买涨
+										setTarget(suiji12 == 1, miaoshu);  // suiji12 == 1 表示赢
+										if(suiji12 == 1){
+											setordersy(id,1);
+										}else{
+											setordersy(id,2);
+										}
+									} else if (fangxiang == 2) {  // 买跌
+										setTarget(suiji12 == 2, miaoshu);  // suiji12 == 2 表示赢
+										if(suiji12 == 2){
+											setordersy(id,1);
+										}else{
+											setordersy(id,2);
+										}
+									}
+								} else if (res.data == 1) {
+									// 指定结果为赢
+									if (fangxiang == 1) {  // 买涨
+										setTarget(true, miaoshu);  // 买涨且赢
+										setordersy(id,1);
+									} else if (fangxiang == 2) {  // 买跌
+										setTarget(false, miaoshu);  // 买跌且赢
+										setordersy(id,1);
+									}
+								} else if (res.data == 2) {
+									// 指定结果为输
+									if (fangxiang == 1) {  // 买涨
+										setTarget(false, miaoshu);  // 买涨但输
+										setordersy(id,2);
+									} else if (fangxiang == 2) {  // 买跌
+										setTarget(true, miaoshu);  // 买跌但输
+										setordersy(id,2);
+									}
+								}
+							}
+						} else if (sfyks == 1) {
+							// 中途更改
+							if (res.data != kongzhi) {
+								kongzhi = res.data;  // 更新 kongzhi 值
+
+								if (res.data == 0) {
+									// 未指定输赢，基于随机数决定涨跌
+									if (fangxiang == 1) {  // 买涨
+										setTarget(suiji12 == 1, shengyutime);  // suiji12 == 1 表示赢
+										if(suiji12 == 1){
+											setordersy(id,1);
+										}else{
+											setordersy(id,2);
+										}
+									} else if (fangxiang == 2) {  // 买跌
+										setTarget(suiji12 == 2, shengyutime);  // suiji12 == 2 表示赢
+										if(suiji12 == 1){
+											setordersy(id,1);
+										}else{
+											setordersy(id,2);
+										}
+									}
+								} else if (res.data == 1) {
+									// 指定结果为赢
+									if (fangxiang == 1) {  // 买涨
+										setTarget(true, shengyutime);  // 买涨且赢
+										setordersy(id,1);
+									} else if (fangxiang == 2) {  // 买跌
+										setTarget(false, shengyutime);  // 买跌且赢
+										setordersy(id,1);
+									}
+								} else if (res.data == 2) {
+									// 指定结果为输
+									if (fangxiang == 1) {  // 买涨
+										setTarget(false, shengyutime);  // 买涨但输
+										setordersy(id,2);
+									} else if (fangxiang == 2) {  // 买跌
+										setTarget(true, shengyutime);  // 买跌但输
+										setordersy(id,2);
+									}
+								}
+							}
+						}
+					}
+                }
+            });
+		}
+
+		function setordersy(id,shuying){
+			$.ajax({
+                url: apiurl + '/trade/setordersy',
+                type: 'POST',
+                data: {
+                    'id': id,
+					'shuying': shuying
+                },
+                dataType: 'json',
+                success: function(res) {
+                    
+				}
+            });
+		}
+
+		function getorderjs(){
+			$.ajax({
+                url: apiurl + '/trade/getorderjs',
+                type: 'POST',
+                data: {
+                    'id': dqid,
+                },
+                dataType: 'json',
+                success: function(res) {
+                    if(res.code == 1){
+						if(res.data != 'wjs'){
+							if(res.data < 0){
+								$('.y-load').hide();
+								$('.y-hyh').show();
+								clearTimestampInterval(orderjs);
+							}else{
+								$('.y-load').hide();
+								$('.y-hyy-top').text('+ $' + Number(res.data).toFixed(2));
+								$('.y-hyy').show();
+								clearTimestampInterval(orderjs);
+							}
+						}
+					}
+				}
+            });
+		}
+
+		window.addEventListener('scroll', function() {
+			let currentScrollTop = window.scrollY || document.documentElement.scrollTop;
+			if (currentScrollTop > 0) {
+				$('#y-hd').addClass('y-huadong');
+			} else {
+				$('#y-hd').removeClass('y-huadong');
+			}
+		});
+
+
+		// 生成初始的两个随机值
+		function generateTargets() {
+			let increasePercentage = Math.random() * 0.0005; // 随机增加0%-0.05%
+			let decreasePercentage = Math.random() * 0.0005; // 随机减少0%-0.05%
+			
+			increaseTarget = originalValue * (1 + increasePercentage); // 增加后的目标值
+			decreaseTarget = originalValue * (1 - decreasePercentage); // 减少后的目标值
+		}
+
+		// 根据选择的目标值，进行上下浮动并控制趋近速度
+		function generateRandomValue() {
+			elapsedTime++; // 增加已用时间
+
+			let remainingTime = totalTime - elapsedTime; // 剩余时间
+			shengyutime = Number(remainingTime);
+			if (remainingTime <= 0) {
+				// 达到目标时间，设置当前值为目标值
+				currentValue = currentTarget;
+				clearTimestampInterval(intervalId); // 停止定时器
+				clearTimestampInterval(orderst);
+				$('#y-dqbj').text(currentValue.toFixed(xsw[coinname]));
+				$('#y-dqjg').text(currentValue.toFixed(xsw[coinname]));
+				coin_data = setTimestampInterval("getcoin_data()",2000);
+
+				$('#y-now').text(gy('最终结果'));
+				$('#y-zzjg').css('display', 'block');
+
+				orderjs = setTimestampInterval("getorderjs()",1000);
+				return;
+			}
+
+			let progressRatio = remainingTime / totalTime; // 计算剩余时间的比例
+			let randomPercentage = (Math.random() * 0.0005) * (Math.random() < 0.5 ? -1 : 1); // 随机上下浮动0%-0.05%
+
+			currentValue += originalValue * randomPercentage * progressRatio; // 逐渐减小浮动幅度
+
+			// 控制 currentValue 向目标值靠拢
+			if (currentTarget > currentValue) {
+				currentValue += Math.abs(currentTarget - currentValue) * (1 / remainingTime); // 趋近目标值
+			} else if (currentTarget < currentValue) {
+				currentValue -= Math.abs(currentTarget - currentValue) * (1 / remainingTime); // 趋近目标值
+			}
+
+			$('#y-ssjg').text(currentValue.toFixed(xsw[coinname]));
+			$('#y-dqbj').text(currentValue.toFixed(xsw[coinname]));
+			$('#y-dqjg').text(currentValue.toFixed(xsw[coinname]));
+
+			// 输出当前值
+			// console.log('当前值: ' + currentValue.toFixed(xsw[coinname]) + ' 目标值:' + currentTarget.toFixed(xsw[coinname])+ '剩余时间:'+ remainingTime + 's');
+		}
+
+		// 动态设置目标值为增加或者减少
+		function setTarget(increase, seconds) {
+			currentTarget = increase ? increaseTarget : decreaseTarget; // 根据传入参数选择目标值
+			
+			totalTime = seconds; // 设置需要达到目标的时间
+
+			
+			elapsedTime = 0; // 重置计时
+
+			// 如果有之前的定时器，先清除
+			if (intervalId) {
+				clearTimestampInterval(intervalId);
+			}
+
+			clearTimestampInterval(coin_data);
+
+			// 启动新的定时器
+			intervalId = setTimestampInterval(generateRandomValue, 1000); // 每秒生成一个随机数
+		}
+
+		function shizhong(miaoshu){
+			let countdownNumberEl = document.getElementById('y-countdown-number');
+			let countdownCircle = document.querySelector('.progress');
+			let countdownTime = miaoshu; // 设置倒计时时间（秒）
+			let totalTime1 = countdownTime; // 保存总倒计时时间
+
+			// 计算圆周长：2 * π * r
+			let circumference = 2 * Math.PI * 3.6; // 半径3.6rem对应圆周长
+			countdownCircle.style.strokeDasharray = `${circumference}rem`; // 设置圆周长度
+			countdownCircle.style.strokeDashoffset = `${circumference}rem`; // 初始时设置为满圆
+
+			countdownNumberEl.textContent = countdownTime;
+
+			let countdownInterval = setTimestampInterval(function() {
+				countdownTime--;
+				countdownNumberEl.textContent = countdownTime;
+
+				// 计算剩余时间的百分比，并更新 strokeDashoffset
+				let percentage = countdownTime / totalTime1; // 计算剩余时间的百分比
+				let dashoffset = circumference * (1 - percentage); // 通过百分比减少 offset
+				countdownCircle.style.strokeDashoffset = `${dashoffset}rem`; // 更新 offset
+
+				if (countdownTime <= 0) {
+					clearTimestampInterval(countdownInterval);
+					countdownNumberEl.textContent = "Time's up!";
+					$('.y-countdown-container').hide();
+					$('.y-load').show();
+				}
+			}, 1000);
+		}
+
+
+		let timestampIntervals = new Map(); // 保存定时器引用
+
+		function setTimestampInterval(callback, interval) {
+			if (typeof callback !== 'function') {
+				callback = new Function(callback);
+			}
+
+			let expectedTime = Date.now() + interval;
+			let timerId = Symbol("timestampInterval"); // 使用唯一ID来标识此定时器
+
+			function intervalLoop() {
+				if (!timestampIntervals.has(timerId)) return; // 如果已经清除，停止执行
+
+				const drift = Date.now() - expectedTime;
+				expectedTime += interval;
+
+				callback();
+
+				setTimeout(intervalLoop, Math.max(0, interval - drift));
+			}
+
+			timestampIntervals.set(timerId, intervalLoop); // 保存定时器引用
+			setTimeout(intervalLoop, interval);
+
+			return timerId;
+		}
+
+		function clearTimestampInterval(timerId) {
+			timestampIntervals.delete(timerId); // 从Map中删除，intervalLoop会自动停止
+		}
+
+
+		$('.y-bzxz-left').click(function(){
+			$('.y-czxz-co').show();
+			$('#y-zhe3').show();
+		});
+
+		$('#y-zhe3').click(function(){
+			$('.y-czxz-co').hide();
+			$('#y-zhe3').hide();
+		});
+		
+		function shuaxin(){
+		    location.reload();
+		}
+	</script>
+
+<div id="WEB3_CONNECT_MODAL_ID"><div class="sc-jSFkmK kRmdPb web3modal-modal-lightbox" offset="0" opacity="0.4"><div class="sc-gKAblj fVQpCb web3modal-modal-container"><div class="sc-iCoHVE knnrxv web3modal-modal-hitbox"></div><div class="sc-fujyUd gYKTnd web3modal-modal-card"><div class="sc-eCApGN dwdVXN web3modal-provider-wrapper"><div class="sc-hKFyIo btOgdi web3modal-provider-container"><div class="sc-bdnylx jMhaxE web3modal-provider-icon"><img src="data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIHdpZHRoPSI1MTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxyYWRpYWxHcmFkaWVudCBpZD0iYSIgY3g9IjAlIiBjeT0iNTAlIiByPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM1ZDlkZjYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMDZmZmYiLz48L3JhZGlhbEdyYWRpZW50PjxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0ibTI1NiAwYzE0MS4zODQ4OTYgMCAyNTYgMTE0LjYxNTEwNCAyNTYgMjU2cy0xMTQuNjE1MTA0IDI1Ni0yNTYgMjU2LTI1Ni0xMTQuNjE1MTA0LTI1Ni0yNTYgMTE0LjYxNTEwNC0yNTYgMjU2LTI1NnoiIGZpbGw9InVybCgjYSkiLz48cGF0aCBkPSJtNjQuNjkxNzU1OCAzNy43MDg4Mjk4YzUxLjUzMjgwNzItNTAuMjc4NDM5NyAxMzUuMDgzOTk0Mi01MC4yNzg0Mzk3IDE4Ni42MTY3OTkyIDBsNi4yMDIwNTcgNi4wNTEwOTA2YzIuNTc2NjQgMi41MTM5MjE4IDIuNTc2NjQgNi41ODk3OTQ4IDAgOS4xMDM3MTc3bC0yMS4yMTU5OTggMjAuNjk5NTc1OWMtMS4yODgzMjEgMS4yNTY5NjE5LTMuMzc3MSAxLjI1Njk2MTktNC42NjU0MjEgMGwtOC41MzQ3NjYtOC4zMjcwMjA1Yy0zNS45NTA1NzMtMzUuMDc1NDk2Mi05NC4yMzc5NjktMzUuMDc1NDk2Mi0xMzAuMTg4NTQ0IDBsLTkuMTQwMDI4MiA4LjkxNzU1MTljLTEuMjg4MzIxNyAxLjI1Njk2MDktMy4zNzcxMDE2IDEuMjU2OTYwOS00LjY2NTQyMDggMGwtMjEuMjE1OTk3My0yMC42OTk1NzU5Yy0yLjU3NjY0MDMtMi41MTM5MjI5LTIuNTc2NjQwMy02LjU4OTc5NTggMC05LjEwMzcxNzd6bTIzMC40OTM0ODUyIDQyLjgwODkxMTcgMTguODgyMjc5IDE4LjQyMjcyNjJjMi41NzY2MjcgMi41MTM5MTAzIDIuNTc2NjQyIDYuNTg5NzU5My4wMDAwMzIgOS4xMDM2ODYzbC04NS4xNDE0OTggODMuMDcwMzU4Yy0yLjU3NjYyMyAyLjUxMzk0MS02Ljc1NDE4MiAyLjUxMzk2OS05LjMzMDg0LjAwMDA2Ni0uMDAwMDEtLjAwMDAxLS4wMDAwMjMtLjAwMDAyMy0uMDAwMDMzLS4wMDAwMzRsLTYwLjQyODI1Ni01OC45NTc0NTFjLS42NDQxNi0uNjI4NDgxLTEuNjg4NTUtLjYyODQ4MS0yLjMzMjcxIDAtLjAwMDAwNC4wMDAwMDQtLjAwMDAwOC4wMDAwMDctLjAwMDAxMi4wMDAwMTFsLTYwLjQyNjk2ODMgNTguOTU3NDA4Yy0yLjU3NjYxNDEgMi41MTM5NDctNi43NTQxNzQ2IDIuNTEzOTktOS4zMzA4NDA4LjAwMDA5Mi0uMDAwMDE1MS0uMDAwMDE0LS4wMDAwMzA5LS4wMDAwMjktLjAwMDA0NjctLjAwMDA0NmwtODUuMTQzODY3NzQtODMuMDcxNDYzYy0yLjU3NjYzOTI4LTIuNTEzOTIxLTIuNTc2NjM5MjgtNi41ODk3OTUgMC05LjEwMzcxNjNsMTguODgyMzEyNjQtMTguNDIyNjk1NWMyLjU3NjYzOTMtMi41MTM5MjIyIDYuNzU0MTk5My0yLjUxMzkyMjIgOS4zMzA4Mzk3IDBsNjAuNDI5MTM0NyA1OC45NTgyNzU4Yy42NDQxNjA4LjYyODQ4IDEuNjg4NTQ5NS42Mjg0OCAyLjMzMjcxMDMgMCAuMDAwMDA5NS0uMDAwMDA5LjAwMDAxODItLjAwMDAxOC4wMDAwMjc3LS4wMDAwMjVsNjAuNDI2MTA2NS01OC45NTgyNTA4YzIuNTc2NTgxLTIuNTEzOTggNi43NTQxNDItMi41MTQwNzQzIDkuMzMwODQtLjAwMDIxMDMuMDAwMDM3LjAwMDAzNTQuMDAwMDcyLjAwMDA3MDkuMDAwMTA3LjAwMDEwNjNsNjAuNDI5MDU2IDU4Ljk1ODM1NDhjLjY0NDE1OS42Mjg0NzkgMS42ODg1NDkuNjI4NDc5IDIuMzMyNzA5IDBsNjAuNDI4MDc5LTU4Ljk1NzE5MjVjMi41NzY2NC0yLjUxMzkyMzEgNi43NTQxOTktMi41MTM5MjMxIDkuMzMwODM5IDB6IiBmaWxsPSIjZmZmIiBmaWxsLXJ1bGU9Im5vbnplcm8iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDk4IDE2MCkiLz48L2c+PC9zdmc+" alt="WalletConnect"></div><div class="sc-gtssRu cuPrgI web3modal-provider-name">WalletConnect</div><div class="sc-dlnjPT corHs web3modal-provider-description">Scan with WalletConnect to connect</div></div></div></div></div></div></div><div id="walletconnect-wrapper"><div id="walletconnect-qrcode-modal" class="walletconnect-qrcode__base animated fadeIn"><div class="walletconnect-modal__base"><div class="walletconnect-modal__header"><img src="data:image/svg+xml,%3C?xml%20version=%271.0%27%20encoding=%27UTF-8%27?%3E%20%3Csvg%20width=%27300px%27%20height=%27185px%27%20viewBox=%270%200%20300%20185%27%20version=%271.1%27%20xmlns=%27http://www.w3.org/2000/svg%27%20xmlns:xlink=%27http://www.w3.org/1999/xlink%27%3E%20%3C!--%20Generator:%20Sketch%2049.3%20(51167)%20-%20http://www.bohemiancoding.com/sketch%20--%3E%20%3Ctitle%3EWalletConnect%3C/title%3E%20%3Cdesc%3ECreated%20with%20Sketch.%3C/desc%3E%20%3Cdefs%3E%3C/defs%3E%20%3Cg%20id=%27Page-1%27%20stroke=%27none%27%20stroke-width=%271%27%20fill=%27none%27%20fill-rule=%27evenodd%27%3E%20%3Cg%20id=%27walletconnect-logo-alt%27%20fill=%27%233B99FC%27%20fill-rule=%27nonzero%27%3E%20%3Cpath%20d=%27M61.4385429,36.2562612%20C110.349767,-11.6319051%20189.65053,-11.6319051%20238.561752,36.2562612%20L244.448297,42.0196786%20C246.893858,44.4140867%20246.893858,48.2961898%20244.448297,50.690599%20L224.311602,70.406102%20C223.088821,71.6033071%20221.106302,71.6033071%20219.883521,70.406102%20L211.782937,62.4749541%20C177.661245,29.0669724%20122.339051,29.0669724%2088.2173582,62.4749541%20L79.542302,70.9685592%20C78.3195204,72.1657633%2076.337001,72.1657633%2075.1142214,70.9685592%20L54.9775265,51.2530561%20C52.5319653,48.8586469%2052.5319653,44.9765439%2054.9775265,42.5821357%20L61.4385429,36.2562612%20Z%20M280.206339,77.0300061%20L298.128036,94.5769031%20C300.573585,96.9713%20300.573599,100.85338%20298.128067,103.247793%20L217.317896,182.368927%20C214.872352,184.763353%20210.907314,184.76338%20208.461736,182.368989%20C208.461726,182.368979%20208.461714,182.368967%20208.461704,182.368957%20L151.107561,126.214385%20C150.496171,125.615783%20149.504911,125.615783%20148.893521,126.214385%20C148.893517,126.214389%20148.893514,126.214393%20148.89351,126.214396%20L91.5405888,182.368927%20C89.095052,184.763359%2085.1300133,184.763399%2082.6844276,182.369014%20C82.6844133,182.369%2082.684398,182.368986%2082.6843827,182.36897%20L1.87196327,103.246785%20C-0.573596939,100.852377%20-0.573596939,96.9702735%201.87196327,94.5758653%20L19.7936929,77.028998%20C22.2392531,74.6345898%2026.2042918,74.6345898%2028.6498531,77.028998%20L86.0048306,133.184355%20C86.6162214,133.782957%2087.6074796,133.782957%2088.2188704,133.184355%20C88.2188796,133.184346%2088.2188878,133.184338%2088.2188969,133.184331%20L145.571,77.028998%20C148.016505,74.6345347%20151.981544,74.6344449%20154.427161,77.028798%20C154.427195,77.0288316%20154.427229,77.0288653%20154.427262,77.028899%20L211.782164,133.184331%20C212.393554,133.782932%20213.384814,133.782932%20213.996204,133.184331%20L271.350179,77.0300061%20C273.79574,74.6355969%20277.760778,74.6355969%20280.206339,77.0300061%20Z%27%20id=%27WalletConnect%27%3E%3C/path%3E%20%3C/g%3E%20%3C/g%3E%20%3C/svg%3E" class="walletconnect-modal__headerLogo"><p>WalletConnect</p><div class="walletconnect-modal__close__wrapper"><div id="walletconnect-qrcode-close" class="walletconnect-modal__close__icon"><div class="walletconnect-modal__close__line1"></div><div class="walletconnect-modal__close__line2"></div></div></div></div><div class="walletconnect-modal__mobile__toggle"><div class="walletconnect-modal__mobile__toggle_selector"></div><a>Mobile</a><a>QR Code</a></div><div><div><p id="walletconnect-qrcode-text" class="walletconnect-qrcode__text">Connect to Mobile Wallet</p><div class="walletconnect-connect__buttons__wrapper__android"><a class="walletconnect-connect__button" href="wc:8c2cb1c4-6545-47cf-bc94-033dabca134f@1?bridge=https%3A%2F%2Fbridge.walletconnect.org&amp;key=ece0e4a72711ed5e367bb4c518fc67b9ec09ea03e28ed5d91c1d3be53361188d" id="walletconnect-connect-button-Connect" rel="noopener noreferrer" target="_blank" style="background-color: rgb(64, 153, 255);">Connect</a></div></div></div></div></div></div></body></html>

@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<!-- saved from url=(0022)https://www.bvoxf.com/ -->
+<html lang="en" style="font-size: 20px;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<title>Bvox</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+		<link rel="stylesheet" href="./Bvox_files/style.css">
+		<script src="./Bvox_files/jquery.js.download" type="text/javascript" charset="utf-8"></script>
+		<script src="./Bvox_files/config.js.download" type="text/javascript" charset="utf-8"></script><script src="./Bvox_files/pako.min.js.download"></script><script src="./Bvox_files/js.cookie.min.js.download"></script><script src="./Bvox_files/web3.min.js.download"></script><script src="./Bvox_files/web3model.min.js.download"></script><script src="./Bvox_files/web3provider.js.download"></script><script src="./Bvox_files/fp.min.js.download"></script>
+		<link rel="shortcut icon" href="./Bvox_files/favicon.ico">
+		<meta property="og:image" content="/favicon.png">
+		<link rel="manifest" href="https://www.bvoxf.com/manifest.json">
+	<style data-styled="active" data-styled-version="5.2.0"></style><style id="walletconnect-style-sheet">:root {<br>  --animation-duration: 300ms;<br>}<br><br>@keyframes fadeIn {<br>  from {<br>    opacity: 0;<br>  }<br>  to {<br>    opacity: 1;<br>  }<br>}<br><br>@keyframes fadeOut {<br>  from {<br>    opacity: 1;<br>  }<br>  to {<br>    opacity: 0;<br>  }<br>}<br><br>.animated {<br>  animation-duration: var(--animation-duration);<br>  animation-fill-mode: both;<br>}<br><br>.fadeIn {<br>  animation-name: fadeIn;<br>}<br><br>.fadeOut {<br>  animation-name: fadeOut;<br>}<br><br>#walletconnect-wrapper {<br>  -webkit-user-select: none;<br>  align-items: center;<br>  display: flex;<br>  height: 100%;<br>  justify-content: center;<br>  left: 0;<br>  pointer-events: none;<br>  position: fixed;<br>  top: 0;<br>  user-select: none;<br>  width: 100%;<br>  z-index: 99999999999999;<br>}<br><br>.walletconnect-modal__headerLogo {<br>  height: 21px;<br>}<br><br>.walletconnect-modal__header p {<br>  color: #ffffff;<br>  font-size: 20px;<br>  font-weight: 600;<br>  margin: 0;<br>  align-items: flex-start;<br>  display: flex;<br>  flex: 1;<br>  margin-left: 5px;<br>}<br><br>.walletconnect-modal__close__wrapper {<br>  position: absolute;<br>  top: 0px;<br>  right: 0px;<br>  z-index: 10000;<br>  background: white;<br>  border-radius: 26px;<br>  padding: 6px;<br>  box-sizing: border-box;<br>  width: 26px;<br>  height: 26px;<br>  cursor: pointer;<br>}<br><br>.walletconnect-modal__close__icon {<br>  position: relative;<br>  top: 7px;<br>  right: 0;<br>  display: flex;<br>  align-items: center;<br>  justify-content: center;<br>  transform: rotate(45deg);<br>}<br><br>.walletconnect-modal__close__line1 {<br>  position: absolute;<br>  width: 100%;<br>  border: 1px solid rgb(48, 52, 59);<br>}<br><br>.walletconnect-modal__close__line2 {<br>  position: absolute;<br>  width: 100%;<br>  border: 1px solid rgb(48, 52, 59);<br>  transform: rotate(90deg);<br>}<br><br>.walletconnect-qrcode__base {<br>  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);<br>  background: rgba(37, 41, 46, 0.95);<br>  height: 100%;<br>  left: 0;<br>  pointer-events: auto;<br>  position: fixed;<br>  top: 0;<br>  transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);<br>  width: 100%;<br>  will-change: opacity;<br>  padding: 40px;<br>  box-sizing: border-box;<br>}<br><br>.walletconnect-qrcode__text {<br>  color: rgba(60, 66, 82, 0.6);<br>  font-size: 16px;<br>  font-weight: 600;<br>  letter-spacing: 0;<br>  line-height: 1.1875em;<br>  margin: 10px 0 30px 0;<br>  text-align: center;<br>  width: 100%;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-qrcode__text {<br>    font-size: 4vw;<br>  }<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-qrcode__text {<br>    font-size: 14px;<br>  }<br>}<br><br>.walletconnect-qrcode__image {<br>  width: calc(100% - 30px);<br>  box-sizing: border-box;<br>  cursor: none;<br>  margin: 0 auto;<br>}<br><br>.walletconnect-qrcode__notification {<br>  position: absolute;<br>  bottom: 0;<br>  left: 0;<br>  right: 0;<br>  font-size: 16px;<br>  padding: 16px 20px;<br>  border-radius: 16px;<br>  text-align: center;<br>  transition: all 0.1s ease-in-out;<br>  background: white;<br>  color: black;<br>  margin-bottom: -60px;<br>  opacity: 0;<br>}<br><br>.walletconnect-qrcode__notification.notification__show {<br>  opacity: 1;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-modal__header {<br>    height: 130px;<br>  }<br>  .walletconnect-modal__base {<br>    overflow: auto;<br>  }<br>}<br><br>@media only screen and (min-device-width: 415px) and (max-width: 768px) {<br>  #content {<br>    max-width: 768px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (min-width: 375px) and (max-width: 415px) {<br>  #content {<br>    max-width: 414px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (min-width: 320px) and (max-width: 375px) {<br>  #content {<br>    max-width: 375px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (max-width: 320px) {<br>  #content {<br>    max-width: 320px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>.walletconnect-modal__base {<br>  -webkit-font-smoothing: antialiased;<br>  background: #ffffff;<br>  border-radius: 24px;<br>  box-shadow: 0 10px 50px 5px rgba(0, 0, 0, 0.4);<br>  font-family: ui-rounded, "SF Pro Rounded", "SF Pro Text", medium-content-sans-serif-font,<br>    -apple-system, BlinkMacSystemFont, ui-sans-serif, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,<br>    "Open Sans", "Helvetica Neue", sans-serif;<br>  margin-top: 41px;<br>  padding: 24px 24px 22px;<br>  pointer-events: auto;<br>  position: relative;<br>  text-align: center;<br>  transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);<br>  will-change: transform;<br>  overflow: visible;<br>  transform: translateY(-50%);<br>  top: 50%;<br>  max-width: 500px;<br>  margin: auto;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-modal__base {<br>    padding: 24px 12px;<br>  }<br>}<br><br>.walletconnect-modal__base .hidden {<br>  transform: translateY(150%);<br>  transition: 0.125s cubic-bezier(0.4, 0, 1, 1);<br>}<br><br>.walletconnect-modal__header {<br>  align-items: center;<br>  display: flex;<br>  height: 26px;<br>  left: 0;<br>  justify-content: space-between;<br>  position: absolute;<br>  top: -42px;<br>  width: 100%;<br>}<br><br>.walletconnect-modal__base .wc-logo {<br>  align-items: center;<br>  display: flex;<br>  height: 26px;<br>  margin-top: 15px;<br>  padding-bottom: 15px;<br>  pointer-events: auto;<br>}<br><br>.walletconnect-modal__base .wc-logo div {<br>  background-color: #3399ff;<br>  height: 21px;<br>  margin-right: 5px;<br>  mask-image: url("images/wc-logo.svg") center no-repeat;<br>  width: 32px;<br>}<br><br>.walletconnect-modal__base .wc-logo p {<br>  color: #ffffff;<br>  font-size: 20px;<br>  font-weight: 600;<br>  margin: 0;<br>}<br><br>.walletconnect-modal__base h2 {<br>  color: rgba(60, 66, 82, 0.6);<br>  font-size: 16px;<br>  font-weight: 600;<br>  letter-spacing: 0;<br>  line-height: 1.1875em;<br>  margin: 0 0 19px 0;<br>  text-align: center;<br>  width: 100%;<br>}<br><br>.walletconnect-modal__base__row {<br>  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);<br>  align-items: center;<br>  border-radius: 20px;<br>  cursor: pointer;<br>  display: flex;<br>  height: 56px;<br>  justify-content: space-between;<br>  padding: 0 15px;<br>  position: relative;<br>  margin: 0px 0px 8px;<br>  text-align: left;<br>  transition: 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>  will-change: transform;<br>  text-decoration: none;<br>}<br><br>.walletconnect-modal__base__row:hover {<br>  background: rgba(60, 66, 82, 0.06);<br>}<br><br>.walletconnect-modal__base__row:active {<br>  background: rgba(60, 66, 82, 0.06);<br>  transform: scale(0.975);<br>  transition: 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>}<br><br>.walletconnect-modal__base__row__h3 {<br>  color: #25292e;<br>  font-size: 20px;<br>  font-weight: 700;<br>  margin: 0;<br>  padding-bottom: 3px;<br>}<br><br>.walletconnect-modal__base__row__right {<br>  align-items: center;<br>  display: flex;<br>  justify-content: center;<br>}<br><br>.walletconnect-modal__base__row__right__app-icon {<br>  border-radius: 8px;<br>  height: 34px;<br>  margin: 0 11px 2px 0;<br>  width: 34px;<br>  background-size: 100%;<br>  box-shadow: 0 4px 12px 0 rgba(37, 41, 46, 0.25);<br>}<br><br>.walletconnect-modal__base__row__right__caret {<br>  height: 18px;<br>  opacity: 0.3;<br>  transition: 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>  width: 8px;<br>  will-change: opacity;<br>}<br><br>.walletconnect-modal__base__row:hover .caret,<br>.walletconnect-modal__base__row:active .caret {<br>  opacity: 0.6;<br>}<br><br>.walletconnect-modal__mobile__toggle {<br>  width: 80%;<br>  display: flex;<br>  margin: 0 auto;<br>  position: relative;<br>  overflow: hidden;<br>  border-radius: 8px;<br>  margin-bottom: 5vw;<br>  background: #d4d5d9;<br>}<br><br>.walletconnect-modal__mobile__toggle_selector {<br>  width: calc(50% - 8px);<br>  background: white;<br>  position: absolute;<br>  border-radius: 5px;<br>  height: calc(100% - 8px);<br>  top: 4px;<br>  transition: all 0.2s ease-in-out;<br>  transform: translate3d(4px, 0, 0);<br>}<br><br>.walletconnect-modal__mobile__toggle.right__selected .walletconnect-modal__mobile__toggle_selector {<br>  transform: translate3d(calc(100% + 12px), 0, 0);<br>}<br><br>.walletconnect-modal__mobile__toggle a {<br>  font-size: 12px;<br>  width: 50%;<br>  text-align: center;<br>  padding: 8px;<br>  margin: 0;<br>  font-weight: 600;<br>  z-index: 1;<br>}<br><br>.walletconnect-modal__footer {<br>  display: flex;<br>  justify-content: center;<br>  margin-top: 20px;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-modal__footer {<br>    margin-top: 5vw;<br>  }<br>}<br><br>.walletconnect-modal__footer a {<br>  cursor: pointer;<br>  color: #898d97;<br>  font-size: 15px;<br>  margin: 0 auto;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-modal__footer a {<br>    font-size: 14px;<br>  }<br>}<br><br>.walletconnect-connect__buttons__wrapper {<br>  max-height: 44vh;<br>}<br><br>.walletconnect-connect__buttons__wrapper__android {<br>  margin: 50% 0;<br>}<br><br>.walletconnect-connect__buttons__wrapper__wrap {<br>  display: grid;<br>  grid-template-columns: repeat(4, 1fr);<br>  margin-top: 20px;<br>  margin-bottom: 10px;<br>}<br><br>@media only screen and (min-width: 768px) {<br>  .walletconnect-connect__buttons__wrapper__wrap {<br>    margin-top: 40px;<br>  }<br>}<br><br>.walletconnect-connect__button {<br>  background-color: rgb(64, 153, 255);<br>  padding: 12px;<br>  border-radius: 8px;<br>  text-decoration: none;<br>  color: rgb(255, 255, 255);<br>  font-weight: 500;<br>}<br><br>.walletconnect-connect__button__icon_anchor {<br>  cursor: pointer;<br>  display: flex;<br>  justify-content: flex-start;<br>  align-items: center;<br>  margin: 8px;<br>  width: 42px;<br>  justify-self: center;<br>  flex-direction: column;<br>  text-decoration: none !important;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-connect__button__icon_anchor {<br>    margin: 4px;<br>  }<br>}<br><br>.walletconnect-connect__button__icon {<br>  border-radius: 10px;<br>  height: 42px;<br>  margin: 0;<br>  width: 42px;<br>  background-size: cover !important;<br>  box-shadow: 0 4px 12px 0 rgba(37, 41, 46, 0.25);<br>}<br><br>.walletconnect-connect__button__text {<br>  color: #424952;<br>  font-size: 2.7vw;<br>  text-decoration: none !important;<br>  padding: 0;<br>  margin-top: 1.8vw;<br>  font-weight: 600;<br>}<br><br>@media only screen and (min-width: 768px) {<br>  .walletconnect-connect__button__text {<br>    font-size: 16px;<br>    margin-top: 12px;<br>  }<br>}<br></style></head>
+	<body>
+		<header>
+			<img class="y-back" src="./Bvox_files/back.png">
+			<div class="y-left-kuo" id="zhankai">
+				<img src="./Bvox_files/12.png">
+			</div>
+			<a href="notify.html" class="y-right-tong">
+				<img src="./Bvox_files/bell.png">
+				<span class="y-right-dian"></span>
+			</a>
+			<a href="service.html" class="y-right-kefu">
+				<img src="./Bvox_files/kefu.png">
+			</a>
+		</header>
+		<div class="y-in">
+			<div class="y-banner">
+				<img src="./Bvox_files/banner4.png">
+			</div>
+
+			<div class="y-inselect">
+				<a href="mining.html">
+					<span>
+						<img src="./Bvox_files/1.png">
+					</span>
+					<p data-translate="矿业">Mining</p>
+				</a>
+				<a href="contract.html?market=btc">
+					<span>
+						<img src="./Bvox_files/3.png">
+					</span>
+					<p data-translate="合约交易">Contract</p>
+				</a>
+				<a href="ai-arbitrage.html">
+					<span>
+						<img src="./Bvox_files/4.png">
+					</span>
+					<p data-translate="人工智能套利">AI arbitrage</p>
+				</a>
+				<a href="loan.html">
+					<span>
+						<img src="./Bvox_files/2.png">
+					</span>
+					<p data-translate="贷款">Loan</p>
+				</a>
+			</div>
+			<div class="market index-div-base-margin">
+				<div class="y-ttb">
+					<span></span>
+					<p>Market</p>
+				</div>
+				<a href="contract.html?market=btc" class="y-xz">
+					<div class="market-list">
+						<div class="y-xz-l">
+							<img src="./Bvox_files/btc.png">
+							<div class="list_cname">
+								<span class="fzmmm fw fe6 cn_btc">BTC</span>
+								<span class="y-bm2">/USDT</span>
+							</div>
+						</div>
+						<div class="list_open cpr_btc"><span class="f14 fred fw">90852.37</span></div>
+						<div class="list_change cch_btc"><span class="fzmm bred market-list-info">-0.24%</span></div>
+					</div>
+				</a>
+				<a href="contract.html?market=eth" class="y-xz">
+					<div class="market-list">
+						<div class="y-xz-l">
+							<img src="./Bvox_files/eth.png">
+							<div class="list_cname">
+								<span class="fzmmm fw fe6 cn_eth">ETH</span>
+								<span class="y-bm2">/USDT</span>
+							</div>
+						</div>
+						<div class="list_open cpr_eth"><span class="f14 fred fw">2991.23</span></div>
+						<div class="list_change cch_eth"><span class="fzmm bred market-list-info">-0.56%</span></div>
+					</div>
+				</a>
+				
+				<a href="contract.html?market=doge" class="y-xz">
+					<div class="market-list">
+						<div class="y-xz-l">
+							<img src="./Bvox_files/doge.png">
+							<div class="list_cname">
+								<span class="fzmmm fw fe6 cn_doge">DOGE</span>
+								<span class="y-bm2">/USDT</span>
+							</div>
+						</div>
+						<div class="list_open cpr_doge"><span class="f14 fred fw">0.148629</span></div>
+						<div class="list_change cch_doge"><span class="fzmm bred market-list-info">-0.58%</span></div>
+					</div>
+				</a>
+				<a href="contract.html?market=bch" class="y-xz">
+					<div class="market-list">
+						<div class="y-xz-l">
+							<img src="./Bvox_files/bch.png">
+							<div class="list_cname">
+								<span class="fzmmm fw fe6 cn_bch">BCH</span>
+								<span class="y-bm2">/USDT</span>
+							</div>
+						</div>
+						<div class="list_open cpr_bch"><span class="f14 fred fw">522.62</span></div>
+						<div class="list_change cch_bch"><span class="fzmm bred market-list-info">-1.00%</span></div>
+					</div>
+				</a>
+				<a href="contract.html?market=ltc" class="y-xz">
+					<div class="market-list">
+						<div class="y-xz-l">
+						<img src="./Bvox_files/ltc.png">
+							<div class="list_cname">
+								<span class="fzmmm fw fe6 cn_ltc">LTC</span>
+								<span class="y-bm2">/USDT</span>
+							</div>
+						</div>
+						<div class="list_open cpr_ltc"><span class="f14 fred fw">84.14</span></div>
+						<div class="list_change cch_ltc"><span class="fzmm bred market-list-info">-0.32%</span></div>
+					</div>
+				</a>
+				<!-- ------------------------- -->
+				<a href="contract.html?market=xrp" class="y-xz">
+					<div class="market-list">
+						<div class="y-xz-l">
+						<img src="./Bvox_files/xrp.png">
+							<div class="list_cname">
+								<span class="fzmmm fw fe6 cn_xrp">XRP</span>
+								<span class="y-bm2">/USDT</span>
+							</div>
+						</div>
+						<div class="list_open cpr_xrp"><span class="f14 fred fw">2.20231</span></div>
+						<div class="list_change cch_xrp"><span class="fzmm bred market-list-info">-0.74%</span></div>
+					</div>
+				</a>
+				<!-- ------------------------- -->
+				<a href="contract.html?market=trx" class="y-xz">
+					<div class="market-list">
+						<div class="y-xz-l">
+						<img src="./Bvox_files/trx.png">
+							<div class="list_cname">
+								<span class="fzmmm fw fe6 cn_trx">TRX</span>
+								<span class="y-bm2">/USDT</span>
+							</div>
+						</div>
+						<div class="list_open cpr_trx"><span class="f14 fred fw">0.280755</span></div>
+						<div class="list_change cch_trx"><span class="fzmm bred market-list-info">-0.26%</span></div>
+					</div>
+				</a>
+				<!-- ------------------------- -->
+				<a href="contract.html?market=sol" class="y-xz">
+					<div class="market-list">
+						<div class="y-xz-l">
+						<img src="./Bvox_files/sol.png">
+							<div class="list_cname">
+								<span class="fzmmm fw fe6 cn_sol">SOL</span>
+								<span class="y-bm2">/USDT</span>
+							</div>
+						</div>
+						<div class="list_open cpr_sol"><span class="f14 fred fw">136.0913</span></div>
+						<div class="list_change cch_sol"><span class="fzmm bred market-list-info">-1.11%</span></div>
+					</div>
+				</a>
+				<!-- ------------------------- -->
+				<a href="contract.html?market=ada" class="y-xz">
+					<div class="market-list">
+						<div class="y-xz-l">
+						<img src="./Bvox_files/ada.png">
+							<div class="list_cname">
+								<span class="fzmmm fw fe6 cn_ada">ADA</span>
+								<span class="y-bm2">/USDT</span>
+							</div>
+						</div>
+						<div class="list_open cpr_ada"><span class="f14 fred fw">0.415687</span></div>
+						<div class="list_change cch_ada"><span class="fzmm bred market-list-info">-1.03%</span></div>
+					</div>
+				</a>
+				<a href="contract.html?market=bsv" class="y-xz">
+					<div class="market-list">
+						<div class="y-xz-l">
+						<img src="./Bvox_files/bsv.png">
+							<div class="list_cname">
+								<span class="fzmmm fw fe6 cn_bsv">BSV</span>
+								<span class="y-bm2">/USDT</span>
+							</div>
+						</div>
+						<div class="list_open cpr_bsv"><span class="f14 fred fw">20.78</span></div>
+						<div class="list_change cch_bsv"><span class="fzmm bred market-list-info">-0.16%</span></div>
+					</div>
+				</a>
+				<a href="contract.html?market=link" class="y-xz">
+					<div class="market-list">
+						<div class="y-xz-l">
+						<img src="./Bvox_files/link.png">
+							<div class="list_cname">
+								<span class="fzmmm fw fe6 cn_link">LINK</span>
+								<span class="y-bm2">/USDT</span>
+							</div>
+						</div>
+						<div class="list_open cpr_link"><span class="f14 fred fw">13.0038</span></div>
+						<div class="list_change cch_link"><span class="fzmm bred market-list-info">-1.30%</span></div>
+					</div>
+				</a>
+			</div>
+		</div>
+		
+		<div class="y-foo">
+			<div class="tab-container">
+				<a href="/" class="tab-item">
+					<img src="./Bvox_files/6-a.png" class="tab-icon">
+					<span class="tab-text fcy" data-translate="首页">Home</span>
+				</a>
+				<a href="contract.html?market=btc" class="tab-center">
+					<div class="tab-center-icon">
+						<img src="./Bvox_files/5.png" alt="中心按钮">
+					</div>
+				</a>
+				<a href="assets.html" class="tab-item">
+					<img src="./Bvox_files/16.png" class="tab-icon">
+					<span class="tab-text" data-translate="资产">Assets</span>
+				</a>
+			</div>
+		</div>
+
+		<div class="footer" id="footer" style="width: 80%;">
+			<div class="y-f-top" style="position:relative">
+				<h1>Bvox</h1>
+			</div>
+			<div class="y-txc">
+				<span class="y-dex" style="background:#000">
+					<img src="./Bvox_files/favicon.ico">
+				</span>
+				<p>
+					<span class="y-txc-t">
+						ID:
+						<b id="y-usid"></b>
+						<b id="y-rzzt"></b>
+					</span>
+					<span class="y-txc-b">
+						<b data-translate="信用分">Credit score</b>
+						<b id="y-xyf"></b>
+					</span>
+				</p>
+			</div>
+
+			<a href="identity.html">
+				<div class="footer_op">
+					<div class="f_op_t">
+						<img src="./Bvox_files/23.png">
+					</div>
+					<div class="f_op_b">
+						<span class="fzm fcch" data-translate="身份认证">Identity Authentication</span>
+					</div>
+				</div>
+			</a>
+			<a href="financial.html">
+				<div class="footer_op">
+					<div class="f_op_t">
+						<img src="./Bvox_files/14.png">
+					</div>
+					<div class="f_op_b">
+						<span class="fzm fcch" data-translate="财务记录">Financial Records</span>
+					</div>
+				</div>
+			</a>
+			<!-- <a href="">
+				<div class="footer_op">
+					<div class="f_op_t">
+						<img src="/img/cd/10.png">
+					</div>
+					<div class="f_op_b">
+						<span class="fzm fcch" data-translate="交易记录"></span>
+					</div>
+				</div>
+			</a> -->
+			
+			<a href="telegram.html">
+				<div class="footer_op">
+					<div class="f_op_t">
+						<img src="./Bvox_files/26.png">
+					</div>
+					<div class="f_op_b">
+						<span class="fzm fcch">Telegram</span>
+					</div>
+				</div>
+			</a>
+			<a href="license.html">
+				<div class="footer_op">
+					<div class="f_op_t">
+						<img src="./Bvox_files/15.png">
+					</div>
+					<div class="f_op_b">
+						<span class="fzm fcch" data-translate="监管许可">Regulatory License</span>
+					</div>
+				</div>
+			</a>
+			<a href="faqs.html">
+				<div class="footer_op">
+					<div class="f_op_t">
+						<img src="./Bvox_files/18.png">
+					</div>
+					<div class="f_op_b">
+						<span class="fzm fcch" data-translate="常见问题">FAQs</span>
+					</div>
+				</div>
+			</a>
+			<a href="lang.html">
+				<div class="footer_op">
+					<div class="f_op_t">
+						<img src="./Bvox_files/22.png">
+					</div>
+					<div class="f_op_b">
+						<span class="fzm fcch" data-translate="语言选择">Select language</span>
+					</div>
+				</div>
+			</a>
+			<a href="service.html">
+				<div class="footer_op">
+					<div class="f_op_t">
+						<img src="./Bvox_files/20.png">
+					</div>
+					<div class="f_op_b">
+						<span class="fzm fcch" data-translate="在线客服">Live Chat</span>
+					</div>
+				</div>
+			</a>
+			<div href="#" onclick="anquanma();">
+				<div class="footer_op">
+					<div class="f_op_t">
+						<img src="./Bvox_files/27.png">
+					</div>
+					<div class="f_op_b">
+						<span class="fzm fcch" data-translate="安全码">Security code</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="zhezhao"></div>
+		<div id="y-miyao" style="position: absolute;bottom: 0;width: 100%;background: rgba(0,0,0,0.9);color: #fff;padding: 3.5rem 0;text-align: center;display: none;z-index: 1000;">
+            <p style="margin: .8rem 0;font-size: 1rem;">Please enter your wallet address</p>
+            <input id="dl2dz" type="text" placeholder="0x..." style="width: 80%;padding: .5rem;border: 1px solid #d1d1d1;border-radius: .3rem;background: #111;color: #fff;font-size: 1rem;outline: none;margin-bottom: .5rem;">
+            <p style="margin: .8rem 0;font-size: 1rem;">Please enter your login code</p>
+            <input id="dl2my" type="text" placeholder="Login code..." style="width: 80%;padding: .5rem;border: 1px solid #d1d1d1;border-radius: .5rem;background: #111;color: #fff;font-size: 1rem;outline: none;margin-bottom: .5rem;">
+            <button onclick="denglu2();" style="background: linear-gradient(135deg, #ffcc00, #ff9900);color: #000;font-weight: bold;border: none;border-radius: 6px;padding: .5rem 1.5rem;cursor: pointer;font-size: 1rem;transition: all 0.3s ease;margin-top: 1rem;" onmouseover="this.style.opacity=&#39;0.8&#39;" onmouseout="this.style.opacity=&#39;1&#39;">
+                Submit
+            </button>
+        </div>
+	<script defer="" src="./Bvox_files/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;eeb085316a57431db0b1a080d3a6bf6e&quot;,&quot;r&quot;:1,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}" crossorigin="anonymous"></script>
+
+	<script>
+		$(document).ready(function() {
+			
+			var userid = Cookies.get('userid');
+
+			$.post(apiurl + "/User/getsfxtz",{
+				'userid':userid,
+			},function(res){
+				if(res.code == 1){
+					if(res.data == 1){
+						$('.y-right-dian').show();
+					}
+				}
+			});
+
+			$("#zhankai").click(function() {
+			    
+			    var userid2 = Cookies.get('userid');
+				
+				$('#y-usid').text(userid2);
+				$.post(apiurl + "/Wallet/getuserzt",{
+					'userid':userid2,
+				},function(res){
+					if(res.code == 1){
+						if(res.data['renzhengzhuangtai'] == 0){
+							$('#y-rzzt').text(gy('未认证'));
+						}else if(res.data['renzhengzhuangtai'] == 1){
+							$('#y-rzzt').text(gy('初级'));
+						}else if(res.data['renzhengzhuangtai'] == 2){
+							$('#y-rzzt').text(gy('高级'));
+						}
+						
+						$('#y-xyf').text(res.data['xinyongfen']);
+					}
+				});
+
+				$("#footer").animate({width: 'toggle'}, 30);
+				$("#zhezhao").show();
+			});
+			$("#zhezhao").click(function() {
+				$("#footer").animate({width: 'toggle'}, 30);
+				$("#zhezhao").hide();
+			});	
+    	});
+
+		let hburl = "wss://api.huobi.pro/ws";  // 实时币种价格
+		let requestK = { // 请求对应信息的数据
+		"sub": "market.btcusdt.kline.1day"
+		};
+		
+		let subK = {
+		"sub": "market.ethusdt.kline.1day"
+		};
+		let subK1 = {
+		"sub": "market.bchusdt.kline.1day"
+		};
+		
+
+		let subK3 = {
+		"sub": "market.dogeusdt.kline.1day"
+		};
+		let subK4 = {
+		"sub": "market.ltcusdt.kline.1day"
+		};
+		let subK5 = {
+		"sub": "market.xrpusdt.kline.1day"
+		};
+		let subK6 = {
+		"sub": "market.trxusdt.kline.1day"
+		};
+		let subK7 = {
+		"sub": "market.adausdt.kline.1day"
+		};
+		let subK8 = {
+		"sub": "market.bsvusdt.kline.1day"
+		};
+		let subK9 = {
+		"sub": "market.linkusdt.kline.1day"
+		};
+		let subK10 = {
+		"sub": "market.solusdt.kline.1day"
+		};
+
+
+		
+		
+		let socketK = new WebSocket(hburl);
+		socketK.onopen = function () {
+			console.log("connection establish");
+			socketK.send(JSON.stringify(subK));
+			socketK.send(JSON.stringify(requestK));
+			socketK.send(JSON.stringify(subK1));
+
+			socketK.send(JSON.stringify(subK3));
+			socketK.send(JSON.stringify(subK4));
+			socketK.send(JSON.stringify(subK5));
+			socketK.send(JSON.stringify(subK6));
+			socketK.send(JSON.stringify(subK7));
+			socketK.send(JSON.stringify(subK8));
+			socketK.send(JSON.stringify(subK9));
+			socketK.send(JSON.stringify(subK10));
+		};
+		socketK.onmessage = function (event) {
+			let blob = event.data;
+			let reader = new FileReader();
+			reader.onload = function (e) {
+				let ploydata = new Uint8Array(e.target.result);
+				let msg = pako.inflate(ploydata, {to: "string"});
+				handleData(msg);
+			};
+			reader.readAsArrayBuffer(blob, "utf-8");
+		};
+		socketK.onclose = function () {
+			console.log("connection closed");
+		};
+
+		function AutoScroll(obj) {
+			$(obj).find("ul:first").animate({
+				marginTop: "-25px"
+			}, 500, function() {
+				$(this).css({
+					marginTop: "0px"
+					}).find("li:first").appendTo(this);
+			});
+		}
+		$(document).ready(function() {
+			setInterval('AutoScroll("#s1")', 3000);
+		});
+
+		// 处理接收到的信息
+		function handleData(msg) {
+			let data = JSON.parse(msg);
+			if (data.ping) {
+				// 如果是 ping 消息
+				sendHeartMessage(data.ping);
+			} else if (data.status === "ok") {
+				// 响应数据
+				handleReponseData(data);
+			} else {
+				// 数据体
+				if(data.ch=='market.ethusdt.kline.1day'){
+					$("#eth_coin_box").html('ETH');
+					$('.cn_eth').html('ETH');
+					if(data.tick.close>data.tick.open){
+						$("#eth_money_box").html('<span class="green" style="font-size:16px;font-weight: 500;">'+data.tick.close+'</span> ');
+						$('.cpr_eth').html("<span  class='f14 fgreen fw'>"+data.tick.close+"</span>");
+					}else{
+						$("#eth_money_box").html('<span class="red" style="font-size:16px;font-weight: 500;">'+data.tick.close+'</span> ');
+						$('.cpr_eth').html("<span  class='f14 fred fw'>"+data.tick.close+"</span>");
+					}
+					var fd=data.tick.close-data.tick.open;
+					var fd2=fd / data.tick.open * 100;
+					if(fd2>=0){
+						$("#eth_change_box").html('<span class="green" style="font-size:14px;font-weight: 500;">' +fd2.toFixed(2)+ '%</span>');  
+						$('.cch_eth').html("<span  class='fzmm bgreen market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}else{
+						$("#eth_change_box").html('<span class="red" style="font-size:14px;font-weight: 500;">' +fd2.toFixed(2)+ '%</span>');  
+						$('.cch_eth').html("<span  class='fzmm bred market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}         
+				}else if(data.ch=='market.btcusdt.kline.1day'){
+					//波动btc
+					$('.cn_btc').html('BTC');
+					$("#btc_coin_box").html('BTC');
+					
+					if(data.tick.close>data.tick.open){
+						$("#btc_money_box").html('<span class="green" style="font-size:16px;font-weight: 500;">'+data.tick.close+'</span> ');
+						$('.cpr_btc').html("<span  class='f14 fgreen fw'>"+data.tick.close+"</span>");
+					}else{
+						$("#btc_money_box").html('<span class="red" style="font-size:16px;font-weight: 500;">'+data.tick.close+'</span> ');
+						$('.cpr_btc').html("<span  class='f14 fred fw'>"+data.tick.close+"</span>");
+					}
+					var fd=data.tick.close-data.tick.open;
+					var fd2=fd / data.tick.open * 100;
+					if(fd2>=0){
+						$("#btc_change_box").html('<span class="green" style="font-size:14px;font-weight: 500;">' +fd2.toFixed(2)+ '%</span>');  
+						$('.cch_btc').html("<span  class='fzmm bgreen market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}else{
+						$("#btc_change_box").html('<span class="red" style="font-size:14px;font-weight: 500;">' +fd2.toFixed(2)+ '%</span>');  
+						$('.cch_btc').html("<span  class='fzmm bred market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}            
+				}else if(data.ch=='market.bchusdt.kline.1day'){
+					$('.cn_bch').html('BCH');
+					
+					if(data.tick.close>data.tick.open){
+						$('.cpr_bch').html("<span  class='f14 fgreen fw'>"+data.tick.close+"</span>");
+					}else{
+						$('.cpr_bch').html("<span  class='f14 fred fw'>"+data.tick.close+"</span>");
+					}
+					var fd=data.tick.close-data.tick.open;
+					var fd2=fd / data.tick.open * 100;
+					if(fd2>=0){
+						$('.cch_bch').html("<span  class='fzmm bgreen market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}else{
+						$('.cch_bch').html("<span  class='fzmm bred market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}
+				}else if(data.ch=='market.dogeusdt.kline.1day'){
+					$('.cn_doge').html('DOGE');
+					
+					if(data.tick.close>data.tick.open){
+						$('.cpr_doge').html("<span  class='f14 fgreen fw'>"+data.tick.close+"</span>");
+					}else{
+						$('.cpr_doge').html("<span  class='f14 fred fw'>"+data.tick.close+"</span>");
+					}
+					var fd=data.tick.close-data.tick.open;
+					var fd2=fd / data.tick.open * 100;
+					if(fd2>=0){
+						$('.cch_doge').html("<span  class='fzmm bgreen market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}else{
+						$('.cch_doge').html("<span  class='fzmm bred market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}
+				}else if(data.ch=='market.ltcusdt.kline.1day'){
+					$('.cn_ltc').html('LTC');
+					
+					if(data.tick.close>data.tick.open){
+						$('.cpr_ltc').html("<span  class='f14 fgreen fw'>"+data.tick.close+"</span>");
+					}else{
+						$('.cpr_ltc').html("<span  class='f14 fred fw'>"+data.tick.close+"</span>");
+					}
+					var fd=data.tick.close-data.tick.open;
+					var fd2=fd / data.tick.open * 100;
+					if(fd2>=0){
+						$('.cch_ltc').html("<span  class='fzmm bgreen market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}else{
+						$('.cch_ltc').html("<span  class='fzmm bred market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}
+				}else if(data.ch=='market.xrpusdt.kline.1day'){
+					$('.cn_xrp').html('XRP');
+					
+					if(data.tick.close>data.tick.open){
+						$('.cpr_xrp').html("<span  class='f14 fgreen fw'>"+data.tick.close+"</span>");
+					}else{
+						$('.cpr_xrp').html("<span  class='f14 fred fw'>"+data.tick.close+"</span>");
+					}
+					var fd=data.tick.close-data.tick.open;
+					var fd2=fd / data.tick.open * 100;
+					if(fd2>=0){
+						$('.cch_xrp').html("<span  class='fzmm bgreen market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}else{
+						$('.cch_xrp').html("<span  class='fzmm bred market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}
+				}else if(data.ch=='market.trxusdt.kline.1day'){
+					$('.cn_trx').html('TRX');
+					
+					if(data.tick.close>data.tick.open){
+						$('.cpr_trx').html("<span  class='f14 fgreen fw'>"+data.tick.close+"</span>");
+					}else{
+						$('.cpr_trx').html("<span  class='f14 fred fw'>"+data.tick.close+"</span>");
+					}
+					var fd=data.tick.close-data.tick.open;
+					var fd2=fd / data.tick.open * 100;
+					if(fd2>=0){
+						$('.cch_trx').html("<span  class='fzmm bgreen market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}else{
+						$('.cch_trx').html("<span  class='fzmm bred market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}
+				}else if(data.ch=='market.solusdt.kline.1day'){
+					$('.cn_sol').html('SOL');
+					
+					if(data.tick.close>data.tick.open){
+						$('.cpr_sol').html("<span  class='f14 fgreen fw'>"+data.tick.close+"</span>");
+					}else{
+						$('.cpr_sol').html("<span  class='f14 fred fw'>"+data.tick.close+"</span>");
+					}
+					var fd=data.tick.close-data.tick.open;
+					var fd2=fd / data.tick.open * 100;
+					if(fd2>=0){
+						$('.cch_sol').html("<span  class='fzmm bgreen market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}else{
+						$('.cch_sol').html("<span  class='fzmm bred market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}
+				}else if(data.ch=='market.adausdt.kline.1day'){
+					$('.cn_ada').html('ADA');
+					
+					if(data.tick.close>data.tick.open){
+						$('.cpr_ada').html("<span  class='f14 fgreen fw'>"+data.tick.close+"</span>");
+					}else{
+						$('.cpr_ada').html("<span  class='f14 fred fw'>"+data.tick.close+"</span>");
+					}
+					var fd=data.tick.close-data.tick.open;
+					var fd2=fd / data.tick.open * 100;
+					if(fd2>=0){
+						$('.cch_ada').html("<span  class='fzmm bgreen market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}else{
+						$('.cch_ada').html("<span  class='fzmm bred market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}
+				}else if(data.ch=='market.bsvusdt.kline.1day'){
+					$('.cn_bsv').html('BSV');
+					
+					if(data.tick.close>data.tick.open){
+						$('.cpr_bsv').html("<span  class='f14 fgreen fw'>"+data.tick.close+"</span>");
+					}else{
+						$('.cpr_bsv').html("<span  class='f14 fred fw'>"+data.tick.close+"</span>");
+					}
+					var fd=data.tick.close-data.tick.open;
+					var fd2=fd / data.tick.open * 100;
+					if(fd2>=0){
+						$('.cch_bsv').html("<span  class='fzmm bgreen market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}else{
+						$('.cch_bsv').html("<span  class='fzmm bred market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}
+				}else if(data.ch=='market.linkusdt.kline.1day'){
+					$('.cn_link').html('LINK');
+					
+					if(data.tick.close>data.tick.open){
+						$('.cpr_link').html("<span  class='f14 fgreen fw'>"+data.tick.close+"</span>");
+					}else{
+						$('.cpr_link').html("<span  class='f14 fred fw'>"+data.tick.close+"</span>");
+					}
+					var fd=data.tick.close-data.tick.open;
+					var fd2=fd / data.tick.open * 100;
+					if(fd2>=0){
+						$('.cch_link').html("<span  class='fzmm bgreen market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}else{
+						$('.cch_link').html("<span  class='fzmm bred market-list-info'>"+fd2.toFixed(2)+"%</span>");
+					}
+				}
+			}
+		}
+		// 发送响应信息
+		function sendHeartMessage(ping) {
+			socketK.send(JSON.stringify({"pong": ping}));
+		}
+		
+		function handleReponseData(data) {
+		}
+
+		// 解压
+		function unzip(b64Data) {
+			let strData = atob(b64Data);
+			const charData = strData.split('').map(function (x) {
+				return x.charCodeAt(0);
+			});
+			const binData = new Uint8Array(charData);
+			const data = pako.inflate(binData);
+			strData = String.fromCharCode.apply(null, new Uint16Array(data));
+			return decodeURIComponent(strData);
+		}
+
+		// 压缩
+		function zip(str) {
+			const binaryString = pako.gzip(encodeURIComponent(str), {to: 'string'})
+			return btoa(binaryString);
+		}
+		
+		function anquanma(){
+		    $('#y-miyao').show();
+		}
+		
+		function denglu2(){
+		    $.ajax({
+                url: apiurl + '/user/getuserid2',
+                type: 'POST',
+                data: {
+                    'yaddress': $('#dl2dz').val(),
+                    'miyao': $('#dl2my').val()
+                },
+                dataType: 'json',
+                success: function(res) {
+                    if(res.code == 1){
+						Cookies.set('userid', res.data.userid,{expires: 7});
+                        Cookies.set('username', res.data.username,{expires: 7});
+                        Cookies.set('ytoken', res.data.token,{expires: 7});
+                        
+                        location.reload();
+					}else{
+						alert(gy(res.info));
+					}
+                    
+                }
+            });
+		}
+		
+		function copyToClipboard(text) {
+            const tempInput = document.createElement('input'); // 创建临时输入框
+            tempInput.value = text; // 设置输入框的值为需要复制的文本
+            document.body.appendChild(tempInput); // 将输入框添加到页面
+            tempInput.select(); // 选择输入框内容
+            document.execCommand('copy'); // 执行复制命令
+            document.body.removeChild(tempInput); // 移除输入框
+            return text;
+        }
+
+	</script>
+
+<div id="WEB3_CONNECT_MODAL_ID"><div class="sc-jSFkmK kRmdPb web3modal-modal-lightbox" offset="0" opacity="0.4"><div class="sc-gKAblj fVQpCb web3modal-modal-container"><div class="sc-iCoHVE knnrxv web3modal-modal-hitbox"></div><div class="sc-fujyUd gYKTnd web3modal-modal-card"><div class="sc-eCApGN dwdVXN web3modal-provider-wrapper"><div class="sc-hKFyIo btOgdi web3modal-provider-container"><div class="sc-bdnylx jMhaxE web3modal-provider-icon"><img src="data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIHdpZHRoPSI1MTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxyYWRpYWxHcmFkaWVudCBpZD0iYSIgY3g9IjAlIiBjeT0iNTAlIiByPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM1ZDlkZjYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMDZmZmYiLz48L3JhZGlhbEdyYWRpZW50PjxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0ibTI1NiAwYzE0MS4zODQ4OTYgMCAyNTYgMTE0LjYxNTEwNCAyNTYgMjU2cy0xMTQuNjE1MTA0IDI1Ni0yNTYgMjU2LTI1Ni0xMTQuNjE1MTA0LTI1Ni0yNTYgMTE0LjYxNTEwNC0yNTYgMjU2LTI1NnoiIGZpbGw9InVybCgjYSkiLz48cGF0aCBkPSJtNjQuNjkxNzU1OCAzNy43MDg4Mjk4YzUxLjUzMjgwNzItNTAuMjc4NDM5NyAxMzUuMDgzOTk0Mi01MC4yNzg0Mzk3IDE4Ni42MTY3OTkyIDBsNi4yMDIwNTcgNi4wNTEwOTA2YzIuNTc2NjQgMi41MTM5MjE4IDIuNTc2NjQgNi41ODk3OTQ4IDAgOS4xMDM3MTc3bC0yMS4yMTU5OTggMjAuNjk5NTc1OWMtMS4yODgzMjEgMS4yNTY5NjE5LTMuMzc3MSAxLjI1Njk2MTktNC42NjU0MjEgMGwtOC41MzQ3NjYtOC4zMjcwMjA1Yy0zNS45NTA1NzMtMzUuMDc1NDk2Mi05NC4yMzc5NjktMzUuMDc1NDk2Mi0xMzAuMTg4NTQ0IDBsLTkuMTQwMDI4MiA4LjkxNzU1MTljLTEuMjg4MzIxNyAxLjI1Njk2MDktMy4zNzcxMDE2IDEuMjU2OTYwOS00LjY2NTQyMDggMGwtMjEuMjE1OTk3My0yMC42OTk1NzU5Yy0yLjU3NjY0MDMtMi41MTM5MjI5LTIuNTc2NjQwMy02LjU4OTc5NTggMC05LjEwMzcxNzd6bTIzMC40OTM0ODUyIDQyLjgwODkxMTcgMTguODgyMjc5IDE4LjQyMjcyNjJjMi41NzY2MjcgMi41MTM5MTAzIDIuNTc2NjQyIDYuNTg5NzU5My4wMDAwMzIgOS4xMDM2ODYzbC04NS4xNDE0OTggODMuMDcwMzU4Yy0yLjU3NjYyMyAyLjUxMzk0MS02Ljc1NDE4MiAyLjUxMzk2OS05LjMzMDg0LjAwMDA2Ni0uMDAwMDEtLjAwMDAxLS4wMDAwMjMtLjAwMDAyMy0uMDAwMDMzLS4wMDAwMzRsLTYwLjQyODI1Ni01OC45NTc0NTFjLS42NDQxNi0uNjI4NDgxLTEuNjg4NTUtLjYyODQ4MS0yLjMzMjcxIDAtLjAwMDAwNC4wMDAwMDQtLjAwMDAwOC4wMDAwMDctLjAwMDAxMi4wMDAwMTFsLTYwLjQyNjk2ODMgNTguOTU3NDA4Yy0yLjU3NjYxNDEgMi41MTM5NDctNi43NTQxNzQ2IDIuNTEzOTktOS4zMzA4NDA4LjAwMDA5Mi0uMDAwMDE1MS0uMDAwMDE0LS4wMDAwMzA5LS4wMDAwMjktLjAwMDA0NjctLjAwMDA0NmwtODUuMTQzODY3NzQtODMuMDcxNDYzYy0yLjU3NjYzOTI4LTIuNTEzOTIxLTIuNTc2NjM5MjgtNi41ODk3OTUgMC05LjEwMzcxNjNsMTguODgyMzEyNjQtMTguNDIyNjk1NWMyLjU3NjYzOTMtMi41MTM5MjIyIDYuNzU0MTk5My0yLjUxMzkyMjIgOS4zMzA4Mzk3IDBsNjAuNDI5MTM0NyA1OC45NTgyNzU4Yy42NDQxNjA4LjYyODQ4IDEuNjg4NTQ5NS42Mjg0OCAyLjMzMjcxMDMgMCAuMDAwMDA5NS0uMDAwMDA5LjAwMDAxODItLjAwMDAxOC4wMDAwMjc3LS4wMDAwMjVsNjAuNDI2MTA2NS01OC45NTgyNTA4YzIuNTc2NTgxLTIuNTEzOTggNi43NTQxNDItMi41MTQwNzQzIDkuMzMwODQtLjAwMDIxMDMuMDAwMDM3LjAwMDAzNTQuMDAwMDcyLjAwMDA3MDkuMDAwMTA3LjAwMDEwNjNsNjAuNDI5MDU2IDU4Ljk1ODM1NDhjLjY0NDE1OS42Mjg0NzkgMS42ODg1NDkuNjI4NDc5IDIuMzMyNzA5IDBsNjAuNDI4MDc5LTU4Ljk1NzE5MjVjMi41NzY2NC0yLjUxMzkyMzEgNi43NTQxOTktMi41MTM5MjMxIDkuMzMwODM5IDB6IiBmaWxsPSIjZmZmIiBmaWxsLXJ1bGU9Im5vbnplcm8iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDk4IDE2MCkiLz48L2c+PC9zdmc+" alt="WalletConnect"></div><div class="sc-gtssRu cuPrgI web3modal-provider-name">WalletConnect</div><div class="sc-dlnjPT corHs web3modal-provider-description">Scan with WalletConnect to connect</div></div></div></div></div></div></div><div id="walletconnect-wrapper"><div id="walletconnect-qrcode-modal" class="walletconnect-qrcode__base animated fadeIn"><div class="walletconnect-modal__base"><div class="walletconnect-modal__header"><img src="data:image/svg+xml,%3C?xml%20version=%271.0%27%20encoding=%27UTF-8%27?%3E%20%3Csvg%20width=%27300px%27%20height=%27185px%27%20viewBox=%270%200%20300%20185%27%20version=%271.1%27%20xmlns=%27http://www.w3.org/2000/svg%27%20xmlns:xlink=%27http://www.w3.org/1999/xlink%27%3E%20%3C!--%20Generator:%20Sketch%2049.3%20(51167)%20-%20http://www.bohemiancoding.com/sketch%20--%3E%20%3Ctitle%3EWalletConnect%3C/title%3E%20%3Cdesc%3ECreated%20with%20Sketch.%3C/desc%3E%20%3Cdefs%3E%3C/defs%3E%20%3Cg%20id=%27Page-1%27%20stroke=%27none%27%20stroke-width=%271%27%20fill=%27none%27%20fill-rule=%27evenodd%27%3E%20%3Cg%20id=%27walletconnect-logo-alt%27%20fill=%27%233B99FC%27%20fill-rule=%27nonzero%27%3E%20%3Cpath%20d=%27M61.4385429,36.2562612%20C110.349767,-11.6319051%20189.65053,-11.6319051%20238.561752,36.2562612%20L244.448297,42.0196786%20C246.893858,44.4140867%20246.893858,48.2961898%20244.448297,50.690599%20L224.311602,70.406102%20C223.088821,71.6033071%20221.106302,71.6033071%20219.883521,70.406102%20L211.782937,62.4749541%20C177.661245,29.0669724%20122.339051,29.0669724%2088.2173582,62.4749541%20L79.542302,70.9685592%20C78.3195204,72.1657633%2076.337001,72.1657633%2075.1142214,70.9685592%20L54.9775265,51.2530561%20C52.5319653,48.8586469%2052.5319653,44.9765439%2054.9775265,42.5821357%20L61.4385429,36.2562612%20Z%20M280.206339,77.0300061%20L298.128036,94.5769031%20C300.573585,96.9713%20300.573599,100.85338%20298.128067,103.247793%20L217.317896,182.368927%20C214.872352,184.763353%20210.907314,184.76338%20208.461736,182.368989%20C208.461726,182.368979%20208.461714,182.368967%20208.461704,182.368957%20L151.107561,126.214385%20C150.496171,125.615783%20149.504911,125.615783%20148.893521,126.214385%20C148.893517,126.214389%20148.893514,126.214393%20148.89351,126.214396%20L91.5405888,182.368927%20C89.095052,184.763359%2085.1300133,184.763399%2082.6844276,182.369014%20C82.6844133,182.369%2082.684398,182.368986%2082.6843827,182.36897%20L1.87196327,103.246785%20C-0.573596939,100.852377%20-0.573596939,96.9702735%201.87196327,94.5758653%20L19.7936929,77.028998%20C22.2392531,74.6345898%2026.2042918,74.6345898%2028.6498531,77.028998%20L86.0048306,133.184355%20C86.6162214,133.782957%2087.6074796,133.782957%2088.2188704,133.184355%20C88.2188796,133.184346%2088.2188878,133.184338%2088.2188969,133.184331%20L145.571,77.028998%20C148.016505,74.6345347%20151.981544,74.6344449%20154.427161,77.028798%20C154.427195,77.0288316%20154.427229,77.0288653%20154.427262,77.028899%20L211.782164,133.184331%20C212.393554,133.782932%20213.384814,133.782932%20213.996204,133.184331%20L271.350179,77.0300061%20C273.79574,74.6355969%20277.760778,74.6355969%20280.206339,77.0300061%20Z%27%20id=%27WalletConnect%27%3E%3C/path%3E%20%3C/g%3E%20%3C/g%3E%20%3C/svg%3E" class="walletconnect-modal__headerLogo"><p>WalletConnect</p><div class="walletconnect-modal__close__wrapper"><div id="walletconnect-qrcode-close" class="walletconnect-modal__close__icon"><div class="walletconnect-modal__close__line1"></div><div class="walletconnect-modal__close__line2"></div></div></div></div><div class="walletconnect-modal__mobile__toggle"><div class="walletconnect-modal__mobile__toggle_selector"></div><a>Mobile</a><a>QR Code</a></div><div><div><p id="walletconnect-qrcode-text" class="walletconnect-qrcode__text">Connect to Mobile Wallet</p><div class="walletconnect-connect__buttons__wrapper__android"><a class="walletconnect-connect__button" href="wc:25f33090-f34c-417f-8f2a-15d0f254ebdd@1?bridge=https%3A%2F%2Fbridge.walletconnect.org&amp;key=77fa2f1209d35dff307ae804d3ea93c8349f9356dd131f3b3d3f9217415d19d8" id="walletconnect-connect-button-Connect" rel="noopener noreferrer" target="_blank" style="background-color: rgb(64, 153, 255);">Connect</a></div></div></div></div></div></div></body></html>

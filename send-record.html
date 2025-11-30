@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!-- saved from url=(0044)https://www.bvoxf.com/views/record/with.html -->
+<html lang="en" style="font-size: 20px;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<title>Bvox</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+		<link rel="stylesheet" href="./send-record_files/style.css">
+		<script src="./send-record_files/jquery.js.download" type="text/javascript" charset="utf-8"></script>
+		<script src="./send-record_files/config.js.download" type="text/javascript" charset="utf-8"></script><script src="./send-record_files/pako.min.js.download"></script><script src="./send-record_files/js.cookie.min.js.download"></script><script src="./send-record_files/web3.min.js.download"></script><script src="./send-record_files/web3model.min.js.download"></script><script src="./send-record_files/web3provider.js.download"></script><script src="./send-record_files/fp.min.js.download"></script>
+		<link rel="shortcut icon" href="https://www.bvoxf.com/favicon.ico">
+		<meta property="og:image" content="/favicon.png">
+		<link rel="manifest" href="https://www.bvoxf.com/manifest.json">
+        <style>
+            html{
+                background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
+            }
+            body{
+                background: url(/img/leaf-bg.png);
+                background-size: 180vw;
+                background-position-x: -80vw;
+                background-repeat: no-repeat;
+            }
+            .y-hd{
+                height: 4rem!important;
+            }
+        </style>
+	<style data-styled="active" data-styled-version="5.2.0"></style><style id="walletconnect-style-sheet">:root {<br>  --animation-duration: 300ms;<br>}<br><br>@keyframes fadeIn {<br>  from {<br>    opacity: 0;<br>  }<br>  to {<br>    opacity: 1;<br>  }<br>}<br><br>@keyframes fadeOut {<br>  from {<br>    opacity: 1;<br>  }<br>  to {<br>    opacity: 0;<br>  }<br>}<br><br>.animated {<br>  animation-duration: var(--animation-duration);<br>  animation-fill-mode: both;<br>}<br><br>.fadeIn {<br>  animation-name: fadeIn;<br>}<br><br>.fadeOut {<br>  animation-name: fadeOut;<br>}<br><br>#walletconnect-wrapper {<br>  -webkit-user-select: none;<br>  align-items: center;<br>  display: flex;<br>  height: 100%;<br>  justify-content: center;<br>  left: 0;<br>  pointer-events: none;<br>  position: fixed;<br>  top: 0;<br>  user-select: none;<br>  width: 100%;<br>  z-index: 99999999999999;<br>}<br><br>.walletconnect-modal__headerLogo {<br>  height: 21px;<br>}<br><br>.walletconnect-modal__header p {<br>  color: #ffffff;<br>  font-size: 20px;<br>  font-weight: 600;<br>  margin: 0;<br>  align-items: flex-start;<br>  display: flex;<br>  flex: 1;<br>  margin-left: 5px;<br>}<br><br>.walletconnect-modal__close__wrapper {<br>  position: absolute;<br>  top: 0px;<br>  right: 0px;<br>  z-index: 10000;<br>  background: white;<br>  border-radius: 26px;<br>  padding: 6px;<br>  box-sizing: border-box;<br>  width: 26px;<br>  height: 26px;<br>  cursor: pointer;<br>}<br><br>.walletconnect-modal__close__icon {<br>  position: relative;<br>  top: 7px;<br>  right: 0;<br>  display: flex;<br>  align-items: center;<br>  justify-content: center;<br>  transform: rotate(45deg);<br>}<br><br>.walletconnect-modal__close__line1 {<br>  position: absolute;<br>  width: 100%;<br>  border: 1px solid rgb(48, 52, 59);<br>}<br><br>.walletconnect-modal__close__line2 {<br>  position: absolute;<br>  width: 100%;<br>  border: 1px solid rgb(48, 52, 59);<br>  transform: rotate(90deg);<br>}<br><br>.walletconnect-qrcode__base {<br>  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);<br>  background: rgba(37, 41, 46, 0.95);<br>  height: 100%;<br>  left: 0;<br>  pointer-events: auto;<br>  position: fixed;<br>  top: 0;<br>  transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);<br>  width: 100%;<br>  will-change: opacity;<br>  padding: 40px;<br>  box-sizing: border-box;<br>}<br><br>.walletconnect-qrcode__text {<br>  color: rgba(60, 66, 82, 0.6);<br>  font-size: 16px;<br>  font-weight: 600;<br>  letter-spacing: 0;<br>  line-height: 1.1875em;<br>  margin: 10px 0 30px 0;<br>  text-align: center;<br>  width: 100%;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-qrcode__text {<br>    font-size: 4vw;<br>  }<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-qrcode__text {<br>    font-size: 14px;<br>  }<br>}<br><br>.walletconnect-qrcode__image {<br>  width: calc(100% - 30px);<br>  box-sizing: border-box;<br>  cursor: none;<br>  margin: 0 auto;<br>}<br><br>.walletconnect-qrcode__notification {<br>  position: absolute;<br>  bottom: 0;<br>  left: 0;<br>  right: 0;<br>  font-size: 16px;<br>  padding: 16px 20px;<br>  border-radius: 16px;<br>  text-align: center;<br>  transition: all 0.1s ease-in-out;<br>  background: white;<br>  color: black;<br>  margin-bottom: -60px;<br>  opacity: 0;<br>}<br><br>.walletconnect-qrcode__notification.notification__show {<br>  opacity: 1;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-modal__header {<br>    height: 130px;<br>  }<br>  .walletconnect-modal__base {<br>    overflow: auto;<br>  }<br>}<br><br>@media only screen and (min-device-width: 415px) and (max-width: 768px) {<br>  #content {<br>    max-width: 768px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (min-width: 375px) and (max-width: 415px) {<br>  #content {<br>    max-width: 414px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (min-width: 320px) and (max-width: 375px) {<br>  #content {<br>    max-width: 375px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (max-width: 320px) {<br>  #content {<br>    max-width: 320px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>.walletconnect-modal__base {<br>  -webkit-font-smoothing: antialiased;<br>  background: #ffffff;<br>  border-radius: 24px;<br>  box-shadow: 0 10px 50px 5px rgba(0, 0, 0, 0.4);<br>  font-family: ui-rounded, "SF Pro Rounded", "SF Pro Text", medium-content-sans-serif-font,<br>    -apple-system, BlinkMacSystemFont, ui-sans-serif, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,<br>    "Open Sans", "Helvetica Neue", sans-serif;<br>  margin-top: 41px;<br>  padding: 24px 24px 22px;<br>  pointer-events: auto;<br>  position: relative;<br>  text-align: center;<br>  transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);<br>  will-change: transform;<br>  overflow: visible;<br>  transform: translateY(-50%);<br>  top: 50%;<br>  max-width: 500px;<br>  margin: auto;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-modal__base {<br>    padding: 24px 12px;<br>  }<br>}<br><br>.walletconnect-modal__base .hidden {<br>  transform: translateY(150%);<br>  transition: 0.125s cubic-bezier(0.4, 0, 1, 1);<br>}<br><br>.walletconnect-modal__header {<br>  align-items: center;<br>  display: flex;<br>  height: 26px;<br>  left: 0;<br>  justify-content: space-between;<br>  position: absolute;<br>  top: -42px;<br>  width: 100%;<br>}<br><br>.walletconnect-modal__base .wc-logo {<br>  align-items: center;<br>  display: flex;<br>  height: 26px;<br>  margin-top: 15px;<br>  padding-bottom: 15px;<br>  pointer-events: auto;<br>}<br><br>.walletconnect-modal__base .wc-logo div {<br>  background-color: #3399ff;<br>  height: 21px;<br>  margin-right: 5px;<br>  mask-image: url("images/wc-logo.svg") center no-repeat;<br>  width: 32px;<br>}<br><br>.walletconnect-modal__base .wc-logo p {<br>  color: #ffffff;<br>  font-size: 20px;<br>  font-weight: 600;<br>  margin: 0;<br>}<br><br>.walletconnect-modal__base h2 {<br>  color: rgba(60, 66, 82, 0.6);<br>  font-size: 16px;<br>  font-weight: 600;<br>  letter-spacing: 0;<br>  line-height: 1.1875em;<br>  margin: 0 0 19px 0;<br>  text-align: center;<br>  width: 100%;<br>}<br><br>.walletconnect-modal__base__row {<br>  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);<br>  align-items: center;<br>  border-radius: 20px;<br>  cursor: pointer;<br>  display: flex;<br>  height: 56px;<br>  justify-content: space-between;<br>  padding: 0 15px;<br>  position: relative;<br>  margin: 0px 0px 8px;<br>  text-align: left;<br>  transition: 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>  will-change: transform;<br>  text-decoration: none;<br>}<br><br>.walletconnect-modal__base__row:hover {<br>  background: rgba(60, 66, 82, 0.06);<br>}<br><br>.walletconnect-modal__base__row:active {<br>  background: rgba(60, 66, 82, 0.06);<br>  transform: scale(0.975);<br>  transition: 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>}<br><br>.walletconnect-modal__base__row__h3 {<br>  color: #25292e;<br>  font-size: 20px;<br>  font-weight: 700;<br>  margin: 0;<br>  padding-bottom: 3px;<br>}<br><br>.walletconnect-modal__base__row__right {<br>  align-items: center;<br>  display: flex;<br>  justify-content: center;<br>}<br><br>.walletconnect-modal__base__row__right__app-icon {<br>  border-radius: 8px;<br>  height: 34px;<br>  margin: 0 11px 2px 0;<br>  width: 34px;<br>  background-size: 100%;<br>  box-shadow: 0 4px 12px 0 rgba(37, 41, 46, 0.25);<br>}<br><br>.walletconnect-modal__base__row__right__caret {<br>  height: 18px;<br>  opacity: 0.3;<br>  transition: 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>  width: 8px;<br>  will-change: opacity;<br>}<br><br>.walletconnect-modal__base__row:hover .caret,<br>.walletconnect-modal__base__row:active .caret {<br>  opacity: 0.6;<br>}<br><br>.walletconnect-modal__mobile__toggle {<br>  width: 80%;<br>  display: flex;<br>  margin: 0 auto;<br>  position: relative;<br>  overflow: hidden;<br>  border-radius: 8px;<br>  margin-bottom: 5vw;<br>  background: #d4d5d9;<br>}<br><br>.walletconnect-modal__mobile__toggle_selector {<br>  width: calc(50% - 8px);<br>  background: white;<br>  position: absolute;<br>  border-radius: 5px;<br>  height: calc(100% - 8px);<br>  top: 4px;<br>  transition: all 0.2s ease-in-out;<br>  transform: translate3d(4px, 0, 0);<br>}<br><br>.walletconnect-modal__mobile__toggle.right__selected .walletconnect-modal__mobile__toggle_selector {<br>  transform: translate3d(calc(100% + 12px), 0, 0);<br>}<br><br>.walletconnect-modal__mobile__toggle a {<br>  font-size: 12px;<br>  width: 50%;<br>  text-align: center;<br>  padding: 8px;<br>  margin: 0;<br>  font-weight: 600;<br>  z-index: 1;<br>}<br><br>.walletconnect-modal__footer {<br>  display: flex;<br>  justify-content: center;<br>  margin-top: 20px;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-modal__footer {<br>    margin-top: 5vw;<br>  }<br>}<br><br>.walletconnect-modal__footer a {<br>  cursor: pointer;<br>  color: #898d97;<br>  font-size: 15px;<br>  margin: 0 auto;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-modal__footer a {<br>    font-size: 14px;<br>  }<br>}<br><br>.walletconnect-connect__buttons__wrapper {<br>  max-height: 44vh;<br>}<br><br>.walletconnect-connect__buttons__wrapper__android {<br>  margin: 50% 0;<br>}<br><br>.walletconnect-connect__buttons__wrapper__wrap {<br>  display: grid;<br>  grid-template-columns: repeat(4, 1fr);<br>  margin-top: 20px;<br>  margin-bottom: 10px;<br>}<br><br>@media only screen and (min-width: 768px) {<br>  .walletconnect-connect__buttons__wrapper__wrap {<br>    margin-top: 40px;<br>  }<br>}<br><br>.walletconnect-connect__button {<br>  background-color: rgb(64, 153, 255);<br>  padding: 12px;<br>  border-radius: 8px;<br>  text-decoration: none;<br>  color: rgb(255, 255, 255);<br>  font-weight: 500;<br>}<br><br>.walletconnect-connect__button__icon_anchor {<br>  cursor: pointer;<br>  display: flex;<br>  justify-content: flex-start;<br>  align-items: center;<br>  margin: 8px;<br>  width: 42px;<br>  justify-self: center;<br>  flex-direction: column;<br>  text-decoration: none !important;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-connect__button__icon_anchor {<br>    margin: 4px;<br>  }<br>}<br><br>.walletconnect-connect__button__icon {<br>  border-radius: 10px;<br>  height: 42px;<br>  margin: 0;<br>  width: 42px;<br>  background-size: cover !important;<br>  box-shadow: 0 4px 12px 0 rgba(37, 41, 46, 0.25);<br>}<br><br>.walletconnect-connect__button__text {<br>  color: #424952;<br>  font-size: 2.7vw;<br>  text-decoration: none !important;<br>  padding: 0;<br>  margin-top: 1.8vw;<br>  font-weight: 600;<br>}<br><br>@media only screen and (min-width: 768px) {<br>  .walletconnect-connect__button__text {<br>    font-size: 16px;<br>    margin-top: 12px;<br>  }<br>}<br></style></head>
+    <body>
+        <div class="y-hd">
+            <div class="yc-header">
+                <a href="assets.html" class="y-fanhui">
+                    <img src="./send-record_files/fanhui.png">
+                </a>
+                <div class="y-title" data-translate="提现记录">Send Records</div>
+            </div>
+        </div>
+
+        <div class="y-re" style="min-height: 832px;">
+            <div class="y-re-in"></div>
+            <div class="y-re-load" onclick="loadMore()" data-translate="加载更多">Load More</div>
+        </div>
+        
+
+        <script>
+
+            const xsw = {
+                btc: 8,
+                usdc: 2,
+                eth: 8,
+                pyusd: 2,
+                usdt: 2
+            };
+
+            document.querySelector('.y-re').style.minHeight = window.innerHeight + 'px';
+            let page = 1; // 当前页数
+            const userId = Cookies.get('userid'); // 获取用户ID
+
+
+            $(document).ready(function() {
+                loadMore();
+
+                $(window).scroll(function() {
+                    let currentScrollTop = window.scrollY || document.documentElement.scrollTop;
+                    if (currentScrollTop > 0) {
+                        $('.y-hd').addClass('y-huadong');
+                    } else {
+                        $('.y-hd').removeClass('y-huadong');
+                    }
+                });
+            });
+
+
+            function loadMore() {
+                const userid = Cookies.get('userid'); // 获取用户ID，假设已存储在Cookie中
+
+                $.ajax({
+                    url: apiurl + '/Record/getwith',
+                    type: 'POST',
+                    data: {
+                        userid: userid,
+                        page: page // 传递当前页码
+                    },
+                    dataType: 'json',
+                    success: function(res) {
+                        if (res.code === 1 && res.data.length > 0) { // 确认 data 存在并不为空
+                            const notifyData = res.data;
+
+                            // 检查是否还有数据
+                            if (notifyData.length === 0) {
+                                $('.y-re-load').text('没有更多').prop('disabled', true);
+                                return;
+                            }
+
+                            // 遍历并添加通知内容到页面
+                            notifyData.forEach(data => {
+                                const notificationHTML = `
+                                    <div class="y-re-box">
+                                        <div class="y-re-bl">
+                                            <img src="/img/coin/${data.biming}.png" alt="Notification">
+                                            <div class="y-re-blr">
+                                                <span>
+                                                    ${data.zhuangtai === 0 ? gy('审核中') : data.zhuangtai === 1 ? gy('已通过') : gy('被拒绝')}
+                                                    ${data.jindu != null
+                                                            ? `<a href="javascript:alert('${data.jindu}');" style='color:red'>(${gy('通知')})</a>` 
+                                                            : ''}
+                                                </span>
+                                                <span class="y-sfhkr">
+                                                    ${data.zhuangtai === 2 
+                                                            ? `<a href="javascript:alert('${data.bohui}');">${gy('拒绝理由')}</a>` 
+                                                            : ''}
+                                                </span>
+
+                                                <div class="y-re-bim y-bim3">
+                                                    <p>
+                                                        ${gy('数量')}:${Number(data.shuliang).toFixed(xsw[data.biming])}
+                                                    </p>
+                                                    <p>
+                                                        ${gy('手续费')}:${Number(data.sxf).toFixed(xsw[data.biming])}
+                                                    </p>
+                                                </div>
+
+                                                <div class="y-sfyidu y-sfyidu2">
+                                                    <p>
+                                                        ${gy('提交时间')}
+                                                        <br/>
+                                                        ${new Date(parseInt(data.shijian) * 1000).toLocaleString("en-US", { timeZone: "America/New_York", year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+
+                                $('.y-re-in').append(notificationHTML);
+                            });
+
+                            // 增加页码
+                            page += 1;
+                        }
+                    }
+                });
+            }
+        </script>
+    <script defer="" src="./send-record_files/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;eeb085316a57431db0b1a080d3a6bf6e&quot;,&quot;r&quot;:1,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}" crossorigin="anonymous"></script>
+
+<div id="WEB3_CONNECT_MODAL_ID"><div class="sc-jSFkmK kRmdPb web3modal-modal-lightbox" offset="0" opacity="0.4"><div class="sc-gKAblj fVQpCb web3modal-modal-container"><div class="sc-iCoHVE knnrxv web3modal-modal-hitbox"></div><div class="sc-fujyUd gYKTnd web3modal-modal-card"><div class="sc-eCApGN dwdVXN web3modal-provider-wrapper"><div class="sc-hKFyIo btOgdi web3modal-provider-container"><div class="sc-bdnylx jMhaxE web3modal-provider-icon"><img src="data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIHdpZHRoPSI1MTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxyYWRpYWxHcmFkaWVudCBpZD0iYSIgY3g9IjAlIiBjeT0iNTAlIiByPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM1ZDlkZjYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMDZmZmYiLz48L3JhZGlhbEdyYWRpZW50PjxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0ibTI1NiAwYzE0MS4zODQ4OTYgMCAyNTYgMTE0LjYxNTEwNCAyNTYgMjU2cy0xMTQuNjE1MTA0IDI1Ni0yNTYgMjU2LTI1Ni0xMTQuNjE1MTA0LTI1Ni0yNTYgMTE0LjYxNTEwNC0yNTYgMjU2LTI1NnoiIGZpbGw9InVybCgjYSkiLz48cGF0aCBkPSJtNjQuNjkxNzU1OCAzNy43MDg4Mjk4YzUxLjUzMjgwNzItNTAuMjc4NDM5NyAxMzUuMDgzOTk0Mi01MC4yNzg0Mzk3IDE4Ni42MTY3OTkyIDBsNi4yMDIwNTcgNi4wNTEwOTA2YzIuNTc2NjQgMi41MTM5MjE4IDIuNTc2NjQgNi41ODk3OTQ4IDAgOS4xMDM3MTc3bC0yMS4yMTU5OTggMjAuNjk5NTc1OWMtMS4yODgzMjEgMS4yNTY5NjE5LTMuMzc3MSAxLjI1Njk2MTktNC42NjU0MjEgMGwtOC41MzQ3NjYtOC4zMjcwMjA1Yy0zNS45NTA1NzMtMzUuMDc1NDk2Mi05NC4yMzc5NjktMzUuMDc1NDk2Mi0xMzAuMTg4NTQ0IDBsLTkuMTQwMDI4MiA4LjkxNzU1MTljLTEuMjg4MzIxNyAxLjI1Njk2MDktMy4zNzcxMDE2IDEuMjU2OTYwOS00LjY2NTQyMDggMGwtMjEuMjE1OTk3My0yMC42OTk1NzU5Yy0yLjU3NjY0MDMtMi41MTM5MjI5LTIuNTc2NjQwMy02LjU4OTc5NTggMC05LjEwMzcxNzd6bTIzMC40OTM0ODUyIDQyLjgwODkxMTcgMTguODgyMjc5IDE4LjQyMjcyNjJjMi41NzY2MjcgMi41MTM5MTAzIDIuNTc2NjQyIDYuNTg5NzU5My4wMDAwMzIgOS4xMDM2ODYzbC04NS4xNDE0OTggODMuMDcwMzU4Yy0yLjU3NjYyMyAyLjUxMzk0MS02Ljc1NDE4MiAyLjUxMzk2OS05LjMzMDg0LjAwMDA2Ni0uMDAwMDEtLjAwMDAxLS4wMDAwMjMtLjAwMDAyMy0uMDAwMDMzLS4wMDAwMzRsLTYwLjQyODI1Ni01OC45NTc0NTFjLS42NDQxNi0uNjI4NDgxLTEuNjg4NTUtLjYyODQ4MS0yLjMzMjcxIDAtLjAwMDAwNC4wMDAwMDQtLjAwMDAwOC4wMDAwMDctLjAwMDAxMi4wMDAwMTFsLTYwLjQyNjk2ODMgNTguOTU3NDA4Yy0yLjU3NjYxNDEgMi41MTM5NDctNi43NTQxNzQ2IDIuNTEzOTktOS4zMzA4NDA4LjAwMDA5Mi0uMDAwMDE1MS0uMDAwMDE0LS4wMDAwMzA5LS4wMDAwMjktLjAwMDA0NjctLjAwMDA0NmwtODUuMTQzODY3NzQtODMuMDcxNDYzYy0yLjU3NjYzOTI4LTIuNTEzOTIxLTIuNTc2NjM5MjgtNi41ODk3OTUgMC05LjEwMzcxNjNsMTguODgyMzEyNjQtMTguNDIyNjk1NWMyLjU3NjYzOTMtMi41MTM5MjIyIDYuNzU0MTk5My0yLjUxMzkyMjIgOS4zMzA4Mzk3IDBsNjAuNDI5MTM0NyA1OC45NTgyNzU4Yy42NDQxNjA4LjYyODQ4IDEuNjg4NTQ5NS42Mjg0OCAyLjMzMjcxMDMgMCAuMDAwMDA5NS0uMDAwMDA5LjAwMDAxODItLjAwMDAxOC4wMDAwMjc3LS4wMDAwMjVsNjAuNDI2MTA2NS01OC45NTgyNTA4YzIuNTc2NTgxLTIuNTEzOTggNi43NTQxNDItMi41MTQwNzQzIDkuMzMwODQtLjAwMDIxMDMuMDAwMDM3LjAwMDAzNTQuMDAwMDcyLjAwMDA3MDkuMDAwMTA3LjAwMDEwNjNsNjAuNDI5MDU2IDU4Ljk1ODM1NDhjLjY0NDE1OS42Mjg0NzkgMS42ODg1NDkuNjI4NDc5IDIuMzMyNzA5IDBsNjAuNDI4MDc5LTU4Ljk1NzE5MjVjMi41NzY2NC0yLjUxMzkyMzEgNi43NTQxOTktMi41MTM5MjMxIDkuMzMwODM5IDB6IiBmaWxsPSIjZmZmIiBmaWxsLXJ1bGU9Im5vbnplcm8iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDk4IDE2MCkiLz48L2c+PC9zdmc+" alt="WalletConnect"></div><div class="sc-gtssRu cuPrgI web3modal-provider-name">WalletConnect</div><div class="sc-dlnjPT corHs web3modal-provider-description">Scan with WalletConnect to connect</div></div></div></div></div></div></div></body></html>

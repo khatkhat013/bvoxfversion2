@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!-- saved from url=(0062)https://www.bvoxf.com/views/contract/kline.html?market=btcusdt -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>kline</title>
+
+	<style>
+		#chart_container {
+			margin: 0 auto;
+			width: 100%;
+			height: 500px;
+		}
+        .changInterval {
+            margin-bottom: 10px;
+            padding-left: 5px;
+        }
+        .interval-item{
+            font-size:14px;
+            padding: 2px;
+            color: #000;
+        }
+        .active{
+            border-bottom:3px solid #FCD535;
+        }
+        .loding{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            justify-content: center;
+            padding-top: 130px;
+            display: none;
+        }
+        .loding img{
+            width: 50px;
+            height: 50px;
+        }
+	</style>
+</head>
+
+<body>
+
+<div class="changInterval">
+    <span class="interval-item">Time</span>
+    <span class="interval-item active" onclick="changInterval(&#39;m1&#39;,this)">1m</span>
+    <span class="interval-item" onclick="changInterval(&#39;m5&#39;,this)">5m</span>
+    <span class="interval-item" onclick="changInterval(&#39;m15&#39;,this)">15m</span>
+    <span class="interval-item" onclick="changInterval(&#39;m30&#39;,this)">30m</span>
+    <span class="interval-item" onclick="changInterval(&#39;m60&#39;,this)">1h</span>
+    <span class="interval-item" onclick="changInterval(&#39;h4&#39;,this)">4h</span>
+    <span class="interval-item" onclick="changInterval(&#39;d1&#39;,this)">1D</span>
+</div>
+
+
+
+
+<div id="chart_container">
+    <div class="loding" data-type="0" style="display: none;">
+        <img src="./loading.gif" alt="">
+    </div>
+<div tabindex="1" style="user-select: none; -webkit-tap-highlight-color: transparent; position: relative; outline: none; border-style: none; width: 100%; cursor: crosshair;"><div style="margin: 0px; padding: 0px; position: relative; overflow: hidden; width: 100%; height: 374px;"><div style="top: 0px; margin: 0px; padding: 0px; position: absolute; overflow: hidden; left: 0px; width: 496px; height: 374px;"><canvas width="992" height="748" style="position: absolute; top: 0px; left: 0px; z-index: 2; width: 496px; height: 374px;"></canvas><canvas width="992" height="748" style="position: absolute; top: 0px; left: 0px; z-index: 2; width: 496px; height: 374px;"></canvas></div><div style="top: 0px; margin: 0px; padding: 0px; position: absolute; overflow: hidden; left: 496px; width: 58px; height: 374px;"><canvas width="116" height="748" style="position: absolute; top: 0px; left: 0px; z-index: 2; width: 58px; height: 374px;"></canvas><canvas width="116" height="748" style="position: absolute; top: 0px; left: 0px; z-index: 2; width: 58px; height: 374px;"></canvas></div></div><div style="margin: 0px; padding: 0px; position: relative; background-color: rgb(221, 221, 221); height: 1px; width: 100%;"><div style="margin: 0px; padding: 0px; width: 100%; position: absolute; z-index: 20; top: -3px; height: 7px; cursor: ns-resize;"></div></div><div style="margin: 0px; padding: 0px; position: relative; overflow: hidden; width: 100%; height: 100px;"><div style="top: 0px; margin: 0px; padding: 0px; position: absolute; overflow: hidden; left: 0px; width: 496px; height: 100px;"><canvas width="992" height="200" style="position: absolute; top: 0px; left: 0px; z-index: 2; width: 496px; height: 100px;"></canvas><canvas width="992" height="200" style="position: absolute; top: 0px; left: 0px; z-index: 2; width: 496px; height: 100px;"></canvas></div><div style="top: 0px; margin: 0px; padding: 0px; position: absolute; overflow: hidden; left: 496px; width: 58px; height: 100px;"><canvas width="116" height="200" style="position: absolute; top: 0px; left: 0px; z-index: 2; width: 58px; height: 100px;"></canvas><canvas width="116" height="200" style="position: absolute; top: 0px; left: 0px; z-index: 2; width: 58px; height: 100px;"></canvas></div></div><div style="margin: 0px; padding: 0px; position: relative; overflow: hidden; width: 100%; height: 25px;"><div style="top: 0px; margin: 0px; padding: 0px; position: absolute; overflow: hidden; left: 0px; width: 496px; height: 25px;"><canvas width="992" height="50" style="position: absolute; top: 0px; left: 0px; z-index: 2; width: 496px; height: 25px;"></canvas><canvas width="992" height="50" style="position: absolute; top: 0px; left: 0px; z-index: 2; width: 496px; height: 25px;"></canvas></div></div></div></div>
+<div id="chart_container1" style="display: none; position: relative;"><div id="loading" style="display: none; position: absolute; z-index: 9527; top: 0px; left: 0px; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.6);"><div class="spin">loading...</div></div><div id="interval_tool_bar" class="light" style="height: 30px; line-height: 30px; display: block;"><button class="interval-item" data-interval-item="time-sharing">Time sharing</button><button class="interval-item active" data-interval-item="m1">1 M</button><button class="interval-item" data-interval-item="m5">5 M</button><button class="interval-item" data-interval-item="m15">15 M</button><button class="interval-item" data-interval-item="m30">30 M</button><button class="interval-item" data-interval-item="m60">60 M</button><button class="interval-item" data-interval-item="h4">4 H</button><button class="interval-item" data-interval-item="d1">1 Day</button><button class="interval-item" data-interval-item="w1">1 Week</button></div><div id="vy-chart" style="position: absolute; bottom: 0px; width: 100%; height: calc(100% - 30px);"><div id="date-time" style="position: absolute; z-index: 100; bottom: 10px; font-size: 12px; color: rgb(255, 255, 255); background-color: rgb(88, 88, 88); transform: translate(-50%, 0px); white-space: nowrap; user-select: none;"></div><div id="volume" style="position: absolute; z-index: 100; right: 0px; width: 54px; font-size: 12px; text-align: center; color: rgb(255, 255, 255); background-color: rgb(88, 88, 88); user-select: none;"></div><div id="real_time_volume" style="position: absolute; z-index: 80; right: 0px; width: 54px; font-size: 12px; text-align: center; color: rgb(255, 255, 255); user-select: none; top: 35.1043px; background-color: rgb(204, 20, 20);">90584.8800</div><canvas width="300" height="150" style="position: absolute; top: 0px; left: 0px; padding: 25px 0px 0px; width: 150px; height: 64px;"></canvas><canvas width="300" height="150" style="position: absolute; z-index: 100; top: 0px; left: 0px; cursor: crosshair; width: 150px; height: 75px;"></canvas><canvas width="300" height="100" style="position: absolute; bottom: 54px; left: 0px; width: 150px; height: 50px;"></canvas><canvas width="300" height="108" style="position: absolute; bottom: 0px; left: 0px; width: 150px; height: 54px;"></canvas><canvas width="108" height="150" style="position: absolute; top: 0px; right: 0px; width: 54px; height: 75px;"></canvas><canvas width="108" height="100" style="position: absolute; bottom: 54px; right: 0px; width: 54px; height: 50px;"></canvas><div id="dashboard-wrapper" style="position: absolute; z-index: 50; left: 0px; top: 0px; width: 100%; height: 20px; background: rgb(255, 255, 255);"><div id="span-wrapper"><span>   S=<i style="color: undefined;">0</i></span><span>   High=<i style="color: undefined;">0</i></span><span>   Low=<i style="color: undefined;">0</i></span><span>   Collect=<i style="color: undefined;">0</i></span><span>Vol=<i style="color: undefined;">0</i></span><span>MA5=<i style="color: undefined;">0</i></span><span>MA10=<i style="color: undefined;">0</i></span></div></div><canvas width="108" height="108" style="width: 54px; height: 54px; position: absolute; bottom: 0px; right: 0px; background: rgb(255, 255, 255);"></canvas></div></div>
+<script defer="" src="./vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;eeb085316a57431db0b1a080d3a6bf6e&quot;,&quot;r&quot;:1,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}" crossorigin="anonymous"></script>
+
+<script>
+    var urlParams = new URLSearchParams(window.location.search);
+    var paramValue = urlParams.get('market');
+	window.SYMBOL = paramValue;
+	window.fenshi = "Time sharing";
+	window.fen = "M";
+	window.xiaoshi = "H";
+	window.tian = "Day";
+	window.zhou = "Week";
+
+	window.kai = "   S";
+	window.gao = "   High";
+	window.di = "   Low";
+	window.shou = "   Collect";
+	window.labels=["Time:","   S:","   Collect:","   High:","   Low:","Finished:"];
+	window.plots=[{
+			key: "ma5",
+			title: "MA5: ",
+			type: "line"
+		}, {
+			key: "ma10",
+			title: "MA10: ",
+			type: "line"
+		}, {
+			key: "ma30",
+			title: "MA30: ",
+			type: "line"
+		}, {
+			key: "ma60",
+			title: "MA60: ",
+			type: "line"
+		}];
+</script>
+<script type="text/javascript" src="./jquery.js.download"></script>
+<script type="text/javascript" src="./pako.min.js.download"></script>
+<script type="text/javascript" src="./kline.min.js.download"></script>
+<script type="text/javascript" src="./klinecharts.min.js.download"></script>
+<script type="text/javascript" src="./ws-deedfeeds.js.download"></script>
+<script>
+	function initOnReady() {
+	    loading()
+		window.init_offset = 10
+
+		VyKline.bootstrap({
+			container: document.getElementById('chart_container1'), // 容器
+			deedfeeds: window.deedfeeds, // 数据反馈对象
+			showIntervalToolbar: true,
+			defaultInterval: 'm1',
+			interval: [ 'm1','m5','m15','m30','m60','h4','d1', 'w1'],
+			theme: 'light',
+			customChart: {
+			    volume_height:50,
+				init_offset_x: window.init_offset,
+				default_rise_color: '#49C043',
+				default_fall_color: '#CC1414',
+			},
+			onTimeIntervalChanged: interval => {
+
+				console.log("window.deedfeeds", interval);
+			}
+		})
+
+
+		vyChart.switchChartType('KLINE')
+	}
+	window.addEventListener('DOMContentLoaded', initOnReady, false);
+</script>
+
+<style>
+    .is-grabbing{cursor:grabbing!important}#interval_tool_bar{position:absolute;left:0;top:0;width:100%;text-align:left;font-family:PingFang SC,Microsoft YaHei}#interval_tool_bar.dark .interval-item{border:1px solid #333;background-color:#333;color:#fff}#interval_tool_bar.dark .interval-item.active,#interval_tool_bar.dark .interval-item:hover{background-color:#666}#interval_tool_bar .interval-item{margin-right:10px;padding:4px 10px;outline:none;transition:all .25s;border:1px solid #f1f1f1;cursor:pointer;vertical-align:top;background-color:#fff}#interval_tool_bar .interval-item:hover{background-color:#f1f1f1}#interval_tool_bar .interval-item.active{background-color:#f0f3fa}#vy-chart div{box-sizing:border-box;position:relative}#vy-chart i{font-style:normal}#vy-chart #dashboard-wrapper{font-size:12px;color:#4a4a4a}#vy-chart #dashboard-wrapper #span-wrapper>span{display:inline-block;margin-right:10px;min-width:70px;font-weight:700}#loading .spin{display:inline-block;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#2d8cf0}#contextmenu{box-sizing:border-box;width:260px;font-size:12px;border:1px solid #dadce0;height:300px;background-color:pink}#contextmenu li{padding:0 30px;height:24px;line-height:24px;list-style-type:none;cursor:default}#contextmenu li:hover{background-color:#dadce0}
+</style>
+
+</body></html>
