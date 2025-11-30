@@ -1,0 +1,686 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>K-Line Chart</title>
+	<script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		html, body {
+			width: 100%;
+			height: 100%;
+			background: #1e2630;
+		}
+		body {
+			color: #fff;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		}
+		.container {
+			width: 100%;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+		}
+		.toolbar {
+			background: #1a202c;
+			border-bottom: 1px solid #3a4147;
+			padding: 8px 12px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			flex-shrink: 0;
+		}
+		.btn-group {
+			display: flex;
+			gap: 4px;
+		}
+		.time-btn {
+			padding: 4px 10px;
+			font-size: 11px;
+			border: 1px solid #4a5157;
+			background: transparent;
+			color: #999;
+			border-radius: 2px;
+			cursor: pointer;
+			white-space: nowrap;
+			transition: all 0.15s;
+		}
+		.time-btn:hover {
+			border-color: #666;
+			color: #ccc;
+		}
+		.time-btn.active {
+			background: #6d67e6;
+			border-color: #6d67e6;
+			color: #fff;
+		}
+		.top-stats {
+			display: flex;
+			gap: 24px;
+			font-size: 11px;
+			align-items: center;
+			flex: 1;
+			margin-left: 20px;
+		}
+		.stat-item {
+			display: flex;
+			gap: 6px;
+			align-items: center;
+		}
+		.stat-label {
+			color: #8a92a0;
+		}
+		.stat-value {
+			color: #fff;
+			font-weight: bold;
+		}
+		.stat-value.collect {
+			//color: #ffd700;
+		}
+		.stat-value.high {
+			color: #26a69a;
+		}
+		.stat-value.low {
+			color: #f6465d;
+		}
+		.chart-container {
+			flex: 1;
+			position: relative;
+			overflow: hidden;
+		}
+		#chart {
+			width: 100%;
+			height: 100%;
+		}
+		.overlay-info {
+			position: absolute;
+			top: 12px;
+			right: 60px;
+			background: rgba(0, 0, 0, 0.7);
+			padding: 8px 12px;
+			border-radius: 4px;
+			font-size: 11px;
+			display: none;
+			color: #ccc;
+		}
+		.overlay-info.show {
+			display: block;
+		}
+		.overlay-info div {
+			margin: 2px 0;
+		}
+		.overlay-info .label {
+			display: inline-block;
+			width: 40px;
+			color: #999;
+		}
+		.overlay-info .value {
+			color: #fff;
+			font-weight: bold;
+		}
+		.overlay-info .value.up {
+			color: #26a69a;
+		}
+		.overlay-info .value.down {
+			color: #f6465d;
+		}
+		.bottom-info {
+			background: #1a202c;
+			border-top: 1px solid #3a4147;
+			padding: 6px 12px;
+			font-size: 10px;
+			display: flex;
+			gap: 20px;
+			flex-shrink: 0;
+			overflow-x: auto;
+		}
+		.info-item {
+			display: flex;
+			gap: 4px;
+			white-space: nowrap;
+		}
+		.info-label {
+			color: #777;
+		}
+		.info-value {
+			color: #ccc;
+			font-weight: bold;
+		}
+		legend {
+			position: absolute;
+			top: 12px;
+			left: 12px;
+			display: flex;
+			gap: 16px;
+			font-size: 10px;
+			background: rgba(0, 0, 0, 0.6);
+			padding: 4px 8px;
+			border-radius: 3px;
+		}
+		.legend-item {
+			display: flex;
+			align-items: center;
+			gap: 4px;
+		}
+		.legend-color {
+			width: 10px;
+			height: 1px;
+		}
+		.legend-color.ma7 {
+			background: #ffd700;
+		}
+		.legend-color.ma25 {
+			background: #1e90ff;
+		}
+		.legend-text {
+			color: #ccc;
+		}
+		.price-badge {
+			position: absolute;
+			right: 12px;
+			top: 50%;
+			transform: translateY(-50%);
+			background: rgba(0, 0, 0, 0.8);
+			padding: 12px 16px;
+			border-radius: 4px;
+			font-size: 24px;
+			font-weight: bold;
+			color: #26a69a;
+			border-left: 3px solid #26a69a;
+			z-index: 10;
+		}
+		.price-badge.down {
+			color: #f6465d;
+			border-left-color: #f6465d;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="toolbar">
+			<div class="btn-group">
+				<button class="time-btn active" data-interval="1">1m</button>
+				<button class="time-btn" data-interval="5">5m</button>
+				<button class="time-btn" data-interval="15">15m</button>
+				<button class="time-btn" data-interval="30">30m</button>
+				<button class="time-btn" data-interval="60">1h</button>
+				<button class="time-btn" data-interval="240">4h</button>
+				<button class="time-btn" data-interval="1440">1D</button>
+			</div>
+			<div class="top-stats">
+				<div class="stat-item">
+					<span class="stat-label">Time:</span>
+					<span class="stat-value" id="time-stat">2025-11-29 16:41</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-label">MAG:</span>
+					<span class="stat-value collect" id="mag-stat">-</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-label">MAX:</span>
+					<span class="stat-value high" id="max-stat">-</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-label">MAI0:</span>
+					<span class="stat-value low" id="mai-stat">-</span>
+				</div>
+			</div>
+		</div>
+		
+		<div class="chart-container">
+			<div id="chart"></div>
+			<div class="price-badge" id="price-badge">90870.74</div>
+			<div class="overlay-info" id="overlay">
+				<div><span class="label">Time:</span> <span class="value" id="ov-time">-</span></div>
+				<div><span class="label">Open:</span> <span class="value" id="ov-open">-</span></div>
+				<div><span class="label">High:</span> <span class="value" id="ov-high">-</span></div>
+				<div><span class="label">Low:</span> <span class="value" id="ov-low">-</span></div>
+				<div><span class="label">Close:</span> <span class="value" id="ov-close">-</span></div>
+				<div><span class="label">Vol:</span> <span class="value" id="ov-vol">-</span></div>
+			</div>
+			<div class="legend">
+				<div class="legend-item">
+					<div class="legend-color ma7"></div>
+					<span class="legend-text">MA5: <span id="ma7-value">-</span></span>
+				</div>
+				<div class="legend-item">
+					<div class="legend-color ma25"></div>
+					<span class="legend-text">MA10: <span id="ma25-value">-</span></span>
+				</div>
+			</div>
+		</div>
+		
+		<div class="bottom-info">
+			<div class="info-item">
+				<span class="info-label">VOL(S,10,20)</span>
+				<span class="info-value" id="vol-val">-</span>
+			</div>
+			<div class="info-item">
+				<span class="info-label">MA5:</span>
+				<span class="info-value" id="info-ma5">-</span>
+			</div>
+			<div class="info-item">
+				<span class="info-label">MA10:</span>
+				<span class="info-value" id="info-ma10">-</span>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const queryParams = new URLSearchParams(window.location.search);
+		const market = queryParams.get('market') || 'btcusdt';
+		const coinname = market.replace('usdt', '').toUpperCase();
+		
+		const container = document.getElementById('chart');
+		let currentInterval = 1;
+		let chartData = {};
+		let lastCandlePrice = 90870.57;
+		let lastCandleOpen = 90870.57;
+		let lastCandleHigh = 90870.57;
+		let lastCandleLow = 90870.57;
+		let allChartData = { data: [], ma7Data: [], ma25Data: [], ma30Data: [], closes: [] };
+
+		// Create chart
+		const chart = LightweightCharts.createChart(container, {
+			layout: {
+				textColor: '#8a92a0',
+				background: { color: '#1e2630' }
+			},
+			timeScale: {
+				timeVisible: true,
+				secondsVisible: true,
+				borderColor: '#3a4147'
+			},
+			rightPriceScale: {
+				borderColor: '#3a4147',
+				autoScale: true,
+				mode: LightweightCharts.PriceScaleMode.Normal
+			},
+			grid: {
+				hStyle: 'dashed',
+				vStyle: 'dashed',
+				hColor: '#3a4147',
+				vColor: '#3a4147'
+			},
+			crosshair: {
+				mode: LightweightCharts.CrosshairMode.Magnet
+			}
+		});
+
+		// Candlestick series
+		const candlesticks = chart.addCandlestickSeries({
+			upColor: '#26a69a',
+			downColor: '#f6465d',
+			borderUpColor: '#26a69a',
+			borderDownColor: '#f6465d',
+			wickUpColor: '#26a69a',
+			wickDownColor: '#f6465d',
+			priceScaleId: 'right'
+		});
+		
+		// Configure right price scale for candlesticks (upper pane)
+		chart.priceScale('right').applyOptions({
+			scaleMargins: {
+				top: 0.1,
+				bottom: 0.3,
+			},
+			autoScale: true
+		});
+
+		// Volume series - separate lower pane
+		const volumes = chart.addHistogramSeries({
+			//color: '#385263',
+			priceScaleId: 'left',
+			scaleMargins: { top: 0.8, bottom: 0 }
+		});
+
+		// Configure left price scale for volume (lower pane)
+		chart.priceScale('left').applyOptions({
+			scaleMargins: {
+				top: 0.8,
+				bottom: 0,
+			},
+		});
+
+		// MA7 and MA25
+		const ma7 = chart.addLineSeries({
+			color: '#ffd700',
+			lineWidth: 1,
+			//title: 'MA(7)',
+			//priceScaleId: 'right'
+		});
+
+		const ma25 = chart.addLineSeries({
+			color: '#1e90ff',
+			lineWidth: 1,
+			//title: 'MA(25)',
+			//priceScaleId: 'right'
+		});
+
+		// MA30
+		const ma30 = chart.addLineSeries({
+			color: '#26a69a',
+			lineWidth: 1,
+			//title: 'MA(30)',
+			//priceScaleId: 'right'
+		});
+
+		// Generate data
+		function generateData(interval) {
+			const data = [];
+			const volData = [];
+			const ma7Data = [];
+			const ma25Data = [];
+			const ma30Data = [];
+			
+			const now = Math.floor(Date.now() / 1000);
+			const step = interval * 60;
+			let basePrice = 90870.57; // Start at the current price shown in card
+			let closes = [];
+
+			for (let i = 120; i > 0; i--) {
+				const time = now - i * step;
+				// Very small realistic change (0.01% to 0.05% per candle)
+				const changePercent = (Math.random() - 0.5) * 0.0004;
+				const change = basePrice * changePercent;
+				const open = basePrice;
+				const close = open + change;
+				basePrice = close;
+				
+				// High and low within realistic range (1-2 times the change)
+				const high = Math.max(open, close) + Math.abs(change) * (Math.random() * 0.5 + 0.2);
+				const low = Math.min(open, close) - Math.abs(change) * (Math.random() * 0.5 + 0.2);
+				const volume = Math.random() * 5000 + 1000;
+
+				data.push({
+					time,
+					open: parseFloat(open.toFixed(2)),
+					high: parseFloat(high.toFixed(2)),
+					low: parseFloat(low.toFixed(2)),
+					close: parseFloat(close.toFixed(2))
+				});
+
+				volData.push({
+					time,
+					value: volume,
+					color: close >= open ? 'rgba(38, 166, 154, 0.3)' : 'rgba(246, 70, 93, 0.3)'
+				});
+
+				closes.push(close);
+
+				// MA(7)
+				if (closes.length >= 7) {
+					const ma7Closes = closes.slice(-7);
+					const ma7Val = ma7Closes.reduce((a, b) => a + b) / 7;
+					ma7Data.push({ time, value: parseFloat(ma7Val.toFixed(2)) });
+				}
+
+				// MA(25)
+				if (closes.length >= 25) {
+					const ma25Closes = closes.slice(-25);
+					const ma25Val = ma25Closes.reduce((a, b) => a + b) / 25;
+					ma25Data.push({ time, value: parseFloat(ma25Val.toFixed(2)) });
+				}
+
+				// MA(30)
+				if (closes.length >= 30) {
+					const ma30Closes = closes.slice(-30);
+					const ma30Val = ma30Closes.reduce((a, b) => a + b) / 30;
+					ma30Data.push({ time, value: parseFloat(ma30Val.toFixed(2)) });
+				}
+			}
+
+			return { data, volData, ma7Data, ma25Data, ma30Data, closes };
+		}
+
+		// Update last candlestick with real-time price
+		function updateLastCandle() {
+			if (allChartData.data.length === 0) {
+				console.log('No data yet');
+				return;
+			}
+			
+			const changePercent = (Math.random() - 0.5) * 0.0002;
+			const change = lastCandlePrice * changePercent;
+			lastCandlePrice = lastCandlePrice + change;
+			
+			const lastCandle = allChartData.data[allChartData.data.length - 1];
+			const close = parseFloat(lastCandlePrice.toFixed(2));
+			
+			// Track the highest and lowest prices during this candle period
+			// Make sure to include the original high and low from the candle data
+			let high = Math.max(close, lastCandle.high, lastCandleHigh);
+			let low = Math.min(close, lastCandle.low, lastCandleLow);
+			
+			lastCandleHigh = high;
+			lastCandleLow = low;
+			
+			// Update the candlestick with proper high/low tracking
+			const updatedCandle = {
+				time: lastCandle.time,
+				open: lastCandleOpen,
+				high: high,
+				low: low,
+				close: close
+			};
+			
+			console.log('Updating candle:', { open: lastCandleOpen, high: high, low: low, close: close });
+			candlesticks.update(updatedCandle);
+			
+			// Update MA lines
+			const closes = [...allChartData.closes];
+			closes[closes.length - 1] = close;
+			
+			// Update MA7
+			if (closes.length >= 7) {
+				const ma7Closes = closes.slice(-7);
+				const ma7Val = ma7Closes.reduce((a, b) => a + b) / 7;
+				if (allChartData.ma7Data.length > 0) {
+					const lastMa7 = allChartData.ma7Data[allChartData.ma7Data.length - 1];
+					ma7.update({ time: lastMa7.time, value: parseFloat(ma7Val.toFixed(2)) });
+				}
+			}
+			
+			// Update MA25
+			if (closes.length >= 25) {
+				const ma25Closes = closes.slice(-25);
+				const ma25Val = ma25Closes.reduce((a, b) => a + b) / 25;
+				if (allChartData.ma25Data.length > 0) {
+					const lastMa25 = allChartData.ma25Data[allChartData.ma25Data.length - 1];
+					ma25.update({ time: lastMa25.time, value: parseFloat(ma25Val.toFixed(2)) });
+				}
+			}
+			
+			// Update MA30
+			if (closes.length >= 30) {
+				const ma30Closes = closes.slice(-30);
+				const ma30Val = ma30Closes.reduce((a, b) => a + b) / 30;
+				if (allChartData.ma30Data.length > 0) {
+					const lastMa30 = allChartData.ma30Data[allChartData.ma30Data.length - 1];
+					ma30.update({ time: lastMa30.time, value: parseFloat(ma30Val.toFixed(2)) });
+				}
+			}
+			
+			// Update top stats
+			document.getElementById('mag-stat').textContent = close.toFixed(2);
+			
+			// Update price badge
+			const priceBadge = document.getElementById('price-badge');
+			priceBadge.textContent = close.toFixed(2);
+			priceBadge.className = close >= lastCandleOpen ? 'price-badge' : 'price-badge down';
+			
+			// Update MA values in legend
+			if (closes.length >= 7) {
+				const ma7Closes = closes.slice(-7);
+				const ma7Val = ma7Closes.reduce((a, b) => a + b) / 7;
+				document.getElementById('ma7-value').textContent = ma7Val.toFixed(2);
+				document.getElementById('info-ma5').textContent = ma7Val.toFixed(2);
+			}
+			
+			if (closes.length >= 25) {
+				const ma25Closes = closes.slice(-25);
+				const ma25Val = ma25Closes.reduce((a, b) => a + b) / 25;
+				document.getElementById('ma25-value').textContent = ma25Val.toFixed(2);
+				document.getElementById('info-ma10').textContent = ma25Val.toFixed(2);
+			}
+		}
+
+		// Update chart
+		function updateChart(interval) {
+			const { data, volData, ma7Data, ma25Data, ma30Data, closes } = generateData(interval);
+			allChartData = { data: data, ma7Data: ma7Data, ma25Data: ma25Data, ma30Data: ma30Data, closes: closes };
+			lastCandlePrice = data[data.length - 1].close;
+			lastCandleOpen = data[data.length - 1].open;
+			lastCandleHigh = data[data.length - 1].high;
+			lastCandleLow = data[data.length - 1].low;
+			
+			candlesticks.setData(data);
+			volumes.setData(volData);
+			ma7.setData(ma7Data);
+			ma25.setData(ma25Data);
+			ma30.setData(ma30Data);
+			
+			// Calculate fixed price range based on all data
+			if (data.length > 0) {
+				const allPrices = [];
+				data.forEach(d => {
+					allPrices.push(d.high, d.low);
+				});
+				ma7Data.forEach(d => allPrices.push(d.value));
+				ma25Data.forEach(d => allPrices.push(d.value));
+				ma30Data.forEach(d => allPrices.push(d.value));
+				
+				const minPrice = Math.min(...allPrices);
+				const maxPrice = Math.max(...allPrices);
+				const priceRange = maxPrice - minPrice;
+				const padding = priceRange * 0.1; // 10% padding
+				
+				// Set fixed price scale using autoscale
+				chart.priceScale('right').applyOptions({
+					autoScale: true,
+					scaleMargins: {
+						top: 0.1,
+						bottom: 0.3
+					}
+				});
+			}
+			
+			chart.timeScale().fitContent();
+			
+			// Update top stats with the latest values
+			if (data.length > 0) {
+				const latest = data[data.length - 1];
+				const date = new Date(latest.time * 1000);
+				document.getElementById('time-stat').textContent = date.toLocaleString();
+				document.getElementById('mag-stat').textContent = latest.close.toFixed(2);
+				
+				// Update price badge
+				const priceBadge = document.getElementById('price-badge');
+				priceBadge.textContent = latest.close.toFixed(2);
+				priceBadge.className = latest.close >= latest.open ? 'price-badge' : 'price-badge down';
+				
+				const highestHigh = Math.max(...data.map(d => d.high));
+				const lowestLow = Math.min(...data.map(d => d.low));
+				document.getElementById('max-stat').textContent = highestHigh.toFixed(2);
+				document.getElementById('mai-stat').textContent = lowestLow.toFixed(2);
+				
+				// Update MA values in legend and bottom info
+				if (ma7Data.length > 0) {
+					const lastMa7 = ma7Data[ma7Data.length - 1];
+					document.getElementById('ma7-value').textContent = lastMa7.value.toFixed(2);
+					document.getElementById('info-ma5').textContent = lastMa7.value.toFixed(2);
+				}
+				
+				if (ma25Data.length > 0) {
+					const lastMa25 = ma25Data[ma25Data.length - 1];
+					document.getElementById('ma25-value').textContent = lastMa25.value.toFixed(2);
+					document.getElementById('info-ma10').textContent = lastMa25.value.toFixed(2);
+				}
+				
+				// Update volume in bottom info
+				if (volData.length > 0) {
+					const lastVol = volData[volData.length - 1];
+					document.getElementById('vol-val').textContent = (lastVol.value / 1000).toFixed(2) + 'K';
+				}
+			}
+		}
+
+		// Crosshair move
+		chart.subscribeCrosshairMove((param) => {
+			if (!param.time) {
+				document.getElementById('overlay').classList.remove('show');
+				return;
+			}
+
+			const data = param.seriesData.get(candlesticks);
+			const volData = param.seriesData.get(volumes);
+
+			if (data) {
+				const date = new Date(param.time * 1000);
+				document.getElementById('ov-time').textContent = date.toLocaleString();
+				document.getElementById('ov-open').textContent = data.open.toFixed(2);
+				document.getElementById('ov-high').textContent = data.high.toFixed(2);
+				document.getElementById('ov-low').textContent = data.low.toFixed(2);
+				
+				const closeEl = document.getElementById('ov-close');
+				closeEl.textContent = data.close.toFixed(2);
+				closeEl.className = 'value ' + (data.close >= data.open ? 'up' : 'down');
+				
+				if (volData && volData.value !== undefined) {
+					document.getElementById('ov-vol').textContent = volData.value.toFixed(2) + 'K';
+				} else {
+					document.getElementById('ov-vol').textContent = '-';
+				}
+				
+				document.getElementById('overlay').classList.add('show');
+			}
+		});
+
+		// Time buttons
+		document.querySelectorAll('.time-btn').forEach(btn => {
+			btn.addEventListener('click', (e) => {
+				document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+				e.target.classList.add('active');
+				currentInterval = parseInt(e.target.dataset.interval);
+				updateChart(currentInterval);
+			});
+		});
+
+		// Initial
+		updateChart(1);
+
+		// Resize
+		window.addEventListener('resize', () => {
+			if (container.clientWidth > 0) {
+				chart.applyOptions({ 
+					width: container.clientWidth,
+					height: container.clientHeight
+				});
+			}
+		});
+
+		// Auto refresh - full update every 5 seconds
+		setInterval(() => {
+			try {
+				updateChart(currentInterval);
+			} catch(e) {
+				console.error('Error in updateChart:', e);
+			}
+		}, 10000);
+		
+		// Real-time price updates every 3 seconds
+		setInterval(() => {
+			try {
+				updateLastCandle();
+			} catch(e) {
+				console.error('Error in updateLastCandle:', e);
+			}
+		}, 10000);
+	</script>
+</body>
+</html>

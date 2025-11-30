@@ -1,0 +1,329 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="BVOX Finance - Crypto Trading Platform">
+    <meta property="og:image" content="/assets/favicon.png">
+    
+    <title>BVOX Finance - Crypto Trading Platform</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="shortcut icon" href="./assets/favicon.ico">
+    <link rel="manifest" href="./manifest.json">
+    
+    <style>
+        html {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img class="y-back" src="./assets/banner4.png" alt="Banner">
+        <div class="y-left-kuo" id="zhankai">
+            <img src="./assets/menu-icon.png" alt="Menu">
+        </div>
+        <a href="./pages/notify.html" class="y-right-tong">
+            <img src="./assets/bell.png" alt="Notifications">
+            <span class="y-right-dian"></span>
+        </a>
+        <a href="./pages/service.html" class="y-right-kefu">
+            <img src="./assets/kefu.png" alt="Support">
+        </a>
+    </header>
+
+    <div class="y-in">
+        <div class="y-banner">
+            <img src="./assets/banner4.png" alt="Main Banner">
+        </div>
+
+        <!-- Quick Navigation -->
+        <div class="y-inselect">
+            <a href="./pages/mining.html">
+                <span><img src="./assets/mining-icon.png" alt="Mining"></span>
+                <p data-translate="çŸ¿ä¸š">Mining</p>
+            </a>
+            <a href="./pages/contract.html?market=btc">
+                <span><img src="./assets/contract-icon.png" alt="Contract"></span>
+                <p data-translate="åˆçº¦äº¤æ˜“">Contract</p>
+            </a>
+            <a href="./pages/ai-arbitrage.html">
+                <span><img src="./assets/ai-icon.png" alt="AI Arbitrage"></span>
+                <p data-translate="äººå·¥æ™ºèƒ½å¥—åˆ©">AI arbitrage</p>
+            </a>
+            <a href="./pages/loan.html">
+                <span><img src="./assets/loan-icon.png" alt="Loan"></span>
+                <p data-translate="è´·æ¬¾">Loan</p>
+            </a>
+        </div>
+
+        <!-- Market Section -->
+        <div class="market index-div-base-margin">
+            <div class="y-ttb">
+                <span></span>
+                <p>Market</p>
+            </div>
+            <div id="market-container">
+                <!-- Market items will be populated here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="y-foo">
+        <div class="tab-container">
+            <a href="/" class="tab-item">
+                <img src="./assets/home-icon.png" class="tab-icon" alt="Home">
+                <span class="tab-text fcy" data-translate="é¦–é¡µ">Home</span>
+            </a>
+            <a href="./pages/contract.html?market=btc" class="tab-center">
+                <div class="tab-center-icon">
+                    <img src="./assets/trade-icon.png" alt="Trade">
+                </div>
+            </a>
+            <a href="./pages/assets.html" class="tab-item">
+                <img src="./assets/assets-icon.png" class="tab-icon" alt="Assets">
+                <span class="tab-text" data-translate="èµ„äº§">Assets</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- User Info Footer -->
+    <div class="footer" id="footer">
+        <div class="y-f-top">
+            <h1>BVOX</h1>
+        </div>
+        <div class="y-txc">
+            <span class="y-dex" style="background:#000">
+                <img src="./assets/favicon.ico" alt="BVOX">
+            </span>
+            <p>
+                <span class="y-txc-t">
+                    ID: <b id="y-usid"></b> <b id="y-rzzt"></b>
+                </span>
+                <span class="y-txc-b">
+                    <b data-translate="ä¿¡ç”¨åˆ†">Credit score</b>
+                    <b id="y-xyf"></b>
+                </span>
+            </p>
+        </div>
+
+        <a href="./pages/identity.html">
+            <div class="footer_op">
+                <div class="f_op_t"><img src="./assets/identity-icon.png" alt="Identity"></div>
+                <div class="f_op_b"><span class="fzm fcch" data-translate="èº«ä»½è®¤è¯">Identity Authentication</span></div>
+            </div>
+        </a>
+        <a href="./pages/financial.html">
+            <div class="footer_op">
+                <div class="f_op_t"><img src="./assets/financial-icon.png" alt="Financial"></div>
+                <div class="f_op_b"><span class="fzm fcch" data-translate="è´¢åŠ¡è®°å½•">Financial Records</span></div>
+            </div>
+        </a>
+        <a href="./pages/telegram.html">
+            <div class="footer_op">
+                <div class="f_op_t"><img src="./assets/telegram-icon.png" alt="Telegram"></div>
+                <div class="f_op_b"><span class="fzm fcch">Telegram</span></div>
+            </div>
+        </a>
+        <a href="./pages/license.html">
+            <div class="footer_op">
+                <div class="f_op_t"><img src="./assets/license-icon.png" alt="License"></div>
+                <div class="f_op_b"><span class="fzm fcch" data-translate="ç›‘ç®¡è®¸å¯">Regulatory License</span></div>
+            </div>
+        </a>
+        <a href="./pages/faqs.html">
+            <div class="footer_op">
+                <div class="f_op_t"><img src="./assets/faq-icon.png" alt="FAQs"></div>
+                <div class="f_op_b"><span class="fzm fcch" data-translate="å¸¸è§é—®é¢˜">FAQs</span></div>
+            </div>
+        </a>
+        <a href="./pages/lang.html">
+            <div class="footer_op">
+                <div class="f_op_t"><img src="./assets/lang-icon.png" alt="Language"></div>
+                <div class="f_op_b"><span class="fzm fcch" data-translate="è¯­è¨€é€‰æ‹©">Select language</span></div>
+            </div>
+        </a>
+        <a href="./pages/service.html">
+            <div class="footer_op">
+                <div class="f_op_t"><img src="./assets/service-icon.png" alt="Service"></div>
+                <div class="f_op_b"><span class="fzm fcch" data-translate="åœ¨çº¿å®¢æœ">Live Chat</span></div>
+            </div>
+        </a>
+        <div onclick="showSecurityCode();">
+            <div class="footer_op">
+                <div class="f_op_t"><img src="./assets/security-icon.png" alt="Security"></div>
+                <div class="f_op_b"><span class="fzm fcch" data-translate="å®‰å…¨ç ">Security code</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="zhezhao"></div>
+
+    <!-- Security Code / Login Modal -->
+    <div id="security-modal" style="position: absolute;bottom: 0;width: 100%;background: rgba(0,0,0,0.9);color: #fff;padding: 3.5rem 0;text-align: center;display: none;z-index: 1000;">
+        <p style="margin: .8rem 0;font-size: 1rem;">Please enter your wallet address</p>
+        <input id="wallet-address" type="text" placeholder="0x..." style="width: 80%;padding: .5rem;border: 1px solid #d1d1d1;border-radius: .3rem;background: #111;color: #fff;font-size: 1rem;outline: none;margin-bottom: .5rem;">
+        <p style="margin: .8rem 0;font-size: 1rem;">Please enter your login code</p>
+        <input id="security-code" type="text" placeholder="Login code..." style="width: 80%;padding: .5rem;border: 1px solid #d1d1d1;border-radius: .5rem;background: #111;color: #fff;font-size: 1rem;outline: none;margin-bottom: .5rem;">
+        <button onclick="handleLogin();" style="background: linear-gradient(135deg, #ffcc00, #ff9900);color: #000;font-weight: bold;border: none;border-radius: 6px;padding: .5rem 1.5rem;cursor: pointer;font-size: 1rem;transition: all 0.3s ease;margin-top: 1rem;">Submit</button>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Config must load first -->
+    <script src="./js/config.js"></script>
+    <script src="./js/utils.js"></script>
+    
+    <!-- Third-party libraries -->
+    <script src="./js/jquery.js"></script>
+    <script src="./js/pako.min.js"></script>
+    <script src="./js/js.cookie.min.js"></script>
+    <script src="./js/web3.min.js"></script>
+    <script src="./js/web3provider.js"></script>
+
+    <!-- Main application script -->
+    <script>
+        // Initialize on page load
+        $(document).ready(function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            // Check if user is logged in
+            const userId = getCurrentUserId();
+            if (!userId) {
+                console.log('User not logged in');
+                // Optionally redirect to login page
+            }
+
+            // Initialize price WebSocket
+            initializePriceUpdates();
+
+            // Load user information
+            loadUserInfo();
+
+            // Set up event listeners
+            setupEventListeners();
+        }
+
+        function initializePriceUpdates() {
+            // Create and connect WebSocket manager
+            window.priceManager = new PriceWebSocketManager();
+            window.priceManager.connect();
+
+            // Listen for price updates
+            window.addEventListener('priceUpdate', (event) => {
+                const data = event.detail;
+                if (data.ch) {
+                    handlePriceUpdate(data);
+                }
+            });
+        }
+
+        function handlePriceUpdate(data) {
+            // This function handles real-time price updates
+            // Extract market info from channel name
+            const channel = data.ch;
+            const pair = channel.split('.')[1];
+
+            if (!data.tick || !data.tick.close) return;
+
+            const close = data.tick.close;
+            const open = data.tick.open;
+            const change = ((close - open) / open * 100).toFixed(2);
+            const isPositive = change >= 0;
+
+            // Update UI for each market
+            updateMarketDisplay(pair, close, change, isPositive);
+        }
+
+        function updateMarketDisplay(pair, price, change, isPositive) {
+            // Update market items on the page
+            const selector = `.market-item[data-pair="${pair}"] .price`;
+            const changeSelector = `.market-item[data-pair="${pair}"] .change`;
+
+            const colorClass = isPositive ? 'fgreen' : 'fred';
+            $(selector).html(`<span class="${colorClass}" style="font-weight: 500;">${formatCurrency(price)}</span>`);
+            $(changeSelector).html(`<span class="${colorClass}" style="font-weight: 500;">${change}%</span>`);
+        }
+
+        function loadUserInfo() {
+            const userId = getCurrentUserId();
+            if (!userId) return;
+
+            $('#y-usid').text(userId);
+
+            // Load user status from API
+            $.post(apiurl + "/Wallet/getuserzt", {
+                'userid': userId,
+            }, function(res) {
+                if (res.code == 1) {
+                    // Update authentication status
+                    let status = 'æœªè®¤è¯';
+                    if (res.data['renzhengzhuangtai'] == 1) {
+                        status = 'åˆçº§';
+                    } else if (res.data['renzhengzhuangtai'] == 2) {
+                        status = 'é«˜çº§';
+                    }
+                    $('#y-rzzt').text(status);
+                    $('#y-xyf').text(res.data['xinyongfen']);
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            // Menu toggle
+            $("#zhankai").click(function() {
+                loadUserInfo();
+                $("#footer").animate({width: 'toggle'}, 30);
+                $("#zhezhao").show();
+            });
+
+            $("#zhezhao").click(function() {
+                $("#footer").animate({width: 'toggle'}, 30);
+                $("#zhezhao").hide();
+            });
+        }
+
+        function showSecurityCode() {
+            $('#security-modal').show();
+        }
+
+        function handleLogin() {
+            const address = $('#wallet-address').val();
+            const code = $('#security-code').val();
+
+            if (!address || !code) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            $.ajax({
+                url: apiurl + '/user/getuserid2',
+                type: 'POST',
+                data: {
+                    'yaddress': address,
+                    'miyao': code
+                },
+                dataType: 'json',
+                success: function(res) {
+                    if (res.code == 1) {
+                        setCookie('userid', res.data.userid);
+                        setCookie('username', res.data.username);
+                        setCookie('ytoken', res.data.token);
+                        location.reload();
+                    } else {
+                        alert(gy(res.info || 'Login failed'));
+                    }
+                },
+                error: function() {
+                    alert('Network error. Please try again.');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -178,7 +178,6 @@ input, textarea, button, select {
     z-index: 999;
     padding: 1rem;
     overflow-y: auto;
-    background-image: url(/img/yybg.png);
     background-position: 0 0;
     background-repeat: no-repeat;
     background-size: cover;
@@ -569,7 +568,7 @@ input, textarea, button, select {
     top: 0;
     left: 0;
     width: 100%;
-    background: url(/img/leaf-bg.png);
+    background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
     background-size: 200vw;
     background-position-x: -80vw;
     background-repeat: no-repeat;
@@ -773,7 +772,7 @@ input, textarea, button, select {
 
 .y-ai-k-in{
     position: relative;
-    background: url(/img/tlbg.png);
+    background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
     background-size: cover;
     width: 100%;
     background-repeat: no-repeat;
@@ -1398,7 +1397,7 @@ input, textarea, button, select {
 
 .y-lingh{
     padding: 0 1rem;
-    background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%), url(/img/leaf-bg.png);
+    background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
     background-blend-mode: difference;
     padding-bottom: 2rem;
 }

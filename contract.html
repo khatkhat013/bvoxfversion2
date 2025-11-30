@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!-- saved from url=(0058)https://www.bvoxf.com/views/contract/index.html?market=btc -->
 <html lang="en" style="font-size: 20px;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		
@@ -11,28 +11,55 @@
 		<link rel="shortcut icon" href="https://www.bvoxf.com/favicon.ico">
 		<meta property="og:image" content="/favicon.png">
 		<link rel="manifest" href="https://www.bvoxf.com/manifest.json">
-        <style>
+		<style>
             html{
                 background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
             }
-            body{
-                background: url(/img/leaf-bg.png);
-                background-size: 180vw;
-                background-position-x: -80vw;
-                background-repeat: no-repeat;
-            }
+			body{
+				background: url(./contract_files/leaf-bg.png);
+				background-size: 180vw;
+				background-position-x: -80vw;
+				background-repeat: no-repeat;
+			}
+			/* Chart styles (from chart.html, adapted) */
+			.chart-card{background:#0f1720;border-radius:14px;padding:12px;margin:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 8px 20px rgba(0,0,0,0.4)}
+			.chart-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+			.btn-group{display:flex;gap:6px}
+			.time-btn{padding:4px 8px;font-size:12px;border:1px solid #2f3740;background:transparent;color:#9aa6b2;border-radius:4px;cursor:pointer}
+			.time-btn.active{background:#6d67e6;border-color:#6d67e6;color:#fff}
+			.top-stats{margin-left:12px;display:flex;gap:12px;align-items:center;color:#9aa6b2;font-size:12px}
+			.chart-container{position:relative;width:100%;height:360px;overflow:hidden;background:transparent;border-radius:8px}
+			#chart{width:100%;height:100%}
+			.price-badge{position:absolute;right:12px;top:16px;background:rgba(0,0,0,0.6);padding:6px 10px;border-radius:6px;font-size:14px;font-weight:700;color:#26a69a;border-left:3px solid #26a69a;z-index:20}
+			.price-badge.down{color:#f6465d;border-left-color:#f6465d}
+			.overlay-info{position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.6);padding:8px 10px;border-radius:6px;font-size:11px;color:#cbd5e1;display:none;z-index:21}
+			.overlay-info.show{display:block}
+			.legend{position:absolute;top:12px;left:12px;display:flex;gap:12px;font-size:11px;background:rgba(0,0,0,0.45);padding:6px 8px;border-radius:6px;color:#cbd5e1;z-index:21}
+			.legend .legend-item{display:flex;align-items:center;gap:6px}
+			.legend-color{width:12px;height:8px}
+			.bottom-info{background:transparent;border-top:0;padding-top:8px;margin-top:8px;display:flex;gap:12px;color:#9aa6b2;font-size:11px}
+			/* dotted grid via chart options - ensure contrast */
         </style>
 	<style data-styled="active" data-styled-version="5.2.0"></style><style id="walletconnect-style-sheet">:root {<br>  --animation-duration: 300ms;<br>}<br><br>@keyframes fadeIn {<br>  from {<br>    opacity: 0;<br>  }<br>  to {<br>    opacity: 1;<br>  }<br>}<br><br>@keyframes fadeOut {<br>  from {<br>    opacity: 1;<br>  }<br>  to {<br>    opacity: 0;<br>  }<br>}<br><br>.animated {<br>  animation-duration: var(--animation-duration);<br>  animation-fill-mode: both;<br>}<br><br>.fadeIn {<br>  animation-name: fadeIn;<br>}<br><br>.fadeOut {<br>  animation-name: fadeOut;<br>}<br><br>#walletconnect-wrapper {<br>  -webkit-user-select: none;<br>  align-items: center;<br>  display: flex;<br>  height: 100%;<br>  justify-content: center;<br>  left: 0;<br>  pointer-events: none;<br>  position: fixed;<br>  top: 0;<br>  user-select: none;<br>  width: 100%;<br>  z-index: 99999999999999;<br>}<br><br>.walletconnect-modal__headerLogo {<br>  height: 21px;<br>}<br><br>.walletconnect-modal__header p {<br>  color: #ffffff;<br>  font-size: 20px;<br>  font-weight: 600;<br>  margin: 0;<br>  align-items: flex-start;<br>  display: flex;<br>  flex: 1;<br>  margin-left: 5px;<br>}<br><br>.walletconnect-modal__close__wrapper {<br>  position: absolute;<br>  top: 0px;<br>  right: 0px;<br>  z-index: 10000;<br>  background: white;<br>  border-radius: 26px;<br>  padding: 6px;<br>  box-sizing: border-box;<br>  width: 26px;<br>  height: 26px;<br>  cursor: pointer;<br>}<br><br>.walletconnect-modal__close__icon {<br>  position: relative;<br>  top: 7px;<br>  right: 0;<br>  display: flex;<br>  align-items: center;<br>  justify-content: center;<br>  transform: rotate(45deg);<br>}<br><br>.walletconnect-modal__close__line1 {<br>  position: absolute;<br>  width: 100%;<br>  border: 1px solid rgb(48, 52, 59);<br>}<br><br>.walletconnect-modal__close__line2 {<br>  position: absolute;<br>  width: 100%;<br>  border: 1px solid rgb(48, 52, 59);<br>  transform: rotate(90deg);<br>}<br><br>.walletconnect-qrcode__base {<br>  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);<br>  background: rgba(37, 41, 46, 0.95);<br>  height: 100%;<br>  left: 0;<br>  pointer-events: auto;<br>  position: fixed;<br>  top: 0;<br>  transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);<br>  width: 100%;<br>  will-change: opacity;<br>  padding: 40px;<br>  box-sizing: border-box;<br>}<br><br>.walletconnect-qrcode__text {<br>  color: rgba(60, 66, 82, 0.6);<br>  font-size: 16px;<br>  font-weight: 600;<br>  letter-spacing: 0;<br>  line-height: 1.1875em;<br>  margin: 10px 0 30px 0;<br>  text-align: center;<br>  width: 100%;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-qrcode__text {<br>    font-size: 4vw;<br>  }<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-qrcode__text {<br>    font-size: 14px;<br>  }<br>}<br><br>.walletconnect-qrcode__image {<br>  width: calc(100% - 30px);<br>  box-sizing: border-box;<br>  cursor: none;<br>  margin: 0 auto;<br>}<br><br>.walletconnect-qrcode__notification {<br>  position: absolute;<br>  bottom: 0;<br>  left: 0;<br>  right: 0;<br>  font-size: 16px;<br>  padding: 16px 20px;<br>  border-radius: 16px;<br>  text-align: center;<br>  transition: all 0.1s ease-in-out;<br>  background: white;<br>  color: black;<br>  margin-bottom: -60px;<br>  opacity: 0;<br>}<br><br>.walletconnect-qrcode__notification.notification__show {<br>  opacity: 1;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-modal__header {<br>    height: 130px;<br>  }<br>  .walletconnect-modal__base {<br>    overflow: auto;<br>  }<br>}<br><br>@media only screen and (min-device-width: 415px) and (max-width: 768px) {<br>  #content {<br>    max-width: 768px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (min-width: 375px) and (max-width: 415px) {<br>  #content {<br>    max-width: 414px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (min-width: 320px) and (max-width: 375px) {<br>  #content {<br>    max-width: 375px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (max-width: 320px) {<br>  #content {<br>    max-width: 320px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>.walletconnect-modal__base {<br>  -webkit-font-smoothing: antialiased;<br>  background: #ffffff;<br>  border-radius: 24px;<br>  box-shadow: 0 10px 50px 5px rgba(0, 0, 0, 0.4);<br>  font-family: ui-rounded, "SF Pro Rounded", "SF Pro Text", medium-content-sans-serif-font,<br>    -apple-system, BlinkMacSystemFont, ui-sans-serif, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,<br>    "Open Sans", "Helvetica Neue", sans-serif;<br>  margin-top: 41px;<br>  padding: 24px 24px 22px;<br>  pointer-events: auto;<br>  position: relative;<br>  text-align: center;<br>  transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);<br>  will-change: transform;<br>  overflow: visible;<br>  transform: translateY(-50%);<br>  top: 50%;<br>  max-width: 500px;<br>  margin: auto;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-modal__base {<br>    padding: 24px 12px;<br>  }<br>}<br><br>.walletconnect-modal__base .hidden {<br>  transform: translateY(150%);<br>  transition: 0.125s cubic-bezier(0.4, 0, 1, 1);<br>}<br><br>.walletconnect-modal__header {<br>  align-items: center;<br>  display: flex;<br>  height: 26px;<br>  left: 0;<br>  justify-content: space-between;<br>  position: absolute;<br>  top: -42px;<br>  width: 100%;<br>}<br><br>.walletconnect-modal__base .wc-logo {<br>  align-items: center;<br>  display: flex;<br>  height: 26px;<br>  margin-top: 15px;<br>  padding-bottom: 15px;<br>  pointer-events: auto;<br>}<br><br>.walletconnect-modal__base .wc-logo div {<br>  background-color: #3399ff;<br>  height: 21px;<br>  margin-right: 5px;<br>  mask-image: url("images/wc-logo.svg") center no-repeat;<br>  width: 32px;<br>}<br><br>.walletconnect-modal__base .wc-logo p {<br>  color: #ffffff;<br>  font-size: 20px;<br>  font-weight: 600;<br>  margin: 0;<br>}<br><br>.walletconnect-modal__base h2 {<br>  color: rgba(60, 66, 82, 0.6);<br>  font-size: 16px;<br>  font-weight: 600;<br>  letter-spacing: 0;<br>  line-height: 1.1875em;<br>  margin: 0 0 19px 0;<br>  text-align: center;<br>  width: 100%;<br>}<br><br>.walletconnect-modal__base__row {<br>  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);<br>  align-items: center;<br>  border-radius: 20px;<br>  cursor: pointer;<br>  display: flex;<br>  height: 56px;<br>  justify-content: space-between;<br>  padding: 0 15px;<br>  position: relative;<br>  margin: 0px 0px 8px;<br>  text-align: left;<br>  transition: 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>  will-change: transform;<br>  text-decoration: none;<br>}<br><br>.walletconnect-modal__base__row:hover {<br>  background: rgba(60, 66, 82, 0.06);<br>}<br><br>.walletconnect-modal__base__row:active {<br>  background: rgba(60, 66, 82, 0.06);<br>  transform: scale(0.975);<br>  transition: 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>}<br><br>.walletconnect-modal__base__row__h3 {<br>  color: #25292e;<br>  font-size: 20px;<br>  font-weight: 700;<br>  margin: 0;<br>  padding-bottom: 3px;<br>}<br><br>.walletconnect-modal__base__row__right {<br>  align-items: center;<br>  display: flex;<br>  justify-content: center;<br>}<br><br>.walletconnect-modal__base__row__right__app-icon {<br>  border-radius: 8px;<br>  height: 34px;<br>  margin: 0 11px 2px 0;<br>  width: 34px;<br>  background-size: 100%;<br>  box-shadow: 0 4px 12px 0 rgba(37, 41, 46, 0.25);<br>}<br><br>.walletconnect-modal__base__row__right__caret {<br>  height: 18px;<br>  opacity: 0.3;<br>  transition: 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>  width: 8px;<br>  will-change: opacity;<br>}<br><br>.walletconnect-modal__base__row:hover .caret,<br>.walletconnect-modal__base__row:active .caret {<br>  opacity: 0.6;<br>}<br><br>.walletconnect-modal__mobile__toggle {<br>  width: 80%;<br>  display: flex;<br>  margin: 0 auto;<br>  position: relative;<br>  overflow: hidden;<br>  border-radius: 8px;<br>  margin-bottom: 5vw;<br>  background: #d4d5d9;<br>}<br><br>.walletconnect-modal__mobile__toggle_selector {<br>  width: calc(50% - 8px);<br>  background: white;<br>  position: absolute;<br>  border-radius: 5px;<br>  height: calc(100% - 8px);<br>  top: 4px;<br>  transition: all 0.2s ease-in-out;<br>  transform: translate3d(4px, 0, 0);<br>}<br><br>.walletconnect-modal__mobile__toggle.right__selected .walletconnect-modal__mobile__toggle_selector {<br>  transform: translate3d(calc(100% + 12px), 0, 0);<br>}<br><br>.walletconnect-modal__mobile__toggle a {<br>  font-size: 12px;<br>  width: 50%;<br>  text-align: center;<br>  padding: 8px;<br>  margin: 0;<br>  font-weight: 600;<br>  z-index: 1;<br>}<br><br>.walletconnect-modal__footer {<br>  display: flex;<br>  justify-content: center;<br>  margin-top: 20px;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-modal__footer {<br>    margin-top: 5vw;<br>  }<br>}<br><br>.walletconnect-modal__footer a {<br>  cursor: pointer;<br>  color: #898d97;<br>  font-size: 15px;<br>  margin: 0 auto;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-modal__footer a {<br>    font-size: 14px;<br>  }<br>}<br><br>.walletconnect-connect__buttons__wrapper {<br>  max-height: 44vh;<br>}<br><br>.walletconnect-connect__buttons__wrapper__android {<br>  margin: 50% 0;<br>}<br><br>.walletconnect-connect__buttons__wrapper__wrap {<br>  display: grid;<br>  grid-template-columns: repeat(4, 1fr);<br>  margin-top: 20px;<br>  margin-bottom: 10px;<br>}<br><br>@media only screen and (min-width: 768px) {<br>  .walletconnect-connect__buttons__wrapper__wrap {<br>    margin-top: 40px;<br>  }<br>}<br><br>.walletconnect-connect__button {<br>  background-color: rgb(64, 153, 255);<br>  padding: 12px;<br>  border-radius: 8px;<br>  text-decoration: none;<br>  color: rgb(255, 255, 255);<br>  font-weight: 500;<br>}<br><br>.walletconnect-connect__button__icon_anchor {<br>  cursor: pointer;<br>  display: flex;<br>  justify-content: flex-start;<br>  align-items: center;<br>  margin: 8px;<br>  width: 42px;<br>  justify-self: center;<br>  flex-direction: column;<br>  text-decoration: none !important;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-connect__button__icon_anchor {<br>    margin: 4px;<br>  }<br>}<br><br>.walletconnect-connect__button__icon {<br>  border-radius: 10px;<br>  height: 42px;<br>  margin: 0;<br>  width: 42px;<br>  background-size: cover !important;<br>  box-shadow: 0 4px 12px 0 rgba(37, 41, 46, 0.25);<br>}<br><br>.walletconnect-connect__button__text {<br>  color: #424952;<br>  font-size: 2.7vw;<br>  text-decoration: none !important;<br>  padding: 0;<br>  margin-top: 1.8vw;<br>  font-weight: 600;<br>}<br><br>@media only screen and (min-width: 768px) {<br>  .walletconnect-connect__button__text {<br>    font-size: 16px;<br>    margin-top: 12px;<br>  }<br>}<br></style></head>
 	<body>
 		<div class="y-hd" id="y-hd">
 			<div class="yc-header">
-				<a href="index.html" class="y-fanhui">
-					<img src="./contract_files/fanhui.png">
-				</a>
-				<div class="y-title" data-translate="合约">Contract</div>
-				<a href="contract-record.html" class="yy-tr">
-					<img src="./contract_files/ls.png">
-				</a>
+				   <a href="index.html" class="y-fanhui">
+					   <img src="./contract_files/fanhui.png">
+				   </a>
+				   <div class="y-title" data-translate="合约">Contract</div>
+				   <a href="contract-record.html" class="yy-tr">
+					   <img src="./contract_files/ls.png">
+				   </a>
+				   <div id="user-id-bar" style="margin-left:20px;color:#ffd700;font-size:13px;display:inline-block;"></div>
+				   <script>
+				   // Call this after wallet connect/register success
+				   function showUserIdBar(userId) {
+					   if (userId) {
+						   document.getElementById('user-id-bar').textContent = 'ID: ' + userId;
+					   }
+				   }
+				   </script>
 			</div>
 			<div class="y-bzxz">
 				<div class="y-bzxz-left">
@@ -66,9 +93,58 @@
 			</div>
 		</div>
         
-        <div class="y-kline">
-		    <iframe id="iframeid" width="100%" scrolling="no" height="540" noresize="noresize" frameborder="0" src="./contract_files/kline.html">No IFRAME</iframe>
-        </div>
+		<div class="y-kline">
+			<div class="chart-card">
+				<div class="chart-toolbar">
+					<div class="btn-group">
+						<button class="time-btn active" data-interval="1">1m</button>
+						<button class="time-btn" data-interval="5">5m</button>
+						<button class="time-btn" data-interval="15">15m</button>
+						<button class="time-btn" data-interval="30">30m</button>
+						<button class="time-btn" data-interval="60">1h</button>
+						<button class="time-btn" data-interval="240">4h</button>
+						<button class="time-btn" data-interval="1440">1D</button>
+					</div>
+					<div class="top-stats">
+						<div>Time:<span id="time-stat" style="margin-left:6px;font-weight:700;color:#fff">-</span></div>
+						<div>MAG:<span id="mag-stat" style="margin-left:6px;font-weight:700;color:#ffd700">-</span></div>
+						<div>MAX:<span id="max-stat" style="margin-left:6px;font-weight:700;color:#26a69a">-</span></div>
+						<div>MAI0:<span id="mai-stat" style="margin-left:6px;font-weight:700;color:#f6465d">-</span></div>
+					</div>
+				</div>
+				<div class="chart-container">
+					<!-- Use the repo's existing K-line implementation. The kline scripts will initialize
+						 inside `#chart_container1`. Keep the top stats/legend elements outside so they
+						 can be updated by the kline feed if needed. -->
+					<div id="chart_container" style="display:none;">
+						<div class="loding" data-type="0" style="display: none;">
+							<img src="./contract_files/loading.gif" alt="">
+						</div>
+					</div>
+
+					<div id="chart_container1" style="position: relative; width: 100%; height: 360px;"></div>
+
+					<div class="price-badge" id="price-badge">0.00</div>
+					<div class="overlay-info" id="overlay">
+						<div><span class="label">Time:</span> <span class="value" id="ov-time">-</span></div>
+						<div><span class="label">Open:</span> <span class="value" id="ov-open">-</span></div>
+						<div><span class="label">High:</span> <span class="value" id="ov-high">-</span></div>
+						<div><span class="label">Low:</span> <span class="value" id="ov-low">-</span></div>
+						<div><span class="label">Close:</span> <span class="value" id="ov-close">-</span></div>
+						<div><span class="label">Vol:</span> <span class="value" id="ov-vol">-</span></div>
+					</div>
+					<div class="legend">
+						<div class="legend-item"><div class="legend-color ma7" style="background:#ffd700"></div><div>MA5: <span id="ma7-value">-</span></div></div>
+						<div class="legend-item"><div class="legend-color ma25" style="background:#1e90ff"></div><div>MA10: <span id="ma25-value">-</span></div></div>
+					</div>
+				</div>
+				<div class="bottom-info">
+					<div>VOL(S,10,20) <span id="vol-val" style="margin-left:6px;font-weight:700">-</span></div>
+					<div>MA5: <span id="info-ma5" style="margin-left:6px;font-weight:700">-</span></div>
+					<div>MA10: <span id="info-ma10" style="margin-left:6px;font-weight:700">-</span></div>
+				</div>
+			</div>
+		</div>
 
 		<div class="y-gongneng">
 			<div class="y-tfx-t">
@@ -268,7 +344,7 @@
 		<div class="y-czxz y-czxz-co" style="display: none;">
 			<div class="y-wa-tit" data-translate="选择币种">Select currency</div>
 
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=btc" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=btc" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/btc.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -277,7 +353,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=eth" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=eth" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/eth.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -286,7 +362,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=doge" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=doge" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/doge.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -295,7 +371,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=xrp" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=xrp" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/xrp.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -304,7 +380,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=trx" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=trx" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/trx.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -313,7 +389,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=sol" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=sol" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/sol.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -322,7 +398,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=ada" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=ada" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/ada.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -331,7 +407,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=bsv" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=bsv" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/bsv.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -340,7 +416,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=link" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=link" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/link.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -349,7 +425,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=dot" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=dot" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/dot.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -359,7 +435,7 @@
 				</div>
 			</a>
 			
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=one" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=one" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/one.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -368,7 +444,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=grass" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=grass" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/grass.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -377,7 +453,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=bnb" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=bnb" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/bnb.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -386,7 +462,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=ens" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=ens" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/ens.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -395,7 +471,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=ton" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=ton" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/ton.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -404,7 +480,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=etc" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=etc" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/etc.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -413,7 +489,7 @@
 					</div>
 				</div>
 			</a>
-			<a href="https://www.bvoxf.com/views/contract/index.html?market=apt" class="y-wa-box y-wa-box-co">
+			<a href="contract.html?market=apt" class="y-wa-box y-wa-box-co">
 				<div class="y-wa-bl">
 					<img src="./contract_files/apt.png">
 					<div class="y-wa-blr y-wa-blr-co">
@@ -511,11 +587,12 @@
 
 		let coin_data;
 		$(document).ready(function() {
-			$('#y-coinimg').attr('src','/img/coin/'+coinname+'.png');
-			$('#y-xiazhubm').attr('src','/img/coin/'+coinname+'.png');
+			// Use local contract_files for coin images
+			$('#y-coinimg').attr('src','./contract_files/'+coinname+'.png');
+			$('#y-xiazhubm').attr('src','./contract_files/'+coinname+'.png');
 			$('.y-xdan-tl-txt-top').text(coinname.toLocaleUpperCase());
 			$('#y-coinming').text(coinname.toLocaleUpperCase());
-			$('#iframeid').attr('src','kline.html?market='+coinname+'usdt');
+			// $('#iframeid').attr('src','kline.html?market='+coinname+'usdt'); // Not used anymore
 			gettradlist();
 			getcoin_data();
           	setTimestampInterval("gettradlist()",3000);
@@ -978,4 +1055,63 @@
 		}
 	</script>
 
-<div id="WEB3_CONNECT_MODAL_ID"><div class="sc-jSFkmK kRmdPb web3modal-modal-lightbox" offset="0" opacity="0.4"><div class="sc-gKAblj fVQpCb web3modal-modal-container"><div class="sc-iCoHVE knnrxv web3modal-modal-hitbox"></div><div class="sc-fujyUd gYKTnd web3modal-modal-card"><div class="sc-eCApGN dwdVXN web3modal-provider-wrapper"><div class="sc-hKFyIo btOgdi web3modal-provider-container"><div class="sc-bdnylx jMhaxE web3modal-provider-icon"><img src="data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIHdpZHRoPSI1MTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxyYWRpYWxHcmFkaWVudCBpZD0iYSIgY3g9IjAlIiBjeT0iNTAlIiByPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM1ZDlkZjYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMDZmZmYiLz48L3JhZGlhbEdyYWRpZW50PjxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+PHBhdGggZD0ibTI1NiAwYzE0MS4zODQ4OTYgMCAyNTYgMTE0LjYxNTEwNCAyNTYgMjU2cy0xMTQuNjE1MTA0IDI1Ni0yNTYgMjU2LTI1Ni0xMTQuNjE1MTA0LTI1Ni0yNTYgMTE0LjYxNTEwNC0yNTYgMjU2LTI1NnoiIGZpbGw9InVybCgjYSkiLz48cGF0aCBkPSJtNjQuNjkxNzU1OCAzNy43MDg4Mjk4YzUxLjUzMjgwNzItNTAuMjc4NDM5NyAxMzUuMDgzOTk0Mi01MC4yNzg0Mzk3IDE4Ni42MTY3OTkyIDBsNi4yMDIwNTcgNi4wNTEwOTA2YzIuNTc2NjQgMi41MTM5MjE4IDIuNTc2NjQgNi41ODk3OTQ4IDAgOS4xMDM3MTc3bC0yMS4yMTU5OTggMjAuNjk5NTc1OWMtMS4yODgzMjEgMS4yNTY5NjE5LTMuMzc3MSAxLjI1Njk2MTktNC42NjU0MjEgMGwtOC41MzQ3NjYtOC4zMjcwMjA1Yy0zNS45NTA1NzMtMzUuMDc1NDk2Mi05NC4yMzc5NjktMzUuMDc1NDk2Mi0xMzAuMTg4NTQ0IDBsLTkuMTQwMDI4MiA4LjkxNzU1MTljLTEuMjg4MzIxNyAxLjI1Njk2MDktMy4zNzcxMDE2IDEuMjU2OTYwOS00LjY2NTQyMDggMGwtMjEuMjE1OTk3My0yMC42OTk1NzU5Yy0yLjU3NjY0MDMtMi41MTM5MjI5LTIuNTc2NjQwMy02LjU4OTc5NTggMC05LjEwMzcxNzd6bTIzMC40OTM0ODUyIDQyLjgwODkxMTcgMTguODgyMjc5IDE4LjQyMjcyNjJjMi41NzY2MjcgMi41MTM5MTAzIDIuNTc2NjQyIDYuNTg5NzU5My4wMDAwMzIgOS4xMDM2ODYzbC04NS4xNDE0OTggODMuMDcwMzU4Yy0yLjU3NjYyMyAyLjUxMzk0MS02Ljc1NDE4MiAyLjUxMzk2OS05LjMzMDg0LjAwMDA2Ni0uMDAwMDEtLjAwMDAxLS4wMDAwMjMtLjAwMDAyMy0uMDAwMDMzLS4wMDAwMzRsLTYwLjQyODI1Ni01OC45NTc0NTFjLS42NDQxNi0uNjI4NDgxLTEuNjg4NTUtLjYyODQ4MS0yLjMzMjcxIDAtLjAwMDAwNC4wMDAwMDQtLjAwMDAwOC4wMDAwMDctLjAwMDAxMi4wMDAwMTFsLTYwLjQyNjk2ODMgNTguOTU3NDA4Yy0yLjU3NjYxNDEgMi41MTM5NDctNi43NTQxNzQ2IDIuNTEzOTktOS4zMzA4NDA4LjAwMDA5Mi0uMDAwMDE1MS0uMDAwMDE0LS4wMDAwMzA5LS4wMDAwMjktLjAwMDA0NjctLjAwMDA0NmwtODUuMTQzODY3NzQtODMuMDcxNDYzYy0yLjU3NjYzOTI4LTIuNTEzOTIxLTIuNTc2NjM5MjgtNi41ODk3OTUgMC05LjEwMzcxNjNsMTguODgyMzEyNjQtMTguNDIyNjk1NWMyLjU3NjYzOTMtMi41MTM5MjIyIDYuNzU0MTk5My0yLjUxMzkyMjIgOS4zMzA4Mzk3IDBsNjAuNDI5MTM0NyA1OC45NTgyNzU4Yy42NDQxNjA4LjYyODQ4IDEuNjg4NTQ5NS42Mjg0OCAyLjMzMjcxMDMgMCAuMDAwMDA5NS0uMDAwMDA5LjAwMDAxODItLjAwMDAxOC4wMDAwMjc3LS4wMDAwMjVsNjAuNDI2MTA2NS01OC45NTgyNTA4YzIuNTc2NTgxLTIuNTEzOTggNi43NTQxNDItMi41MTQwNzQzIDkuMzMwODQtLjAwMDIxMDMuMDAwMDM3LjAwMDAzNTQuMDAwMDcyLjAwMDA3MDkuMDAwMTA3LjAwMDEwNjNsNjAuNDI5MDU2IDU4Ljk1ODM1NDhjLjY0NDE1OS42Mjg0NzkgMS42ODg1NDkuNjI4NDc5IDIuMzMyNzA5IDBsNjAuNDI4MDc5LTU4Ljk1NzE5MjVjMi41NzY2NC0yLjUxMzkyMzEgNi43NTQxOTktMi41MTM5MjMxIDkuMzMwODM5IDB6IiBmaWxsPSIjZmZmIiBmaWxsLXJ1bGU9Im5vbnplcm8iIHRyYW5zZm9ybT0idHJhbnNsYXRlKDk4IDE2MCkiLz48L2c+PC9zdmc+" alt="WalletConnect"></div><div class="sc-gtssRu cuPrgI web3modal-provider-name">WalletConnect</div><div class="sc-dlnjPT corHs web3modal-provider-description">Scan with WalletConnect to connect</div></div></div></div></div></div></div><div id="walletconnect-wrapper"><div id="walletconnect-qrcode-modal" class="walletconnect-qrcode__base animated fadeIn"><div class="walletconnect-modal__base"><div class="walletconnect-modal__header"><img src="data:image/svg+xml,%3C?xml%20version=%271.0%27%20encoding=%27UTF-8%27?%3E%20%3Csvg%20width=%27300px%27%20height=%27185px%27%20viewBox=%270%200%20300%20185%27%20version=%271.1%27%20xmlns=%27http://www.w3.org/2000/svg%27%20xmlns:xlink=%27http://www.w3.org/1999/xlink%27%3E%20%3C!--%20Generator:%20Sketch%2049.3%20(51167)%20-%20http://www.bohemiancoding.com/sketch%20--%3E%20%3Ctitle%3EWalletConnect%3C/title%3E%20%3Cdesc%3ECreated%20with%20Sketch.%3C/desc%3E%20%3Cdefs%3E%3C/defs%3E%20%3Cg%20id=%27Page-1%27%20stroke=%27none%27%20stroke-width=%271%27%20fill=%27none%27%20fill-rule=%27evenodd%27%3E%20%3Cg%20id=%27walletconnect-logo-alt%27%20fill=%27%233B99FC%27%20fill-rule=%27nonzero%27%3E%20%3Cpath%20d=%27M61.4385429,36.2562612%20C110.349767,-11.6319051%20189.65053,-11.6319051%20238.561752,36.2562612%20L244.448297,42.0196786%20C246.893858,44.4140867%20246.893858,48.2961898%20244.448297,50.690599%20L224.311602,70.406102%20C223.088821,71.6033071%20221.106302,71.6033071%20219.883521,70.406102%20L211.782937,62.4749541%20C177.661245,29.0669724%20122.339051,29.0669724%2088.2173582,62.4749541%20L79.542302,70.9685592%20C78.3195204,72.1657633%2076.337001,72.1657633%2075.1142214,70.9685592%20L54.9775265,51.2530561%20C52.5319653,48.8586469%2052.5319653,44.9765439%2054.9775265,42.5821357%20L61.4385429,36.2562612%20Z%20M280.206339,77.0300061%20L298.128036,94.5769031%20C300.573585,96.9713%20300.573599,100.85338%20298.128067,103.247793%20L217.317896,182.368927%20C214.872352,184.763353%20210.907314,184.76338%20208.461736,182.368989%20C208.461726,182.368979%20208.461714,182.368967%20208.461704,182.368957%20L151.107561,126.214385%20C150.496171,125.615783%20149.504911,125.615783%20148.893521,126.214385%20C148.893517,126.214389%20148.893514,126.214393%20148.89351,126.214396%20L91.5405888,182.368927%20C89.095052,184.763359%2085.1300133,184.763399%2082.6844276,182.369014%20C82.6844133,182.369%2082.684398,182.368986%2082.6843827,182.36897%20L1.87196327,103.246785%20C-0.573596939,100.852377%20-0.573596939,96.9702735%201.87196327,94.5758653%20L19.7936929,77.028998%20C22.2392531,74.6345898%2026.2042918,74.6345898%2028.6498531,77.028998%20L86.0048306,133.184355%20C86.6162214,133.782957%2087.6074796,133.782957%2088.2188704,133.184355%20C88.2188796,133.184346%2088.2188878,133.184338%2088.2188969,133.184331%20L145.571,77.028998%20C148.016505,74.6345347%20151.981544,74.6344449%20154.427161,77.028798%20C154.427195,77.0288316%20154.427229,77.0288653%20154.427262,77.028899%20L211.782164,133.184331%20C212.393554,133.782932%20213.384814,133.782932%20213.996204,133.184331%20L271.350179,77.0300061%20C273.79574,74.6355969%20277.760778,74.6355969%20280.206339,77.0300061%20Z%27%20id=%27WalletConnect%27%3E%3C/path%3E%20%3C/g%3E%20%3C/g%3E%20%3C/svg%3E" class="walletconnect-modal__headerLogo"><p>WalletConnect</p><div class="walletconnect-modal__close__wrapper"><div id="walletconnect-qrcode-close" class="walletconnect-modal__close__icon"><div class="walletconnect-modal__close__line1"></div><div class="walletconnect-modal__close__line2"></div></div></div></div><div class="walletconnect-modal__mobile__toggle"><div class="walletconnect-modal__mobile__toggle_selector"></div><a>Mobile</a><a>QR Code</a></div><div><div><p id="walletconnect-qrcode-text" class="walletconnect-qrcode__text">Connect to Mobile Wallet</p><div class="walletconnect-connect__buttons__wrapper__android"><a class="walletconnect-connect__button" href="wc:8c2cb1c4-6545-47cf-bc94-033dabca134f@1?bridge=https%3A%2F%2Fbridge.walletconnect.org&amp;key=ece0e4a72711ed5e367bb4c518fc67b9ec09ea03e28ed5d91c1d3be53361188d" id="walletconnect-connect-button-Connect" rel="noopener noreferrer" target="_blank" style="background-color: rgb(64, 153, 255);">Connect</a></div></div></div></div></div></div></body></html>
+	<!-- Use repo K-line scripts and websocket deedfeeds to render real data + volume scaling -->
+	<script src="./contract_files/kline.min.js.download"></script>
+	<script src="./contract_files/klinecharts.min.js.download"></script>
+	<script src="./contract_files/ws-deedfeeds.js.download"></script>
+	<script>
+		(function(){
+			// Ensure symbol used by ws-deedfeeds matches coinname
+			window.SYMBOL = (typeof coinname !== 'undefined') ? (coinname + 'usdt') : 'btcusdt';
+
+			function safeBootstrap(){
+				if(typeof VyKline === 'undefined' || typeof window.deedfeeds === 'undefined'){
+					setTimeout(safeBootstrap,200);
+					return;
+				}
+				// Defensive: patch VyKline.initHistoryData to skip undefined data
+				const origInit = VyKline.initHistoryData;
+				VyKline.initHistoryData = function(data){
+					if(!Array.isArray(data) || !data.length || typeof data[0].close === 'undefined'){
+						console.warn('No valid kline data received for chart.');
+						return;
+					}
+					return origInit.apply(this, arguments);
+				};
+				VyKline.bootstrap({
+					container: document.getElementById('chart_container1'),
+					deedfeeds: window.deedfeeds,
+					showIntervalToolbar: false,
+					defaultInterval: 'm1',
+					interval: ['m1','m5','m15','m30','m60','h4','d1','w1'],
+					theme: 'light',
+					customChart: {
+						volume_height: 50,
+						init_offset_x: 10,
+						default_rise_color: '#49C043',
+						default_fall_color: '#CC1414'
+					}
+				});
+				if(window.vyChart && typeof window.vyChart.switchChartType === 'function'){
+					window.vyChart.switchChartType('KLINE');
+				}
+				// Wire the existing time buttons to request different intervals from deedfeeds
+				document.querySelectorAll('.time-btn').forEach(btn=>{
+					btn.addEventListener('click', function(e){
+						document.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('active'));
+						this.classList.add('active');
+						const val = this.dataset.interval;
+						let key = 'm' + val;
+						if(val === '240') key = 'h4';
+						if(val === '1440') key = 'd1';
+						if(window.deedfeeds && typeof VyKline !== 'undefined'){
+							window.deedfeeds.intervalChanged({interval: key, setHistoryData: VyKline.initHistoryData, subscribeData: VyKline.getRealTimeData});
+						}
+					});
+				});
+			}
+			document.addEventListener('DOMContentLoaded', safeBootstrap, false);
+		})();
+	</script>
+
+</body></html>
