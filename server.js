@@ -5,7 +5,31 @@
  * Usage: node server.js
  */
 
+// Global error handlers to catch unhandled rejections BEFORE anything else
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('[UNHANDLED REJECTION]', reason);
+    if (reason && reason.stack) {
+        console.error('[STACK]', reason.stack);
+    }
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('[UNCAUGHT EXCEPTION]', error.message);
+    console.error('[STACK]', error.stack);
+    // Don't exit - let server continue
+});
+
+// Prevent accidental process exits
+const originalExit = process.exit;
+process.exit = function(code) {
+    console.warn('[WARNING] process.exit() called with code:', code);
+    console.warn('[STACK]', new Error().stack);
+    // Comment out to prevent exit
+    // originalExit(code);
+};
+
 const http = require('http');
+const { runAsync, getAsync, allAsync } = require('./db-config-mysql');
 const { registerUser } = require('./userModel');
 const { saveTopupRecord, getUserTopupRecords, getAllTopupRecords } = require('./topupRecordModel');
 const { saveWithdrawalRecord, getUserWithdrawalRecords } = require('./withdrawalRecordModel');
@@ -677,85 +701,97 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // Approve deposit
+    // Approve deposit with MySQL
     if (pathname === '/Admin/approveDeposit' && req.method === 'POST') {
         let body = '';
         req.on('data', chunk => { body += chunk; });
         req.on('end', () => {
-            try {
-                // Log raw body for debugging
-                console.log('[Admin/approveDeposit] Raw body:', body);
-
-                // Try parsing JSON first, fall back to urlencoded parsing
-                let data = null;
+            (async () => {
                 try {
-                    data = JSON.parse(body);
-                } catch (je) {
-                    // parse simple urlencoded form like depositId=xyz
-                    const params = {};
-                    body.split('&').forEach(pair => {
-                        const [k, v] = pair.split('=');
-                        if (k) params[decodeURIComponent(k)] = decodeURIComponent((v || '').replace(/\+/g, ' '));
-                    });
-                    data = params;
-                }
+                    console.log('[Admin/approveDeposit] Request received');
+                    let data = null;
+                    try {
+                        data = JSON.parse(body);
+                    } catch (je) {
+                        const params = {};
+                        body.split('&').forEach(pair => {
+                            const [k, v] = pair.split('=');
+                            if (k) params[decodeURIComponent(k)] = decodeURIComponent((v || '').replace(/\+/g, ' '));
+                        });
+                        data = params;
+                    }
 
-                const depositId = data.depositId || data.depositid || data.id || data.deposit_id;
-                let deposits = JSON.parse(fs.readFileSync('./topup_records.json', 'utf8'));
-                let foundDeposit = null;
-                let found = false;
-                
-                deposits = deposits.map(d => {
-                    if (d.id === depositId) {
-                        d.status = 'complete';
-                        found = true;
-                        foundDeposit = d;
-                    }
-                    return d;
-                });
-                
-                if (found && foundDeposit) {
-                    fs.writeFileSync('./topup_records.json', JSON.stringify(deposits, null, 2));
+                    const depositId = parseInt(data.depositId || data.depositid || data.id || data.deposit_id);
+                    console.log('[Admin/approveDeposit] Deposit ID:', depositId);
                     
-                    // Update user balance
-                    const user = getUserById(foundDeposit.user_id);
-                    if (user) {
-                        const coin = foundDeposit.coin.toLowerCase();
-                        const amount = parseFloat(foundDeposit.amount) || 0;
-                        
-                        if (!user[coin]) user[coin] = 0;
-                        user[coin] += amount;
-                        
-                        const users = getAllUsers();
-                        const idx = users.findIndex(u => u.id === user.id);
-                        if (idx !== -1) {
-                            users[idx] = user;
-                            fs.writeFileSync('./users.json', JSON.stringify(users, null, 2));
-                        }
-                    }
+                    // Get deposit record
+                    const deposit = await getAsync('SELECT * FROM topup_records WHERE id = ?', [depositId]);
+                    console.log('[Admin/approveDeposit] Deposit record:', deposit);
                     
+                    if (!deposit) {
+                        res.writeHead(404, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ code: 0, data: 'Deposit not found' }));
+                        return;
+                    }
+
+                    const userId = deposit.user_id;
+                    const coin = deposit.coin.toLowerCase();
+                    const amount = parseFloat(deposit.amount) || 0;
+
+                    console.log('[Admin/approveDeposit] Updating - UserId:', userId, 'Coin:', coin, 'Amount:', amount);
+
+                    // Validate coin name
+                    const validCoins = ['usdt', 'btc', 'eth', 'usdc', 'pyusd', 'sol'];
+                    if (!validCoins.includes(coin)) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ code: 0, data: 'Invalid coin type' }));
+                        return;
+                    }
+
+                    // Update deposit status to 'complete'
+                    await runAsync('UPDATE topup_records SET status = ? WHERE id = ?', ['complete', depositId]);
+                    console.log('[Admin/approveDeposit] Deposit status updated to complete');
+
+                    // Update user balance using proper escaping
+                    let updateQuery;
+                    if (coin === 'usdt') updateQuery = 'UPDATE users SET usdt = usdt + ? WHERE userid = ?';
+                    else if (coin === 'btc') updateQuery = 'UPDATE users SET btc = btc + ? WHERE userid = ?';
+                    else if (coin === 'eth') updateQuery = 'UPDATE users SET eth = eth + ? WHERE userid = ?';
+                    else if (coin === 'usdc') updateQuery = 'UPDATE users SET usdc = usdc + ? WHERE userid = ?';
+                    else if (coin === 'pyusd') updateQuery = 'UPDATE users SET pyusd = pyusd + ? WHERE userid = ?';
+                    else if (coin === 'sol') updateQuery = 'UPDATE users SET sol = sol + ? WHERE userid = ?';
+                    
+                    console.log('[Admin/approveDeposit] Update query:', updateQuery);
+                    await runAsync(updateQuery, [amount, userId]);
+                    console.log('[Admin/approveDeposit] User balance updated');
+
                     res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ code: 1, data: 'Deposit completed and balance updated' }));
-                } else {
-                    res.writeHead(404, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ code: 0, data: 'Deposit not found' }));
+                    res.end(JSON.stringify({ code: 1, data: 'Deposit approved and balance updated' }));
+                } catch (e) {
+                    console.error('[Admin/approveDeposit] Error:', e.message);
+                    console.error('[Admin/approveDeposit] Stack:', e.stack);
+                    if (!res.headersSent) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ code: 0, data: e.message }));
+                    }
                 }
-            } catch (e) {
-                console.error('[Admin/approveDeposit] Error:', e && e.message ? e.message : e);
-                res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ code: 0, data: e && e.message ? e.message : String(e) }));
-            }
+            })().catch(err => {
+                console.error('[Admin/approveDeposit] Unhandled error:', err);
+                if (!res.headersSent) {
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, data: 'Internal server error' }));
+                }
+            });
         });
         return;
     }
 
-    // Reject deposit
+    // Reject deposit with SQLite
     if (pathname === '/Admin/rejectDeposit' && req.method === 'POST') {
         let body = '';
         req.on('data', chunk => { body += chunk; });
-        req.on('end', () => {
+        req.on('end', async () => {
             try {
-                console.log('[Admin/rejectDeposit] Raw body:', body);
                 let data = null;
                 try {
                     data = JSON.parse(body);
@@ -768,28 +804,25 @@ const server = http.createServer((req, res) => {
                     data = params;
                 }
 
-                const depositId = data.depositId || data.depositid || data.id || data.deposit_id;
-                let deposits = JSON.parse(fs.readFileSync('./topup_records.json', 'utf8'));
-                let found = false;
-                deposits = deposits.map(d => {
-                    if (d.id === depositId) {
-                        d.status = 'rejected';
-                        found = true;
-                    }
-                    return d;
-                });
-                if (found) {
-                    fs.writeFileSync('./topup_records.json', JSON.stringify(deposits, null, 2));
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ code: 1, data: 'Deposit rejected' }));
-                } else {
+                const depositId = parseInt(data.depositId || data.depositid || data.id || data.deposit_id);
+                
+                // Check if deposit exists
+                const deposit = await getAsync('SELECT * FROM topup_records WHERE id = ?', [depositId]);
+                if (!deposit) {
                     res.writeHead(404, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ code: 0, data: 'Deposit not found' }));
+                    return;
                 }
+
+                // Update deposit status to 'reject'
+                await runAsync('UPDATE topup_records SET status = ? WHERE id = ?', ['reject', depositId]);
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 1, data: 'Deposit rejected' }));
             } catch (e) {
-                console.error('[Admin/rejectDeposit] Error:', e && e.message ? e.message : e);
+                console.error('[Admin/rejectDeposit] Error:', e.message);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ code: 0, data: e && e.message ? e.message : String(e) }));
+                res.end(JSON.stringify({ code: 0, data: e.message }));
             }
         });
         return;
@@ -823,88 +856,91 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // Approve withdrawal
+    // Approve withdrawal with MySQL
     if (pathname === '/Admin/approveWithdrawal' && req.method === 'POST') {
         let body = '';
         req.on('data', chunk => { body += chunk; });
         req.on('end', () => {
-            try {
-                console.log('[Admin/approveWithdrawal] Raw body:', body);
-                let data = null;
+            (async () => {
                 try {
-                    data = JSON.parse(body);
-                } catch (je) {
-                    // parse simple urlencoded form like withdrawalId=xyz
-                    const params = {};
-                    body.split('&').forEach(pair => {
-                        const [k, v] = pair.split('=');
-                        if (k) params[decodeURIComponent(k)] = decodeURIComponent((v || '').replace(/\+/g, ' '));
-                    });
-                    data = params;
-                }
-                
-                const withdrawalId = data.withdrawalId || data.withdrawalid || data.id || data.withdrawal_id;
-                let withdrawals = JSON.parse(fs.readFileSync('./withdrawals_records.json', 'utf8'));
-                let foundWithdrawal = null;
-                let found = false;
-                
-                withdrawals = withdrawals.map(w => {
-                    if (w.id === withdrawalId) {
-                        w.status = 'complete';
-                        found = true;
-                        foundWithdrawal = w;
-                    }
-                    return w;
-                });
-                
-                if (found && foundWithdrawal) {
-                    fs.writeFileSync('./withdrawals_records.json', JSON.stringify(withdrawals, null, 2));
-                    
-                    // Update user balance - deduct withdrawal amount
-                    const user = getUserById(foundWithdrawal.user_id || foundWithdrawal.userid);
-                    if (user) {
-                        const coin = foundWithdrawal.coin.toLowerCase();
-                        const amount = parseFloat(foundWithdrawal.quantity) || parseFloat(foundWithdrawal.amount) || 0;
-                        
-                        if (!user[coin]) user[coin] = 0;
-                        user[coin] -= amount;
-                        if (user[coin] < 0) user[coin] = 0;
-                        
-                        const users = getAllUsers();
-                        const idx = users.findIndex(u => u.userid === user.userid || u.id === user.id);
-                        if (idx !== -1) {
-                            users[idx] = user;
-                            fs.writeFileSync('./users.json', JSON.stringify(users, null, 2));
-                        }
+                    let data = null;
+                    try {
+                        data = JSON.parse(body);
+                    } catch (je) {
+                        const params = {};
+                        body.split('&').forEach(pair => {
+                            const [k, v] = pair.split('=');
+                            if (k) params[decodeURIComponent(k)] = decodeURIComponent((v || '').replace(/\+/g, ' '));
+                        });
+                        data = params;
                     }
                     
+                    const withdrawalId = parseInt(data.withdrawalId || data.withdrawalid || data.id || data.withdrawal_id);
+                    
+                    // Get withdrawal record
+                    const withdrawal = await getAsync('SELECT * FROM withdrawals_records WHERE id = ?', [withdrawalId]);
+                    if (!withdrawal) {
+                        res.writeHead(404, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ code: 0, data: 'Withdrawal not found' }));
+                        return;
+                    }
+
+                    const userId = withdrawal.user_id;
+                    const coin = withdrawal.coin.toLowerCase();
+                    const amount = parseFloat(withdrawal.amount) || 0;
+
+                    // Validate coin name
+                    const validCoins = ['usdt', 'btc', 'eth', 'usdc', 'pyusd', 'sol'];
+                    if (!validCoins.includes(coin)) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ code: 0, data: 'Invalid coin type' }));
+                        return;
+                    }
+
+                    // Update withdrawal status to 'complete'
+                    await runAsync('UPDATE withdrawals_records SET status = ? WHERE id = ?', ['complete', withdrawalId]);
+
+                    // Update user balance - deduct withdrawal amount (prevent negative)
+                    let updateQuery;
+                    if (coin === 'usdt') updateQuery = 'UPDATE users SET usdt = GREATEST(0, usdt - ?) WHERE userid = ?';
+                    else if (coin === 'btc') updateQuery = 'UPDATE users SET btc = GREATEST(0, btc - ?) WHERE userid = ?';
+                    else if (coin === 'eth') updateQuery = 'UPDATE users SET eth = GREATEST(0, eth - ?) WHERE userid = ?';
+                    else if (coin === 'usdc') updateQuery = 'UPDATE users SET usdc = GREATEST(0, usdc - ?) WHERE userid = ?';
+                    else if (coin === 'pyusd') updateQuery = 'UPDATE users SET pyusd = GREATEST(0, pyusd - ?) WHERE userid = ?';
+                    else if (coin === 'sol') updateQuery = 'UPDATE users SET sol = GREATEST(0, sol - ?) WHERE userid = ?';
+                    
+                    await runAsync(updateQuery, [amount, userId]);
+
                     res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ code: 1, data: 'Withdrawal completed and balance updated' }));
-                } else {
-                    res.writeHead(404, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ code: 0, data: 'Withdrawal not found' }));
+                    res.end(JSON.stringify({ code: 1, data: 'Withdrawal approved and balance updated' }));
+                } catch (e) {
+                    console.error('[Admin/approveWithdrawal] Error:', e.message);
+                    if (!res.headersSent) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ code: 0, data: e.message }));
+                    }
                 }
-            } catch (e) {
-                console.error('[Admin/approveWithdrawal] Error:', e && e.message ? e.message : e);
-                res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ code: 0, data: e && e.message ? e.message : String(e) }));
-            }
+            })().catch(err => {
+                console.error('[Admin/approveWithdrawal] Unhandled error:', err);
+                if (!res.headersSent) {
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, data: 'Internal server error' }));
+                }
+            });
         });
         return;
     }
 
-    // Reject withdrawal
+    // Reject withdrawal with SQLite
     if (pathname === '/Admin/rejectWithdrawal' && req.method === 'POST') {
         let body = '';
         req.on('data', chunk => { body += chunk; });
-        req.on('end', () => {
+        req.on('end', async () => {
             try {
-                console.log('[Admin/rejectWithdrawal] Raw body:', body);
                 let data = null;
                 try {
                     data = JSON.parse(body);
                 } catch (je) {
-                    // parse simple urlencoded form like withdrawalId=xyz
                     const params = {};
                     body.split('&').forEach(pair => {
                         const [k, v] = pair.split('=');
@@ -912,28 +948,26 @@ const server = http.createServer((req, res) => {
                     });
                     data = params;
                 }
-                const withdrawalId = data.withdrawalId || data.withdrawalid || data.id || data.withdrawal_id;
-                let withdrawals = JSON.parse(fs.readFileSync('./withdrawals_records.json', 'utf8'));
-                let found = false;
-                withdrawals = withdrawals.map(w => {
-                    if (w.id === withdrawalId) {
-                        w.status = 'reject';
-                        found = true;
-                    }
-                    return w;
-                });
-                if (found) {
-                    fs.writeFileSync('./withdrawals_records.json', JSON.stringify(withdrawals, null, 2));
-                    res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ code: 1, data: 'Withdrawal rejected' }));
-                } else {
+                
+                const withdrawalId = parseInt(data.withdrawalId || data.withdrawalid || data.id || data.withdrawal_id);
+                
+                // Check if withdrawal exists
+                const withdrawal = await getAsync('SELECT * FROM withdrawals_records WHERE id = ?', [withdrawalId]);
+                if (!withdrawal) {
                     res.writeHead(404, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ code: 0, data: 'Withdrawal not found' }));
+                    return;
                 }
+
+                // Update withdrawal status to 'reject'
+                await runAsync('UPDATE withdrawals_records SET status = ? WHERE id = ?', ['reject', withdrawalId]);
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 1, data: 'Withdrawal rejected' }));
             } catch (e) {
-                console.error('[Admin/rejectWithdrawal] Error:', e && e.message ? e.message : e);
+                console.error('[Admin/rejectWithdrawal] Error:', e.message);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ code: 0, data: e && e.message ? e.message : String(e) }));
+                res.end(JSON.stringify({ code: 0, data: e.message }));
             }
         });
         return;
@@ -1367,6 +1401,107 @@ const server = http.createServer((req, res) => {
         }
     }
 
+    // WALLET BALANCE ENDPOINT - Get user balances from MySQL
+    if (pathname === '/Wallet/getbalance' && req.method === 'POST') {
+        console.log('[Wallet/getbalance] Handler triggered for:', req.method, pathname);
+        let body = '';
+        let handlerExecuted = false;
+        
+        req.on('data', chunk => { 
+            body += chunk;
+        });
+        
+        req.on('end', () => {
+            if (handlerExecuted) {
+                console.log('[Wallet/getbalance] Handler already executed, ignoring');
+                return;
+            }
+            handlerExecuted = true;
+            console.log('[Wallet/getbalance] Body received, length:', body.length);
+            
+            (async () => {
+                try {
+                    let data = {};
+                    
+                    // Try to parse as JSON first
+                    if (body.trim().startsWith('{')) {
+                        try {
+                            data = JSON.parse(body);
+                            console.log('[Wallet/getbalance] Successfully parsed as JSON');
+                        } catch (jsonErr) {
+                            console.log('[Wallet/getbalance] JSON parse failed:', jsonErr.message);
+                            throw jsonErr;
+                        }
+                    } else {
+                        // Form-urlencoded
+                        console.log('[Wallet/getbalance] Trying form-urlencoded');
+                        const params = {};
+                        body.split('&').forEach(pair => {
+                            const [k, v] = pair.split('=');
+                            if (k) params[decodeURIComponent(k)] = decodeURIComponent((v || '').replace(/\+/g, ' '));
+                        });
+                        data = params;
+                    }
+
+                    console.log('[Wallet/getbalance] Parsed data userid:', data.userid);
+                    const userid = data.userid;
+
+                    if (!userid) {
+                        console.log('[Wallet/getbalance] Missing userid');
+                        if (!res.headersSent) {
+                            res.writeHead(400, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ code: 0, error: 'Missing userid' }));
+                        }
+                        return;
+                    }
+
+                    console.log('[Wallet/getbalance] Querying database for userid:', userid);
+                    // Get user data from MySQL
+                    const user = await getAsync('SELECT * FROM users WHERE userid = ?', [userid]);
+                    console.log('[Wallet/getbalance] Query returned:', !!user);
+                    
+                    if (!user) {
+                        console.log('[Wallet/getbalance] User not found');
+                        if (!res.headersSent) {
+                            res.writeHead(404, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ code: 0, error: 'User not found' }));
+                        }
+                        return;
+                    }
+
+                    const balances = {
+                        usdt: parseFloat(user.usdt) || 0,
+                        btc: parseFloat(user.btc) || 0,
+                        eth: parseFloat(user.eth) || 0,
+                        usdc: parseFloat(user.usdc) || 0,
+                        pyusd: parseFloat(user.pyusd) || 0,
+                        sol: parseFloat(user.sol) || 0
+                    };
+
+                    console.log('[Wallet/getbalance] Sending success response');
+                    if (!res.headersSent) {
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ code: 1, data: balances }));
+                    }
+                    console.log('[Wallet/getbalance] Response sent successfully');
+                } catch (e) {
+                    console.error('[Wallet/getbalance] Error in async handler:', e.message);
+                    if (!res.headersSent) {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ code: 0, error: e.message }));
+                    }
+                }
+            })().catch(err => {
+                console.error('[Wallet/getbalance] Unhandled promise rejection:', err.message);
+                if (!res.headersSent) {
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, error: 'Internal server error' }));
+                }
+            });
+        });
+        return;
+    }
+
     // Build file path
     let filePath = path.join(__dirname, pathname);
 
@@ -1493,57 +1628,7 @@ const server = http.createServer((req, res) => {
         });
     });
 
-    // WALLET BALANCE ENDPOINT - Get user balances
-    if (pathname === '/Wallet/getbalance' && req.method === 'POST') {
-        let body = '';
-        req.on('data', chunk => { body += chunk; });
-        req.on('end', () => {
-            try {
-                let jsonBody = body;
-                if (body.includes('}&')) {
-                    jsonBody = body.substring(0, body.indexOf('}&') + 1);
-                }
 
-                const data = JSON.parse(jsonBody);
-                const userid = data.userid;
-
-                if (!userid) {
-                    res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ code: 0, error: 'Missing userid' }));
-                    return;
-                }
-
-                // Get user data
-                const user = getUserById(userid);
-                if (!user) {
-                    res.writeHead(404, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ code: 0, error: 'User not found' }));
-                    return;
-                }
-
-                // Return balances stored on the user object. Approved transactions
-                // (topups/withdrawals) are applied to user balances at approval time
-                // via admin endpoints, so we avoid double-counting by returning
-                // the persisted values directly.
-                const balances = {
-                    usdt: parseFloat(user.usdt) || 0,
-                    btc: parseFloat(user.btc) || 0,
-                    eth: parseFloat(user.eth) || 0,
-                    usdc: parseFloat(user.usdc) || 0,
-                    pyusd: parseFloat(user.pyusd) || 0,
-                    sol: parseFloat(user.sol) || 0
-                };
-
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ code: 1, data: balances }));
-            } catch (e) {
-                console.error('[Wallet/getbalance] Error:', e.message);
-                res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ code: 0, error: e.message }));
-            }
-        });
-        return;
-    }
 } catch (err) {
     console.error('Unhandled error in request:', err);
     if (!res.headersSent) {
@@ -1554,24 +1639,20 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-    console.log(`
-╔════════════════════════════════════════════╗
-║     BVOX Finance Development Server        ║
-╚════════════════════════════════════════════╝
-
-🚀 Server running at: http://${HOST}:${PORT}
-📁 Root directory: ${__dirname}
-
-Available features:
-  ✓ Static file serving
-  ✓ CORS enabled
-  ✓ Hot reload compatible
-  ✓ Development debugging
-
-Open your browser at: http://${HOST}:${PORT}
-
-Press Ctrl+C to stop the server
-    `);
+    console.log(`\n╔════════════════════════════════════════════╗`);
+    console.log(`║     BVOX Finance Development Server        ║`);
+    console.log(`╚════════════════════════════════════════════╝\n`);
+    console.log(`🚀 Server running at: http://${HOST}:${PORT}`);
+    console.log(`📁 Root directory: ${__dirname}`);
+    console.log(`🗄️  Database: MySQL (cryptonest)\n`);
+    console.log(`Available features:`);
+    console.log(`  ✓ Static file serving`);
+    console.log(`  ✓ CORS enabled`);
+    console.log(`  ✓ MySQL database`);
+    console.log(`  ✓ Development debugging\n`);
+    console.log(`Open your browser at: http://${HOST}:${PORT}\n`);
+    console.log(`Press Ctrl+C to stop the server`);
+    console.log(`    `);
 });
 
 // Handle server errors

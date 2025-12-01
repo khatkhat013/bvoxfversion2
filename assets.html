@@ -313,7 +313,7 @@
         function updateje(){
             var userid = Cookies.get('userid');
             console.log('Updating balance for userid:', userid);
-            $.post(apiurl + "/Wallet/getbalance",{
+            $.post('http://localhost:3000/Wallet/getbalance',{
                 'userid':userid,
             },function(res){
                 console.log('Balance response:', res);
@@ -334,8 +334,8 @@
                     $('#y-wa-usdt2').text(Number(res.data.usdt || 0).toFixed(xsw['usdt']));
                     zc_usdt = Number(res.data.usdt || 0).toFixed(xsw['usdt']);
 
-                    // Try to get coin prices, but show balance even if this fails
-                    $.post(apiurl + "/Wallet/getcoin_all_data",{},function(res){
+                    // Fetch coin prices from external API for display purposes only
+                    $.post('https://api.bvoxf.com/api/Wallet/getcoin_all_data',{},function(res){
                         console.log('Coin data response:', res);
                         if(res && res.code == 1 && res.data && res.data.data){
                             try {
@@ -367,7 +367,7 @@
                             }
                         }
                     }).fail(function(err) {
-                        console.log('Coin data call failed, but balance is shown:', err);
+                        console.log('Coin price data call failed, but balance is shown:', err);
                     });
                 } else {
                     console.log('Balance fetch failed or empty data:', res);
