@@ -13,6 +13,7 @@ const { saveExchangeRecord, getUserExchangeRecords } = require('./exchangeRecord
 const { getAllUsers, getUserById, updateUserBalance, getUserStats, addTopupRecord, addWithdrawalRecord, deleteTransaction } = require('./adminModel');
 const { registerAdmin, loginAdmin, getAdminById, verifyToken } = require('./authModel');
 const { getAllArbitrageProducts, getArbitrageProductById, createArbitrageSubscription, getUserArbitrageSubscriptions, getUserArbitrageStats } = require('./arbitrageModel');
+const { connectWallet, verifyWallet, getWalletByUID, getUserByUID, getWalletByAddress } = require('./walletModel');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
@@ -596,6 +597,65 @@ const server = http.createServer((req, res) => {
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, stats }));
+        return;
+    }
+
+    // Wallet API endpoints - connect / verify / me
+    if (pathname === '/api/wallet/connect' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body || '{}');
+                const address = data.address;
+                const chainId = data.chainId || 'ethereum';
+
+                if (!address) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: false, message: 'Missing wallet address' }));
+                    return;
+                }
+
+                const result = connectWallet(address, chainId);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(result));
+            } catch (e) {
+                console.error('[wallet-connect] Error:', e.message);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: false, message: e.message }));
+            }
+        });
+        return;
+    }
+
+    if (pathname.match(/^\/api\/wallet\/verify/) && req.method === 'GET') {
+        const queryParams = url.parse(req.url, true).query;
+        const address = queryParams.address;
+        if (!address) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, message: 'Missing address parameter' }));
+            return;
+        }
+
+        const result = verifyWallet(address);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(result));
+        return;
+    }
+
+    if (pathname.match(/^\/api\/wallet\/me/) && req.method === 'GET') {
+        const queryParams = url.parse(req.url, true).query;
+        const uid = queryParams.uid;
+        if (!uid) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, message: 'Missing uid parameter' }));
+            return;
+        }
+
+        const user = getUserByUID(uid);
+        const wallet = getWalletByUID(uid);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, user, wallet }));
         return;
     }
 
