@@ -12,6 +12,7 @@ const { saveWithdrawalRecord, getUserWithdrawalRecords } = require('./withdrawal
 const { saveExchangeRecord, getUserExchangeRecords } = require('./exchangeRecordModel');
 const { getAllUsers, getUserById, updateUserBalance, getUserStats, addTopupRecord, addWithdrawalRecord, deleteTransaction } = require('./adminModel');
 const { registerAdmin, loginAdmin, getAdminById, verifyToken } = require('./authModel');
+const { getAllArbitrageProducts, getArbitrageProductById, createArbitrageSubscription, getUserArbitrageSubscriptions, getUserArbitrageStats } = require('./arbitrageModel');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
@@ -500,6 +501,101 @@ const server = http.createServer((req, res) => {
                 res.end(JSON.stringify({ error: e.message }));
             }
         });
+        return;
+    }
+
+    // ARBITRAGE API ENDPOINTS
+
+    // Get all arbitrage products
+    if (pathname === '/api/arbitrage/products' && req.method === 'GET') {
+        const products = getAllArbitrageProducts();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, products }));
+        return;
+    }
+
+    // Get arbitrage product by ID
+    if (pathname.match(/^\/api\/arbitrage\/product\/[\w-]+$/)) {
+        const productId = pathname.split('/').pop();
+        const product = getArbitrageProductById(productId);
+
+        if (!product) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Product not found' }));
+            return;
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, product }));
+        return;
+    }
+
+    // Create arbitrage subscription
+    if (pathname === '/api/arbitrage/subscribe' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                let jsonBody = body;
+                if (body.includes('}&')) {
+                    jsonBody = body.substring(0, body.indexOf('}&') + 1);
+                }
+
+                const data = JSON.parse(jsonBody);
+                const { user_id, product_id, amount } = data;
+
+                if (!user_id || !product_id || !amount) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing required fields' }));
+                    return;
+                }
+
+                const subscription = createArbitrageSubscription(user_id, product_id, amount);
+
+                res.writeHead(201, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true, subscription }));
+            } catch (e) {
+                console.error('[arbitrage-subscribe] Error:', e.message);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: e.message }));
+            }
+        });
+        return;
+    }
+
+    // Get user arbitrage subscriptions
+    if (pathname.match(/^\/api\/arbitrage\/subscriptions\?user_id=/)) {
+        const queryParams = url.parse(pathname, true).query;
+        const userId = queryParams.user_id;
+
+        if (!userId) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing user_id parameter' }));
+            return;
+        }
+
+        const subscriptions = getUserArbitrageSubscriptions(userId);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, subscriptions }));
+        return;
+    }
+
+    // Get user arbitrage statistics
+    if (pathname.match(/^\/api\/arbitrage\/stats\?user_id=/)) {
+        const queryParams = url.parse(pathname, true).query;
+        const userId = queryParams.user_id;
+
+        if (!userId) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing user_id parameter' }));
+            return;
+        }
+
+        const stats = getUserArbitrageStats(userId);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, stats }));
         return;
     }
 

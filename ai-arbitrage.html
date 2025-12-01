@@ -204,7 +204,7 @@
                                     <div class="y-ai-btit">Arbitrage products</div>
                                     <div class="y-ai-be">
                                         <span class="y-ai-be-1">
-                                            <img src="./ai-arbitrage_files/tl2.jpg">
+                                            <img src="./ai-arbitrage_files/tl1.jpg">
                                         </span>
                                         <span class="y-ai-be-2">30 <b>DAY</b></span>
                                         <span class="y-ai-be-3"><b>Smart Plan</b> VIP</span>
@@ -234,6 +234,22 @@
                             </div>
         </div>
         <script>
+            // Mapping of crypto types to their icon numbers
+            const cryptoIcons = {
+                'BTC': '1',
+                'ETH': '2',
+                'USDT': '12',
+                'USDC': '4',
+                'PYUSD': '7',
+                'XRP': '5',
+                'LTC': '6',
+                'DOGE': '3',
+                'SOL': '8',
+                'ADA': '9',
+                'LINK': '10',
+                'DOT': '11'
+            };
+            
             window.addEventListener('scroll', function() {
                 let currentScrollTop = window.scrollY || document.documentElement.scrollTop;
                 if (currentScrollTop > 0) {
@@ -244,75 +260,83 @@
             });
 
             $(document).ready(function() {
-                $.post(apiurl + "/Ai/getailist",{},function(res){
-                    if(res.code == 1){
-                        let data = res.data;
-                        let html = '';
+                // Fetch arbitrage products from new API
+                $.ajax({
+                    url: 'http://localhost:3001/api/arbitrage/products',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(res) {
+                        if(res.success && res.products){
+                            let data = res.products;
+                            let html = '';
 
-                        // 循环遍历数据
-                        data.forEach(function(item) {
-                            html += `
-                                <div class="y-ai-bbox">
-                                    <div class="y-ai-btit">${gy('套利产品')}</div>
-                                    <div class="y-ai-be">
-                                        <span class="y-ai-be-1">
-                                            <img src="./ai-arbitrage_files/${item.tubiao}" />
-                                        </span>
-                                        <span class="y-ai-be-2">${item.zhouqi} <b>${gy('天')}</b></span>
-                                                                           $env:PORT=3001; node .\server.js     <span class="y-ai-be-3"><b>${gy('智能计划')}</b> ${item.biaoti.split(' ')[2]}</span>
-                                    </div>
-                                    <div class="y-ai-cis">
-                                        <span>${item.shangxian}</span>
-                                        <span>${gy('次')}</span>
-                                    </div>`;
-                            if (item.yugou === 1) {
-                                html += `<div class="y-ai-yd"><img src="./ai-arbitrage_files/yy.png"/>${gy('预约')}</div>`;
-                            }
-                            html +=`
-                                    <div class="y-ai-bbtit">${gy('数量')}</div>
-                                    <div class="y-ai-bbje">
-                                        $${item.buyxiao}-$${item.buyda}
-                                    </div>
-                                    <div class="y-ai-bbtit">${gy('每日收入')}</div>
-                                    <div class="y-ai-bbje">
-                                        <span>${item.bilixiao}-${item.bilida}</span>%
-                                    </div>
-                                    <div class="y-ai-bbtit">${gy('套利种类')}</div>
-                                    <div class="y-ai-typet">
-                                        <div class="y-ai-typetl">
-                                            ${item.tupian.split(',').map(num => `<img src="./ai-arbitrage_files/${num}.png">`).join('')}
+                            // Loop through products
+                            data.forEach(function(item) {
+                                // Create coin icons for arbitrage types
+                                let coinIcons = item.arbitrage_types.map(type => {
+                                    const iconNum = cryptoIcons[type] || '1';
+                                    return `<img src="./ai-arbitrage_files/${iconNum}.png" title="${type}" style="width:30px; height:30px; margin-right:5px;">`;
+                                }).join('');
+                                
+                                html += `
+                                    <div class="y-ai-bbox">
+                                        <div class="y-ai-btit">Arbitrage products</div>
+                                        <div class="y-ai-be">
+                                            <span class="y-ai-be-1">
+                                                <img src="./ai-arbitrage_files/${item.image}" />
+                                            </span>
+                                            <span class="y-ai-be-2">${item.duration}</span>
+                                            <span class="y-ai-be-3"><b>Smart Plan</b> ${item.name.split(' ')[2]}</span>
                                         </div>
-                                        <a href="ai-plan.html?id=${item.id}" class="y-ai-typetr">
-                                            <img src="./ai-arbitrage_files/qianj.png" />
-                                        </a>
+                                        <div class="y-ai-cis">
+                                            <span>${item.times}</span>
+                                            <span>Times</span>
+                                        </div>
+                                        <div class="y-ai-bbtit">Quantity</div>
+                                        <div class="y-ai-bbje">
+                                            $${item.min_amount}-$${item.max_amount}
+                                        </div>
+                                        <div class="y-ai-bbtit">Daily income</div>
+                                        <div class="y-ai-bbje">
+                                            <span>${item.daily_return_min}-${item.daily_return_max}</span>%
+                                        </div>
+                                        <div class="y-ai-bbtit">Arbitrage type</div>
+                                        <div class="y-ai-typet">
+                                            <div class="y-ai-typetl">
+                                                ${coinIcons}
+                                            </div>
+                                            <a href="ai-plan.html?id=${item.id}" class="y-ai-typetr">
+                                                <img src="./ai-arbitrage_files/qianj.png" />
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
-                            `;
-                        });
-                        $('.y-ai-buy').html(html);
+                                `;
+                            });
+                            $('.y-ai-buy').html(html);
+                        }
+                    },
+                    error: function() {
+                        console.log('Error fetching arbitrage products');
                     }
                 });
 
                 var userid = Cookies.get('userid');
                 var username = Cookies.get('username');
                 
+                // Fetch user arbitrage statistics
                 $.ajax({
-                    url: apiurl + '/Ai/getaisy',
-                    type: 'POST',
-                    data: {
-                        'userid': userid,
-                        'username': username,
-                    },
+                    url: 'http://localhost:3001/api/arbitrage/stats?user_id=' + userid,
+                    type: 'GET',
                     dataType: 'json',
                     success: function(res) {
-                        if(res.code == 1){
-                            $('#y-zongshouyi').text(Number(res.data.total_jine).toFixed(2));
-                            $('#y-jinrishouyi').text(Number(res.data.recent_jine).toFixed(2));
-                            $('#y-chicang').text(Number(res.data.total_shuliang).toFixed(2));
-
-                        }else{
-                            alert(gy(res.data));
+                        if(res.success){
+                            $('#y-zongshouyi').text(Number(res.stats.total_income).toFixed(2));
+                            $('#y-jinrishouyi').text(Number(res.stats.total_income / 30).toFixed(2)); // Approximate daily
+                            $('#y-chicang').text(Number(res.stats.total_invested).toFixed(2));
                         }
+                    },
+                    error: function() {
+                        console.log('Error fetching arbitrage stats');
                     }
                 });
             });

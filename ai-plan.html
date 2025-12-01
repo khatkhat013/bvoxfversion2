@@ -87,82 +87,265 @@
                         </div>
         </div>
         <script>
-            $(document).ready(function() {
+            // Mapping of crypto types to their icon numbers
+            const cryptoIcons = {
+                'BTC': '1',
+                'ETH': '2',
+                'USDT': '12',
+                'USDC': '4',
+                'PYUSD': '7',
+                'XRP': '5',
+                'LTC': '6',
+                'DOGE': '3',
+                'SOL': '8',
+                'ADA': '9',
+                'LINK': '10',
+                'DOT': '11'
+            };
+            
+            function loadProductData() {
                 var urlParams = new URLSearchParams(window.location.search);
-			    var id = urlParams.get('id');
-                $.post(apiurl + "/Ai/getaiidcp",{
-                    'aiid':id
-                },function(res){
-                    if(res.code == 1){
-                        var data = res.data[0]; // 获取返回的产品信息
+                var id = urlParams.get('id');
+                
+                if (!id) {
+                    console.log('No product ID provided');
+                    return;
+                }
+                
+                // Fetch product details from new API
+                $.ajax({
+                    url: 'http://localhost:3001/api/arbitrage/product/' + id,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(res) {
+                        if(res.success && res.product) {
+                            var data = res.product;
+                            
+                            // Create coin icons for arbitrage types
+                            let coinIcons = data.arbitrage_types.map(type => {
+                                const iconNum = cryptoIcons[type] || '1';
+                                return `<img src="./ai-plan_files/${iconNum}.png" title="${type}" style="width:35px; height:35px; margin-right:10px;">`;
+                            }).join('');
 
-                        // 更新HTML节点内容
-                        $('.y-aib-center').html(`
-                            <div class="y-aib-ctop">
-                                <div class="y-aib-ctl">
-                                    <span class="y-aib-ctl-1">
-                                        <img src="./ai-plan_files/${data.tubiao}"/>
-                                        <p>${data.biaoti}</p>
-                                    </span>
-                                    <span class="y-aib-ctl-2">${gy('数量')}</span>
-                                    <span class="y-aib-ctl-3">$<b>${data.buyxiao}-${data.buyda}</b></span>
-                                </div>
-                                <div class="y-aib-ctr">
-                                    <span class="y-aib-ctr-1">${data.zhouqi} <b>${gy('天')}</b></span>
-                                    <span class="y-aib-ctr-2">${gy('每日收入')}</span>
-                                    <span class="y-aib-ctr-3">${data.bilixiao}-${data.bilida}%</span>
-                                </div>
-                            </div>
-                            <div class="y-aib-ccent">
-                                <div class="y-aib-ptt">${gy('套利种类')}</div>
-                                <div class="y-aib-type">
-                                    ${data.tupian.split(',').map(num => `<img src="./ai-plan_files/${num}.png">`).join('')}
-                                </div>
-                            </div>
-                            <div class="y-aib-bottom">
-                                <div class="y-aib-ppt">${gy('托管数量')}</div>
-                                <div class="y-aib-bsl">
-                                    <div class="y-aib-bsll">
-                                        <img src="./ai-plan_files/usdt.png"/>
-                                        <span>${gy('数量')}</span>
+                            // Update HTML with product details
+                            $('.y-aib-center').html(`
+                                <div class="y-aib-ctop">
+                                    <div class="y-aib-ctl">
+                                        <span class="y-aib-ctl-1">
+                                            <img src="./ai-plan_files/${data.image}"/>
+                                            <p>${data.name}</p>
+                                        </span>
+                                        <span class="y-aib-ctl-2">Quantity</span>
+                                        <span class="y-aib-ctl-3">$<b>${data.min_amount}-${data.max_amount}</b></span>
                                     </div>
-                                    <input type="number" id="y-aib-jine" class="y-aib-bslr" placeholder="${gy('请输入数量')}"/>
+                                    <div class="y-aib-ctr">
+                                        <span class="y-aib-ctr-1">${data.duration}</span>
+                                        <span class="y-aib-ctr-2">Daily income</span>
+                                        <span class="y-aib-ctr-3">${data.daily_return_min}-${data.daily_return_max}%</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="y-aib-submit" onclick="aisubmit()">${gy('现在持仓')}</div>
-                            <div class="y-aib-dbts">
-                                <img src="./ai-plan_files/dui.png"/>
-                                <span>${gy('每日收入发送到您的 USDT 钱包')}</span>
-                            </div>
-                            <div class="y-aib-dbts">
-                                <img src="./ai-plan_files/dui.png"/>
-                                <span>${gy('人工智能每天24小时工作')}</span>
-                            </div>
-                        `);
-                    } else {
-                        alert('Load Fail!');
+                                <div class="y-aib-ccent">
+                                    <div class="y-aib-ppt">Arbitrage type</div>
+                                    <div class="y-aib-type">
+                                        ${coinIcons}
+                                    </div>
+                                </div>
+                                <div class="y-aib-bottom">
+                                    <div class="y-aib-ppt">Escrow quantity</div>
+                                    <div class="y-aib-bsl">
+                                        <div class="y-aib-bsll">
+                                            <img src="./ai-plan_files/usdt.png"/>
+                                            <span>Quantity</span>
+                                        </div>
+                                        <input type="number" id="y-aib-jine" class="y-aib-bslr" placeholder="Please enter quantity" min="${data.min_amount}" max="${data.max_amount}"/>
+                                    </div>
+                                </div>
+                                <div class="y-aib-submit" onclick="aisubmit()">Invest now</div>
+                                <div class="y-aib-dbts">
+                                    <img src="./ai-plan_files/dui.png"/>
+                                    <span>Daily income sent to your USDT wallet</span>
+                                </div>
+                                <div class="y-aib-dbts">
+                                    <img src="./ai-plan_files/dui.png"/>
+                                    <span>Artificial intelligence works 24 hours a day</span>
+                                </div>
+                            `);
+                            
+                            // Store product info for later use
+                            window.currentProduct = data;
+                        } else {
+                            alert('Failed to load product details');
+                        }
+                    },
+                    error: function() {
+                        alert('Error fetching product details');
+                    }
+                });
+            }
+            
+            $(document).ready(function() {
+                loadProductData();
+                
+                // Watch for URL changes
+                window.addEventListener('popstate', function() {
+                    loadProductData();
+                });
+            });
+
+            function aisubmit(){
+                var urlParams = new URLSearchParams(window.location.search);
+                var id = urlParams.get('id');
+                var jine = parseFloat($('#y-aib-jine').val());
+                var userid = Cookies.get('userid');
+                var username = Cookies.get('username');
+                
+                // Validate input
+                if (!jine || isNaN(jine)) {
+                    alert('Please enter a valid quantity');
+                    return;
+                }
+                
+                if (window.currentProduct) {
+                    if (jine < window.currentProduct.min_amount || jine > window.currentProduct.max_amount) {
+                        alert('Quantity must be between $' + window.currentProduct.min_amount + ' and $' + window.currentProduct.max_amount);
+                        return;
+                    }
+                }
+
+                // Create subscription via API
+                $.ajax({
+                    url: 'http://localhost:3001/api/arbitrage/subscribe',
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        'user_id': userid || 'guest',
+                        'product_id': id,
+                        'amount': jine
+                    }),
+                    success: function(res) {
+                        if(res.success) {
+                            alert('Investment successful! Amount: $' + jine);
+                            location.href = "ai-record.html";
+                        } else {
+                            alert('Error: ' + res.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Error creating subscription');
+                    }
+                });
+            }
+        </script>
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(res) {
+                        if(res.success && res.product) {
+                            var data = res.product;
+                            
+                            // Create coin icons for arbitrage types
+                            let coinIcons = data.arbitrage_types.map(type => {
+                                const iconNum = cryptoIcons[type] || '1';
+                                return `<img src="./ai-plan_files/${iconNum}.png" title="${type}" style="width:35px; height:35px; margin-right:10px;">`;
+                            }).join('');
+
+                            // Update HTML with product details
+                            $('.y-aib-center').html(`
+                                <div class="y-aib-ctop">
+                                    <div class="y-aib-ctl">
+                                        <span class="y-aib-ctl-1">
+                                            <img src="./ai-plan_files/${data.image}"/>
+                                            <p>${data.name}</p>
+                                        </span>
+                                        <span class="y-aib-ctl-2">Quantity</span>
+                                        <span class="y-aib-ctl-3">$<b>${data.min_amount}-${data.max_amount}</b></span>
+                                    </div>
+                                    <div class="y-aib-ctr">
+                                        <span class="y-aib-ctr-1">${data.duration}</span>
+                                        <span class="y-aib-ctr-2">Daily income</span>
+                                        <span class="y-aib-ctr-3">${data.daily_return_min}-${data.daily_return_max}%</span>
+                                    </div>
+                                </div>
+                                <div class="y-aib-ccent">
+                                    <div class="y-aib-ppt">Arbitrage type</div>
+                                    <div class="y-aib-type">
+                                        ${coinIcons}
+                                    </div>
+                                </div>
+                                <div class="y-aib-bottom">
+                                    <div class="y-aib-ppt">Escrow quantity</div>
+                                    <div class="y-aib-bsl">
+                                        <div class="y-aib-bsll">
+                                            <img src="./ai-plan_files/usdt.png"/>
+                                            <span>Quantity</span>
+                                        </div>
+                                        <input type="number" id="y-aib-jine" class="y-aib-bslr" placeholder="Please enter quantity" min="${data.min_amount}" max="${data.max_amount}"/>
+                                    </div>
+                                </div>
+                                <div class="y-aib-submit" onclick="aisubmit()">Invest now</div>
+                                <div class="y-aib-dbts">
+                                    <img src="./ai-plan_files/dui.png"/>
+                                    <span>Daily income sent to your USDT wallet</span>
+                                </div>
+                                <div class="y-aib-dbts">
+                                    <img src="./ai-plan_files/dui.png"/>
+                                    <span>Artificial intelligence works 24 hours a day</span>
+                                </div>
+                            `);
+                            
+                            // Store product info for later use
+                            window.currentProduct = data;
+                        } else {
+                            alert('Failed to load product details');
+                        }
+                    },
+                    error: function() {
+                        alert('Error fetching product details');
                     }
                 });
             });
 
             function aisubmit(){
                 var urlParams = new URLSearchParams(window.location.search);
-			    var id = urlParams.get('id');
-                var jine = $('#y-aib-jine').val();
+                var id = urlParams.get('id');
+                var jine = parseFloat($('#y-aib-jine').val());
                 var userid = Cookies.get('userid');
                 var username = Cookies.get('username');
+                
+                // Validate input
+                if (!jine || isNaN(jine)) {
+                    alert('Please enter a valid quantity');
+                    return;
+                }
+                
+                if (window.currentProduct) {
+                    if (jine < window.currentProduct.min_amount || jine > window.currentProduct.max_amount) {
+                        alert('Quantity must be between $' + window.currentProduct.min_amount + ' and $' + window.currentProduct.max_amount);
+                        return;
+                    }
+                }
 
-                $.post(apiurl + "/Ai/setneworder",{
-                    'id':id,
-                    'jine':jine,
-                    'userid':userid,
-                    'username':username
-                },function(res){
-                    if(res.code == 1){
-                        alert(gy(res.data));
-                        location.href = "/views/record/ai.html";
-                    }else{
-                        alert(gy(res.data));
+                // Create subscription via API
+                $.ajax({
+                    url: 'http://localhost:3001/api/arbitrage/subscribe',
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        'user_id': userid || 'guest',
+                        'product_id': id,
+                        'amount': jine
+                    }),
+                    success: function(res) {
+                        if(res.success) {
+                            alert('Investment successful! Amount: $' + jine);
+                            location.href = "ai-record.html";
+                        } else {
+                            alert('Error: ' + res.message);
+                        }
+                    },
+                    error: function() {
+                        alert('Error creating subscription');
                     }
                 });
             }
