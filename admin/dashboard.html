@@ -3,156 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - BVOX Finance</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Admin Dashboard - Crypto Nest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 50px;
+            gap: 20px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .logo-text h1 {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .logout-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .btn.secondary {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            border: 1px solid #667eea;
+        }
+
+        .btn.secondary:hover {
+            background: rgba(102, 126, 234, 0.4);
+            border-color: #764ba2;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+        }
+
+        .stat-card.deposits {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-card.withdrawals {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-card.trading {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .stat-card.arbitrage {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .stat-card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .stat-card .number {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .stat-card .description {
+            font-size: 14px;
+            opacity: 0.85;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .content {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-tabs {
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-card .number {
+                font-size: 36px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            table th, table td {
+                padding: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h1>👨‍💼 Admin Dashboard</h1>
-                    <p>Manage users, balances, and transactions</p>
-                </div>
-                <button id="logoutBtn" style="background: #ff6b6b; padding: 10px 20px; border-radius: 6px;">Logout</button>
-            </div>
-        </header>
-
-        <div class="admin-grid">
-            <!-- Left Panel: User List -->
-            <div class="panel">
-                <h2>Users</h2>
-                <div class="search-box">
-                    <input type="text" id="userSearch" placeholder="Search by User ID...">
-                </div>
-                <div class="user-list" id="userList">
-                    <div class="no-user">Loading users...</div>
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">🔐</div>
+                <div class="logo-text">
+                    <h1>Bvoxf</
+                    <p>Admin Dashboard</p>
                 </div>
             </div>
-
-            <!-- Right Panel: User Management -->
-            <div class="panel">
-                <div id="noUserSelected" class="no-user">
-                    <h3>Select a user to view details</h3>
-                </div>
-
-                <div id="userDetails" style="display: none;">
-                    <div class="message" id="message"></div>
-
-                    <div class="stats">
-                        <div class="stat-box">
-                            <strong>User ID</strong>
-                            <div class="value" id="detailUserId">-</div>
-                        </div>
-                        <div class="stat-box">
-                            <strong>Status</strong>
-                            <div class="value" id="detailStatus">Active</div>
-                        </div>
-                    </div>
-
-                    <h3 style="margin-top: 20px; margin-bottom: 10px; color: #667eea;">Balances</h3>
-                    <div class="balance-display" id="balanceDisplay"></div>
-
-                    <!-- Tabs -->
-                    <div class="tabs">
-                        <div class="tab active" data-tab="update">Update Balance</div>
-                        <div class="tab" data-tab="topup">Add Top-up</div>
-                        <div class="tab" data-tab="withdrawal">Add Withdrawal</div>
-                        <div class="tab" data-tab="history">History</div>
-                    </div>
-
-                    <!-- Tab: Update Balance -->
-                    <div class="tab-content active" id="tab-update">
-                        <form id="updateBalanceForm">
-                            <div class="form-group">
-                                <label>Select Coin</label>
-                                <select id="coinSelect" required>
-                                    <option value="">-- Select Coin --</option>
-                                    <option value="USDT">USDT</option>
-                                    <option value="BTC">BTC</option>
-                                    <option value="ETH">ETH</option>
-                                    <option value="USDC">USDC</option>
-                                    <option value="PYUSD">PYUSD</option>
-                                    <option value="SOL">SOL</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>New Amount</label>
-                                <input type="number" id="newAmount" placeholder="Enter amount" step="0.01" required>
-                            </div>
-                            <button type="submit">Update Balance</button>
-                        </form>
-                    </div>
-
-                    <!-- Tab: Add Top-up -->
-                    <div class="tab-content" id="tab-topup">
-                        <form id="addTopupForm">
-                            <div class="form-group">
-                                <label>Select Coin</label>
-                                <select id="topupCoin" required>
-                                    <option value="">-- Select Coin --</option>
-                                    <option value="USDT">USDT</option>
-                                    <option value="BTC">BTC</option>
-                                    <option value="ETH">ETH</option>
-                                    <option value="USDC">USDC</option>
-                                    <option value="PYUSD">PYUSD</option>
-                                    <option value="SOL">SOL</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Amount</label>
-                                <input type="number" id="topupAmount" placeholder="Enter amount" step="0.01" required>
-                            </div>
-                            <button type="submit">Add Top-up</button>
-                        </form>
-                    </div>
-
-                    <!-- Tab: Add Withdrawal -->
-                    <div class="tab-content" id="tab-withdrawal">
-                        <form id="addWithdrawalForm">
-                            <div class="form-group">
-                                <label>Select Coin</label>
-                                <select id="withdrawalCoin" required>
-                                    <option value="">-- Select Coin --</option>
-                                    <option value="USDT">USDT</option>
-                                    <option value="BTC">BTC</option>
-                                    <option value="ETH">ETH</option>
-                                    <option value="USDC">USDC</option>
-                                    <option value="PYUSD">PYUSD</option>
-                                    <option value="SOL">SOL</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Wallet Address</label>
-                                <input type="text" id="withdrawalAddress" placeholder="Enter wallet address" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Quantity</label>
-                                <input type="number" id="withdrawalQuantity" placeholder="Enter quantity" step="0.01" required>
-                            </div>
-                            <button type="submit">Add Withdrawal</button>
-                        </form>
-                    </div>
-
-                    <!-- Tab: History -->
-                    <div class="tab-content" id="tab-history">
-                        <div class="stats" style="margin-bottom: 15px;">
-                            <div class="stat-box">
-                                <strong>Total Top-ups</strong>
-                                <div class="value" id="statTopups">0</div>
-                            </div>
-                            <div class="stat-box">
-                                <strong>Total Withdrawals</strong>
-                                <div class="value" id="statWithdrawals">0</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="header-buttons">
+                <button class="btn secondary" id="usersBtn" onclick="goToUsers()">👥 Users Management</button>
+                <button class="btn secondary" id="profileBtn" onclick="goToProfile()">👤 Profile</button>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
             </div>
         </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card deposits" onclick="switchTab('deposits')">
+                <h3>Deposits</h3>
+                <div class="number" id="depositsCount">0</div>
+                <div class="description">No new deposits</div>
+            </div>
+
+            <div class="stat-card withdrawals" onclick="switchTab('withdrawals')">
+                <h3>Withdrawals</h3>
+                <div class="number" id="withdrawalsCount">0</div>
+                <div class="description">No new withdrawals</div>
+            </div>
+
+            <div class="stat-card trading" onclick="switchTab('transactions')">
+                <h3>Trading</h3>
+                <div class="number" id="tradingCount">0</div>
+                <div class="description">No new trades</div>
+            </div>
+
+            <div class="stat-card arbitrage" onclick="switchTab('exchanges')">
+                <h3>AI Arbitrage</h3>
+                <div class="number" id="arbitrageCount">0</div>
+                <div class="description">No new plans</div>
+            </div>
+        </div>
+
+
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="dashboard.js"></script>
+    <script src="../js/config.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        // Use safe API base: prefer configured apiurl but avoid stale external host
+        const apiBase = (typeof apiurl !== 'undefined' && !String(apiurl).includes('api.bvoxf.com'))
+            ? apiurl
+            : (window.location.origin || 'http://localhost:3000');
+        console.log('Using apiBase:', apiBase);
+
+        // Initialize
+        $(document).ready(function() {
+            loadStats();
+
+            // Users Management button
+            $('#usersBtn').click(function() {
+                goToUsers();
+            });
+
+            // Profile button
+            $('#profileBtn').click(function() {
+                goToProfile();
+            });
+
+            // Logout button
+            $('#logoutBtn').click(function() {
+                if(confirm('Are you sure you want to logout?')) {
+                    window.location.href = '../index.html';
+                }
+            });
+        });
+
+        function goToUsers() {
+            window.location.href = '../admin-users.html';
+        }
+
+        function goToProfile() {
+            // Navigate to admin profile page
+            window.location.href = 'profile.html';
+        }
+
+        function switchTab(tabName) {
+            // Navigate to separate page based on card clicked
+            const pages = {
+                'deposits': 'deposits.html',
+                'withdrawals': 'withdrawals.html',
+                'transactions': 'transactions.html',
+                'exchanges': 'exchanges.html'
+            };
+            
+            if(pages[tabName]) {
+                window.location.href = pages[tabName];
+            }
+        }
+
+        function loadStats() {
+            $.ajax({
+                url: apiBase + '/Admin/getPendingDeposits',
+                type: 'GET',
+                success: function(res) {
+                    const count = res.data ? res.data.length : 0;
+                    $('#depositsCount').text(count);
+                    if(count === 0) {
+                        $('.stat-card.deposits .description').text('No new deposits');
+                    } else {
+                        $('.stat-card.deposits .description').text(`${count} pending deposit${count !== 1 ? 's' : ''}`);
+                    }
+                }
+            });
+
+            $.ajax({
+                url: apiBase + '/Admin/getPendingWithdrawals',
+                type: 'GET',
+                success: function(res) {
+                    const count = res.data ? res.data.length : 0;
+                    $('#withdrawalsCount').text(count);
+                    if(count === 0) {
+                        $('.stat-card.withdrawals .description').text('No new withdrawals');
+                    } else {
+                        $('.stat-card.withdrawals .description').text(`${count} pending withdrawal${count !== 1 ? 's' : ''}`);
+                    }
+                }
+            });
+
+            $.ajax({
+                url: apiBase + '/Admin/getAllTransactions',
+                type: 'GET',
+                success: function(res) {
+                    const count = res.data ? res.data.length : 0;
+                    $('#tradingCount').text(count > 99 ? '99+' : count);
+                    $('.stat-card.trading .description').text(`${count} transaction${count !== 1 ? 's' : ''}`);
+                }
+            });
+
+            $.ajax({
+                url: apiBase + '/Admin/getExchanges',
+                type: 'GET',
+                success: function(res) {
+                    const count = res.data ? res.data.length : 0;
+                    $('#arbitrageCount').text(count > 99 ? '99+' : count);
+                    $('.stat-card.arbitrage .description').text(`${count} exchange${count !== 1 ? 's' : ''}`);
+                }
+            });
+        }
+    </script>
 </body>
 </html>

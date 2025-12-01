@@ -6,7 +6,7 @@
 // API Configuration
 const API_CONFIG = {
     // Change this to your actual API server URL
-    baseURL: 'http://localhost:3000/api', // or your production URL
+    baseURL: 'http://localhost:3000', // or your production URL
     timeout: 10000, // API request timeout in ms
 };
 

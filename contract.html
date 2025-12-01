@@ -15,29 +15,42 @@
                 background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
             }
 			body{
-				background: url(./contract_files/leaf-bg.png);
+				background: url(/contract_files/leaf-bg.png);
 				background-size: 180vw;
 				background-position-x: -80vw;
 				background-repeat: no-repeat;
 			}
-			/* Chart styles (from chart.html, adapted) */
-			.chart-card{background:#0f1720;border-radius:14px;padding:12px;margin:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 8px 20px rgba(0,0,0,0.4)}
-			.chart-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-			.btn-group{display:flex;gap:6px}
-			.time-btn{padding:4px 8px;font-size:12px;border:1px solid #2f3740;background:transparent;color:#9aa6b2;border-radius:4px;cursor:pointer}
-			.time-btn.active{background:#6d67e6;border-color:#6d67e6;color:#fff}
-			.top-stats{margin-left:12px;display:flex;gap:12px;align-items:center;color:#9aa6b2;font-size:12px}
-			.chart-container{position:relative;width:100%;height:360px;overflow:hidden;background:transparent;border-radius:8px}
-			#chart{width:100%;height:100%}
-			.price-badge{position:absolute;right:12px;top:16px;background:rgba(0,0,0,0.6);padding:6px 10px;border-radius:6px;font-size:14px;font-weight:700;color:#26a69a;border-left:3px solid #26a69a;z-index:20}
-			.price-badge.down{color:#f6465d;border-left-color:#f6465d}
-			.overlay-info{position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.6);padding:8px 10px;border-radius:6px;font-size:11px;color:#cbd5e1;display:none;z-index:21}
-			.overlay-info.show{display:block}
-			.legend{position:absolute;top:12px;left:12px;display:flex;gap:12px;font-size:11px;background:rgba(0,0,0,0.45);padding:6px 8px;border-radius:6px;color:#cbd5e1;z-index:21}
-			.legend .legend-item{display:flex;align-items:center;gap:6px}
-			.legend-color{width:12px;height:8px}
-			.bottom-info{background:transparent;border-top:0;padding-top:8px;margin-top:8px;display:flex;gap:12px;color:#9aa6b2;font-size:11px}
-			/* dotted grid via chart options - ensure contrast */
+			/* Chart placeholder styles */
+			.chart-card{
+				background: #0f1720;
+				border-radius: 14px;
+				padding: 12px;
+				margin: 12px;
+				border: 1px solid rgba(255,255,255,0.04);
+				box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+			}
+			.chart-placeholder{
+				position: relative;
+				width: 100%;
+				height: 300px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-direction: column;
+				background: linear-gradient(135deg, rgba(15, 23, 32, 0.5) 0%, rgba(30, 40, 50, 0.5) 100%);
+				border-radius: 8px;
+				border: 2px dashed rgba(255, 255, 255, 0.1);
+			}
+			.chart-placeholder-icon{
+				font-size: 48px;
+				margin-bottom: 12px;
+				opacity: 0.6;
+			}
+			.chart-placeholder-text{
+				color: #9aa6b2;
+				font-size: 14px;
+				font-weight: 500;
+			}
         </style>
 	<style data-styled="active" data-styled-version="5.2.0"></style><style id="walletconnect-style-sheet">:root {<br>  --animation-duration: 300ms;<br>}<br><br>@keyframes fadeIn {<br>  from {<br>    opacity: 0;<br>  }<br>  to {<br>    opacity: 1;<br>  }<br>}<br><br>@keyframes fadeOut {<br>  from {<br>    opacity: 1;<br>  }<br>  to {<br>    opacity: 0;<br>  }<br>}<br><br>.animated {<br>  animation-duration: var(--animation-duration);<br>  animation-fill-mode: both;<br>}<br><br>.fadeIn {<br>  animation-name: fadeIn;<br>}<br><br>.fadeOut {<br>  animation-name: fadeOut;<br>}<br><br>#walletconnect-wrapper {<br>  -webkit-user-select: none;<br>  align-items: center;<br>  display: flex;<br>  height: 100%;<br>  justify-content: center;<br>  left: 0;<br>  pointer-events: none;<br>  position: fixed;<br>  top: 0;<br>  user-select: none;<br>  width: 100%;<br>  z-index: 99999999999999;<br>}<br><br>.walletconnect-modal__headerLogo {<br>  height: 21px;<br>}<br><br>.walletconnect-modal__header p {<br>  color: #ffffff;<br>  font-size: 20px;<br>  font-weight: 600;<br>  margin: 0;<br>  align-items: flex-start;<br>  display: flex;<br>  flex: 1;<br>  margin-left: 5px;<br>}<br><br>.walletconnect-modal__close__wrapper {<br>  position: absolute;<br>  top: 0px;<br>  right: 0px;<br>  z-index: 10000;<br>  background: white;<br>  border-radius: 26px;<br>  padding: 6px;<br>  box-sizing: border-box;<br>  width: 26px;<br>  height: 26px;<br>  cursor: pointer;<br>}<br><br>.walletconnect-modal__close__icon {<br>  position: relative;<br>  top: 7px;<br>  right: 0;<br>  display: flex;<br>  align-items: center;<br>  justify-content: center;<br>  transform: rotate(45deg);<br>}<br><br>.walletconnect-modal__close__line1 {<br>  position: absolute;<br>  width: 100%;<br>  border: 1px solid rgb(48, 52, 59);<br>}<br><br>.walletconnect-modal__close__line2 {<br>  position: absolute;<br>  width: 100%;<br>  border: 1px solid rgb(48, 52, 59);<br>  transform: rotate(90deg);<br>}<br><br>.walletconnect-qrcode__base {<br>  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);<br>  background: rgba(37, 41, 46, 0.95);<br>  height: 100%;<br>  left: 0;<br>  pointer-events: auto;<br>  position: fixed;<br>  top: 0;<br>  transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);<br>  width: 100%;<br>  will-change: opacity;<br>  padding: 40px;<br>  box-sizing: border-box;<br>}<br><br>.walletconnect-qrcode__text {<br>  color: rgba(60, 66, 82, 0.6);<br>  font-size: 16px;<br>  font-weight: 600;<br>  letter-spacing: 0;<br>  line-height: 1.1875em;<br>  margin: 10px 0 30px 0;<br>  text-align: center;<br>  width: 100%;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-qrcode__text {<br>    font-size: 4vw;<br>  }<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-qrcode__text {<br>    font-size: 14px;<br>  }<br>}<br><br>.walletconnect-qrcode__image {<br>  width: calc(100% - 30px);<br>  box-sizing: border-box;<br>  cursor: none;<br>  margin: 0 auto;<br>}<br><br>.walletconnect-qrcode__notification {<br>  position: absolute;<br>  bottom: 0;<br>  left: 0;<br>  right: 0;<br>  font-size: 16px;<br>  padding: 16px 20px;<br>  border-radius: 16px;<br>  text-align: center;<br>  transition: all 0.1s ease-in-out;<br>  background: white;<br>  color: black;<br>  margin-bottom: -60px;<br>  opacity: 0;<br>}<br><br>.walletconnect-qrcode__notification.notification__show {<br>  opacity: 1;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-modal__header {<br>    height: 130px;<br>  }<br>  .walletconnect-modal__base {<br>    overflow: auto;<br>  }<br>}<br><br>@media only screen and (min-device-width: 415px) and (max-width: 768px) {<br>  #content {<br>    max-width: 768px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (min-width: 375px) and (max-width: 415px) {<br>  #content {<br>    max-width: 414px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (min-width: 320px) and (max-width: 375px) {<br>  #content {<br>    max-width: 375px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>@media only screen and (max-width: 320px) {<br>  #content {<br>    max-width: 320px;<br>    box-sizing: border-box;<br>  }<br>}<br><br>.walletconnect-modal__base {<br>  -webkit-font-smoothing: antialiased;<br>  background: #ffffff;<br>  border-radius: 24px;<br>  box-shadow: 0 10px 50px 5px rgba(0, 0, 0, 0.4);<br>  font-family: ui-rounded, "SF Pro Rounded", "SF Pro Text", medium-content-sans-serif-font,<br>    -apple-system, BlinkMacSystemFont, ui-sans-serif, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,<br>    "Open Sans", "Helvetica Neue", sans-serif;<br>  margin-top: 41px;<br>  padding: 24px 24px 22px;<br>  pointer-events: auto;<br>  position: relative;<br>  text-align: center;<br>  transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);<br>  will-change: transform;<br>  overflow: visible;<br>  transform: translateY(-50%);<br>  top: 50%;<br>  max-width: 500px;<br>  margin: auto;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-modal__base {<br>    padding: 24px 12px;<br>  }<br>}<br><br>.walletconnect-modal__base .hidden {<br>  transform: translateY(150%);<br>  transition: 0.125s cubic-bezier(0.4, 0, 1, 1);<br>}<br><br>.walletconnect-modal__header {<br>  align-items: center;<br>  display: flex;<br>  height: 26px;<br>  left: 0;<br>  justify-content: space-between;<br>  position: absolute;<br>  top: -42px;<br>  width: 100%;<br>}<br><br>.walletconnect-modal__base .wc-logo {<br>  align-items: center;<br>  display: flex;<br>  height: 26px;<br>  margin-top: 15px;<br>  padding-bottom: 15px;<br>  pointer-events: auto;<br>}<br><br>.walletconnect-modal__base .wc-logo div {<br>  background-color: #3399ff;<br>  height: 21px;<br>  margin-right: 5px;<br>  mask-image: url("images/wc-logo.svg") center no-repeat;<br>  width: 32px;<br>}<br><br>.walletconnect-modal__base .wc-logo p {<br>  color: #ffffff;<br>  font-size: 20px;<br>  font-weight: 600;<br>  margin: 0;<br>}<br><br>.walletconnect-modal__base h2 {<br>  color: rgba(60, 66, 82, 0.6);<br>  font-size: 16px;<br>  font-weight: 600;<br>  letter-spacing: 0;<br>  line-height: 1.1875em;<br>  margin: 0 0 19px 0;<br>  text-align: center;<br>  width: 100%;<br>}<br><br>.walletconnect-modal__base__row {<br>  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);<br>  align-items: center;<br>  border-radius: 20px;<br>  cursor: pointer;<br>  display: flex;<br>  height: 56px;<br>  justify-content: space-between;<br>  padding: 0 15px;<br>  position: relative;<br>  margin: 0px 0px 8px;<br>  text-align: left;<br>  transition: 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>  will-change: transform;<br>  text-decoration: none;<br>}<br><br>.walletconnect-modal__base__row:hover {<br>  background: rgba(60, 66, 82, 0.06);<br>}<br><br>.walletconnect-modal__base__row:active {<br>  background: rgba(60, 66, 82, 0.06);<br>  transform: scale(0.975);<br>  transition: 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>}<br><br>.walletconnect-modal__base__row__h3 {<br>  color: #25292e;<br>  font-size: 20px;<br>  font-weight: 700;<br>  margin: 0;<br>  padding-bottom: 3px;<br>}<br><br>.walletconnect-modal__base__row__right {<br>  align-items: center;<br>  display: flex;<br>  justify-content: center;<br>}<br><br>.walletconnect-modal__base__row__right__app-icon {<br>  border-radius: 8px;<br>  height: 34px;<br>  margin: 0 11px 2px 0;<br>  width: 34px;<br>  background-size: 100%;<br>  box-shadow: 0 4px 12px 0 rgba(37, 41, 46, 0.25);<br>}<br><br>.walletconnect-modal__base__row__right__caret {<br>  height: 18px;<br>  opacity: 0.3;<br>  transition: 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);<br>  width: 8px;<br>  will-change: opacity;<br>}<br><br>.walletconnect-modal__base__row:hover .caret,<br>.walletconnect-modal__base__row:active .caret {<br>  opacity: 0.6;<br>}<br><br>.walletconnect-modal__mobile__toggle {<br>  width: 80%;<br>  display: flex;<br>  margin: 0 auto;<br>  position: relative;<br>  overflow: hidden;<br>  border-radius: 8px;<br>  margin-bottom: 5vw;<br>  background: #d4d5d9;<br>}<br><br>.walletconnect-modal__mobile__toggle_selector {<br>  width: calc(50% - 8px);<br>  background: white;<br>  position: absolute;<br>  border-radius: 5px;<br>  height: calc(100% - 8px);<br>  top: 4px;<br>  transition: all 0.2s ease-in-out;<br>  transform: translate3d(4px, 0, 0);<br>}<br><br>.walletconnect-modal__mobile__toggle.right__selected .walletconnect-modal__mobile__toggle_selector {<br>  transform: translate3d(calc(100% + 12px), 0, 0);<br>}<br><br>.walletconnect-modal__mobile__toggle a {<br>  font-size: 12px;<br>  width: 50%;<br>  text-align: center;<br>  padding: 8px;<br>  margin: 0;<br>  font-weight: 600;<br>  z-index: 1;<br>}<br><br>.walletconnect-modal__footer {<br>  display: flex;<br>  justify-content: center;<br>  margin-top: 20px;<br>}<br><br>@media only screen and (max-width: 768px) {<br>  .walletconnect-modal__footer {<br>    margin-top: 5vw;<br>  }<br>}<br><br>.walletconnect-modal__footer a {<br>  cursor: pointer;<br>  color: #898d97;<br>  font-size: 15px;<br>  margin: 0 auto;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-modal__footer a {<br>    font-size: 14px;<br>  }<br>}<br><br>.walletconnect-connect__buttons__wrapper {<br>  max-height: 44vh;<br>}<br><br>.walletconnect-connect__buttons__wrapper__android {<br>  margin: 50% 0;<br>}<br><br>.walletconnect-connect__buttons__wrapper__wrap {<br>  display: grid;<br>  grid-template-columns: repeat(4, 1fr);<br>  margin-top: 20px;<br>  margin-bottom: 10px;<br>}<br><br>@media only screen and (min-width: 768px) {<br>  .walletconnect-connect__buttons__wrapper__wrap {<br>    margin-top: 40px;<br>  }<br>}<br><br>.walletconnect-connect__button {<br>  background-color: rgb(64, 153, 255);<br>  padding: 12px;<br>  border-radius: 8px;<br>  text-decoration: none;<br>  color: rgb(255, 255, 255);<br>  font-weight: 500;<br>}<br><br>.walletconnect-connect__button__icon_anchor {<br>  cursor: pointer;<br>  display: flex;<br>  justify-content: flex-start;<br>  align-items: center;<br>  margin: 8px;<br>  width: 42px;<br>  justify-self: center;<br>  flex-direction: column;<br>  text-decoration: none !important;<br>}<br><br>@media only screen and (max-width: 320px) {<br>  .walletconnect-connect__button__icon_anchor {<br>    margin: 4px;<br>  }<br>}<br><br>.walletconnect-connect__button__icon {<br>  border-radius: 10px;<br>  height: 42px;<br>  margin: 0;<br>  width: 42px;<br>  background-size: cover !important;<br>  box-shadow: 0 4px 12px 0 rgba(37, 41, 46, 0.25);<br>}<br><br>.walletconnect-connect__button__text {<br>  color: #424952;<br>  font-size: 2.7vw;<br>  text-decoration: none !important;<br>  padding: 0;<br>  margin-top: 1.8vw;<br>  font-weight: 600;<br>}<br><br>@media only screen and (min-width: 768px) {<br>  .walletconnect-connect__button__text {<br>    font-size: 16px;<br>    margin-top: 12px;<br>  }<br>}<br></style></head>
 	<body>
@@ -92,55 +105,12 @@
 			</div>
 		</div>
         
+		<!-- Chart Placeholder Layout -->
 		<div class="y-kline">
 			<div class="chart-card">
-				<div class="chart-toolbar">
-					<div class="btn-group">
-						<button class="time-btn active" data-interval="1">1m</button>
-						<button class="time-btn" data-interval="5">5m</button>
-						<button class="time-btn" data-interval="15">15m</button>
-						<button class="time-btn" data-interval="30">30m</button>
-						<button class="time-btn" data-interval="60">1h</button>
-						<button class="time-btn" data-interval="240">4h</button>
-						<button class="time-btn" data-interval="1440">1D</button>
-					</div>
-					<div class="top-stats">
-						<div>Time:<span id="time-stat" style="margin-left:6px;font-weight:700;color:#fff">-</span></div>
-						<div>MAG:<span id="mag-stat" style="margin-left:6px;font-weight:700;color:#ffd700">-</span></div>
-						<div>MAX:<span id="max-stat" style="margin-left:6px;font-weight:700;color:#26a69a">-</span></div>
-						<div>MAI0:<span id="mai-stat" style="margin-left:6px;font-weight:700;color:#f6465d">-</span></div>
-					</div>
-				</div>
-				<div class="chart-container">
-					<!-- Use the repo's existing K-line implementation. The kline scripts will initialize
-						 inside `#chart_container1`. Keep the top stats/legend elements outside so they
-						 can be updated by the kline feed if needed. -->
-					<div id="chart_container" style="display:none;">
-						<div class="loding" data-type="0" style="display: none;">
-							<img src="./contract_files/loading.gif" alt="">
-						</div>
-					</div>
-
-					<div id="chart_container1" style="position: relative; width: 100%; height: 360px;"></div>
-
-					<div class="price-badge" id="price-badge">0.00</div>
-					<div class="overlay-info" id="overlay">
-						<div><span class="label">Time:</span> <span class="value" id="ov-time">-</span></div>
-						<div><span class="label">Open:</span> <span class="value" id="ov-open">-</span></div>
-						<div><span class="label">High:</span> <span class="value" id="ov-high">-</span></div>
-						<div><span class="label">Low:</span> <span class="value" id="ov-low">-</span></div>
-						<div><span class="label">Close:</span> <span class="value" id="ov-close">-</span></div>
-						<div><span class="label">Vol:</span> <span class="value" id="ov-vol">-</span></div>
-					</div>
-					<div class="legend">
-						<div class="legend-item"><div class="legend-color ma7" style="background:#ffd700"></div><div>MA5: <span id="ma7-value">-</span></div></div>
-						<div class="legend-item"><div class="legend-color ma25" style="background:#1e90ff"></div><div>MA10: <span id="ma25-value">-</span></div></div>
-					</div>
-				</div>
-				<div class="bottom-info">
-					<div>VOL(S,10,20) <span id="vol-val" style="margin-left:6px;font-weight:700">-</span></div>
-					<div>MA5: <span id="info-ma5" style="margin-left:6px;font-weight:700">-</span></div>
-					<div>MA10: <span id="info-ma10" style="margin-left:6px;font-weight:700">-</span></div>
+				<div class="chart-placeholder">
+					<div class="chart-placeholder-icon">📈</div>
+					<div class="chart-placeholder-text">Chart placeholder</div>
 				</div>
 			</div>
 		</div>
@@ -533,6 +503,29 @@
 			apt: 4
 		};
 
+		// Direction translation mapping
+		const directionMap = {
+			'向上': 'Upward',
+			'向下': 'Down',
+			'Upward': '向上',
+			'Down': '向下'
+		};
+
+		// Function to translate direction with language support
+		function translateDirection(chineseDir) {
+			// If it comes from API (Chinese), convert to English
+			if (chineseDir === '向上') return 'Upward';
+			if (chineseDir === '向下') return 'Down';
+			return chineseDir;
+		}
+
+		// Function to handle multi-language direction display
+		function getDirectionText(chineseDir) {
+			const englishDir = translateDirection(chineseDir);
+			// Apply language translation if available
+			return gy(englishDir);
+		}
+
 		var urlParams = new URLSearchParams(window.location.search);
 		var coinname = urlParams.get('market');
 		
@@ -553,14 +546,15 @@
 						
 					}else{
 						$.each(data.data,function(key,val){
-							if(val.strtype =="向上"){
+							const englishDirection = translateDirection(val.strtype);
+							if(englishDirection == "Upward"){
 								html += '<div class="y-tfx y-tfx-left">'+ val.ts +'</div>'+
-									'<div class="y-tfx y-tfx-right y-shang y-tfx-b1">'+ gy(val.strtype) +'</div>'+
+									'<div class="y-tfx y-tfx-right y-shang y-tfx-b1">'+ getDirectionText(val.strtype) +'</div>'+
 									'<div class="y-tfx y-tfx-left y-tfx-b2">' + val.price + '</div>'+
 									'<div class="y-tfx y-tfx-right">' + val.amount + '</div>';
 							}else{
 								html += '<div class="y-tfx y-tfx-left">'+ val.ts +'</div>'+
-									'<div class="y-tfx y-tfx-right y-xia y-tfx-b1">'+ gy(val.strtype) +'</div>'+
+									'<div class="y-tfx y-tfx-right y-xia y-tfx-b1">'+ getDirectionText(val.strtype) +'</div>'+
 									'<div class="y-tfx y-tfx-left y-tfx-b2">' + val.price + '</div>'+
 									'<div class="y-tfx y-tfx-right">' + val.amount + '</div>';
 							}
@@ -619,11 +613,11 @@
 			if(fx==1){
 				$('.y-xdan-sx-right').removeClass('y-xdan-xzl');
 				$('.y-xdan-sx-left').addClass('y-xdan-xzl');
-				$('#y-gmkdfx').text(gy('向上'));
+				$('#y-gmkdfx').text(gy('Upward'));
 			}else if(fx==2){
 				$('.y-xdan-sx-left').removeClass('y-xdan-xzl');
 				$('.y-xdan-sx-right').addClass('y-xdan-xzl');
-				$('#y-gmkdfx').text(gy('向下'));
+				$('#y-gmkdfx').text(gy('Down'));
 			}
 			$('#y-fx').val(fx);
 		}
@@ -673,9 +667,9 @@
     			$('#y-gmj').text(buyprice);
     			$('#y-gmsl').text(num);
     			if(fangxiang == 1){
-    				$('#y-gmfx').text(gy('向上'));
+    				$('#y-gmfx').text(gy('Upward'));
     			}else{
-    				$('#y-gmfx').text(gy('向下'));
+    				$('#y-gmfx').text(gy('Down'));
     			}
     			$('#y-hysc').text(miaoshu);
     			$('#y-dqsy').text($('#y-syl').val() + '%');
@@ -1055,62 +1049,7 @@
 	</script>
 
 	<!-- Use repo K-line scripts and websocket deedfeeds to render real data + volume scaling -->
-	<script src="./contract_files/kline.min.js.download"></script>
-	<script src="./contract_files/klinecharts.min.js.download"></script>
-	<script src="./contract_files/ws-deedfeeds.js.download"></script>
-	<script>
-		(function(){
-			// Ensure symbol used by ws-deedfeeds matches coinname
-			window.SYMBOL = (typeof coinname !== 'undefined') ? (coinname + 'usdt') : 'btcusdt';
+	<!-- Chart scripts removed -->
 
-			function safeBootstrap(){
-				if(typeof VyKline === 'undefined' || typeof window.deedfeeds === 'undefined'){
-					setTimeout(safeBootstrap,200);
-					return;
-				}
-				// Defensive: patch VyKline.initHistoryData to skip undefined data
-				const origInit = VyKline.initHistoryData;
-				VyKline.initHistoryData = function(data){
-					if(!Array.isArray(data) || !data.length || typeof data[0].close === 'undefined'){
-						console.warn('No valid kline data received for chart.');
-						return;
-					}
-					return origInit.apply(this, arguments);
-				};
-				VyKline.bootstrap({
-					container: document.getElementById('chart_container1'),
-					deedfeeds: window.deedfeeds,
-					showIntervalToolbar: false,
-					defaultInterval: 'm1',
-					interval: ['m1','m5','m15','m30','m60','h4','d1','w1'],
-					theme: 'light',
-					customChart: {
-						volume_height: 50,
-						init_offset_x: 10,
-						default_rise_color: '#49C043',
-						default_fall_color: '#CC1414'
-					}
-				});
-				if(window.vyChart && typeof window.vyChart.switchChartType === 'function'){
-					window.vyChart.switchChartType('KLINE');
-				}
-				// Wire the existing time buttons to request different intervals from deedfeeds
-				document.querySelectorAll('.time-btn').forEach(btn=>{
-					btn.addEventListener('click', function(e){
-						document.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('active'));
-						this.classList.add('active');
-						const val = this.dataset.interval;
-						let key = 'm' + val;
-						if(val === '240') key = 'h4';
-						if(val === '1440') key = 'd1';
-						if(window.deedfeeds && typeof VyKline !== 'undefined'){
-							window.deedfeeds.intervalChanged({interval: key, setHistoryData: VyKline.initHistoryData, subscribeData: VyKline.getRealTimeData});
-						}
-					});
-				});
-			}
-			document.addEventListener('DOMContentLoaded', safeBootstrap, false);
-		})();
-	</script>
 
 </body></html>

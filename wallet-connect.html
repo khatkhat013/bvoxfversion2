@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Bvox - Connect Wallet</title>
+    <link rel="shortcut icon" href="https://www.bvoxf.com/favicon.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
+            font-size: 16px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .wallet-container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 25px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 60px rgba(102, 126, 234, 0.3);
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .wallet-header {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .wallet-logo {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .wallet-header h1 {
+            font-size: 32px;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .wallet-header p {
+            font-size: 16px;
+            color: #7f8c8d;
+            line-height: 1.5;
+        }
+
+        .wallet-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ecf0f1, transparent);
+            margin: 35px 0;
+        }
+
+        .wallet-options {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            padding: 25px;
+            border: 2px solid #e0e8ff;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background: linear-gradient(135deg, #ffffff 0%, #f5f8ff 50%, #ffffff 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wallet-option::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .wallet-option::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .wallet-option:hover::before {
+            opacity: 1;
+        }
+
+        .wallet-option:hover::after {
+            left: 100%;
+        }
+
+        .wallet-option:hover {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 50%, #f5f8ff 100%);
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(102, 126, 234, 0.3), 0 0 30px rgba(102, 126, 234, 0.15);
+        }
+
+        .wallet-option:active {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.25);
+        }
+
+        .wallet-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-right: 20px;
+            flex-shrink: 0;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .wallet-option:hover .wallet-icon {
+            transform: scale(1.15) rotate(8deg);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .wallet-icon.metamask {
+            background: #1a1a2e;
+        }
+
+        .wallet-icon.walletconnect {
+            background: #1a1a2e
+        }
+
+        .wallet-info {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .wallet-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+            letter-spacing: -0.3px;
+        }
+
+        .wallet-description {
+            font-size: 14px;
+            color: #7f8c8d;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .wallet-arrow {
+            font-size: 28px;
+            color: #bdc3c7;
+            margin-left: auto;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .wallet-option:hover .wallet-arrow {
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .wallet-footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 13px;
+            color: #95a5a6;
+            line-height: 1.8;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+            border-radius: 12px;
+            border: 1px solid #e8ecff;
+        }
+
+        .wallet-footer strong {
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+            font-weight: 500;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-message.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .status-message.error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .status-message.loading {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(12, 84, 96, 0.2);
+            border-radius: 50%;
+            border-top-color: #0c5460;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .wallet-container {
+                padding: 30px 20px;
+            }
+
+            .wallet-header h1 {
+                font-size: 28px;
+            }
+
+            .wallet-option {
+                padding: 16px;
+            }
+
+            .wallet-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 28px;
+                margin-right: 15px;
+            }
+
+            .wallet-name {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wallet-container">
+        <div class="wallet-header">
+            <div class="wallet-logo">🦊</div>
+            <h1>Bvox</h1>
+            <p>Connect your wallet to access your account</p>
+        </div>
+
+        <div class="wallet-divider"></div>
+
+        <div class="wallet-options">
+            <!-- MetaMask Option -->
+            <div class="wallet-option" id="metamask-option" onclick="connectMetaMask()">
+                <div class="wallet-icon metamask">
+                    🦊
+                </div>
+                <div class="wallet-info">
+                    <div class="wallet-name">MetaMask</div>
+                    <div class="wallet-description">Connect to your MetaMask Wallet</div>
+                </div>
+                <div class="wallet-arrow">→</div>
+            </div>
+
+            <!-- WalletConnect Option -->
+            <div class="wallet-option" id="walletconnect-option" onclick="connectWalletConnect()">
+                <div class="wallet-icon walletconnect">
+                    📱
+                </div>
+                <div class="wallet-info">
+                    <div class="wallet-name">WalletConnect</div>
+                    <div class="wallet-description">Scan with WalletConnect to connect</div>
+                </div>
+                <div class="wallet-arrow">→</div>
+            </div>
+        </div>
+
+        <div class="status-message" id="status-message"></div>
+
+        <div class="wallet-footer">
+            <strong>Secure Connection</strong><br>
+            We never store your private keys. Your wallet connection is secured by industry-standard protocols.
+        </div>
+    </div>
+
+    <script src="./ai-arbitrage_files/jquery.js.download"></script>
+    <script src="./ai-arbitrage_files/js.cookie.min.js.download"></script>
+    <script src="./ai-arbitrage_files/web3.min.js.download"></script>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status-message');
+            statusEl.textContent = message;
+            statusEl.className = 'status-message ' + type;
+        }
+
+        function showLoading(message) {
+            const statusEl = document.getElementById('status-message');
+            statusEl.innerHTML = '<span class="loading-spinner"></span>' + message;
+            statusEl.className = 'status-message loading';
+        }
+
+        async function connectMetaMask() {
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    showStatus('❌ MetaMask is not installed. Please install MetaMask extension.', 'error');
+                    // Redirect to MetaMask website
+                    setTimeout(() => {
+                        window.open('https://metamask.io/download/', '_blank');
+                    }, 2000);
+                    return;
+                }
+
+                showLoading('Connecting to MetaMask...');
+
+                // Request accounts
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                if (!accounts || accounts.length === 0) {
+                    showStatus('❌ No accounts found. Please unlock MetaMask.', 'error');
+                    return;
+                }
+
+                const address = accounts[0];
+                await connectWalletToServer(address, 'metamask');
+
+            } catch (error) {
+                console.error('MetaMask connection error:', error);
+                if (error.code === 4001) {
+                    showStatus('❌ Connection rejected by user.', 'error');
+                } else {
+                    showStatus('❌ Error: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function connectWalletConnect() {
+            try {
+                showLoading('Opening WalletConnect...');
+
+                // For WalletConnect, we would integrate with their provider
+                // For now, show a prompt for manual address input or QR code
+                const address = prompt('Enter your wallet address:');
+
+                if (!address) {
+                    showStatus('Connection cancelled.', 'error');
+                    return;
+                }
+
+                if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+                    showStatus('❌ Invalid wallet address format.', 'error');
+                    return;
+                }
+
+                await connectWalletToServer(address, 'walletconnect');
+
+            } catch (error) {
+                console.error('WalletConnect error:', error);
+                showStatus('❌ Error: ' + error.message, 'error');
+            }
+        }
+
+        async function connectWalletToServer(address, provider) {
+            try {
+                showLoading('Verifying wallet...');
+
+                const response = await $.ajax({
+                    url: 'http://localhost:3001/api/wallet/connect',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify({
+                        address: address,
+                        chainId: 'ethereum'
+                    })
+                });
+
+                if (response.success) {
+                    const uid = response.uid;
+                    const isNew = response.isNew;
+
+                    // Save UID and wallet address to cookies
+                    Cookies.set('userid', uid, { expires: 365 });
+                    Cookies.set('wallet_address', address, { expires: 365 });
+                    Cookies.set('wallet_provider', provider, { expires: 365 });
+
+                    if (isNew) {
+                        showStatus('✅ New account created! Redirecting...', 'success');
+                        console.log('New user UID:', uid);
+                    } else {
+                        showStatus('✅ Welcome back! Redirecting...', 'success');
+                        console.log('Existing user UID:', uid);
+                    }
+
+                    // Redirect to home page after 1.5 seconds
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+
+                } else {
+                    showStatus('❌ Connection failed: ' + response.message, 'error');
+                }
+
+            } catch (error) {
+                console.error('Server connection error:', error);
+                showStatus('❌ Server error: ' + (error.statusText || error.message), 'error');
+            }
+        }
+
+        // Check if already connected
+        document.addEventListener('DOMContentLoaded', function() {
+            const uid = Cookies.get('userid');
+            if (uid) {
+                // User already has a UID, redirect to home
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Listen for account changes in MetaMask
+        if (typeof window.ethereum !== 'undefined') {
+            window.ethereum.on('accountsChanged', function(accounts) {
+                if (accounts.length === 0) {
+                    // User disconnected wallet
+                    Cookies.remove('userid');
+                    Cookies.remove('wallet_address');
+                    Cookies.remove('wallet_provider');
+                    location.reload();
+                } else if (accounts[0] !== Cookies.get('wallet_address')) {
+                    // User switched accounts
+                    window.location.href = 'wallet-connect.html';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

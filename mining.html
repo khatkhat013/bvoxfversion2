@@ -137,7 +137,7 @@
                         <img src="./mining_files/eth.png">
                     </div>
                     <div class="y-ex-dner" style="padding-top: 1rem;">
-                        <input type="number" id="zyshuliang" placeholder="Please enter the Staking Quantity">
+                        <input type="number" id="zyshuliang" placeholder="Enter Staking Amount">
                     </div>
 
                     <div class="y-ex-dqr" data-translate="提交">Submit</div>
@@ -158,7 +158,7 @@
 
             $(document).ready(function() {
                 setInterval(updateCountdown, 1000);
-                $('#zyshuliang').attr('placeholder',gy('请输入质押数量'));
+                $('#zyshuliang').attr('placeholder', gy('Enter Staking Amount'));
 
                 var userid = Cookies.get('userid');
                 var username = Cookies.get('username');
@@ -242,26 +242,59 @@
 
                 var jine = $('#zyshuliang').val();
 
-                if(jine){
-                    $.ajax({
-                        url: apiurl + '/Mine/setmineorder',
-                        type: 'POST',
-                        data: {
-                            'userid': userid,
-                            'username': username,
-                            'jine': jine,
-                        },
-                        dataType: 'json',
-                        success: function(res) {
-                            if(res.code == 1){
-                                alert(gy('下单成功'));
-                                location.reload();
-                            }else{
-                                alert(gy(res.data));
-                            }
-                        }
-                    });
+                // Validation checks
+                if(!userid || !username){
+                    alert(gy('Please login first'));
+                    return;
                 }
+
+                if(!jine || jine === ''){
+                    alert(gy('Please enter the staking amount'));
+                    return;
+                }
+
+                var amount = parseFloat(jine);
+                if(isNaN(amount) || amount <= 0){
+                    alert(gy('Please enter a valid amount'));
+                    return;
+                }
+
+                // Validate minimum and maximum amounts
+                if(amount < 0.5){
+                    alert(gy('Minimum staking amount is 0.5 ETH'));
+                    return;
+                }
+
+                // Submit the order
+                $.ajax({
+                    url: apiurl + '/Mine/setmineorder',
+                    type: 'POST',
+                    data: {
+                        'userid': userid,
+                        'username': username,
+                        'jine': jine,
+                    },
+                    dataType: 'json',
+                    success: function(res) {
+                        if(res.code == 1){
+                            alert(gy('Order submitted successfully'));
+                            // Clear input and close dialog
+                            $('#zyshuliang').val('');
+                            $('.y-ex-duih').hide();
+                            $('.y-ex-dqrz').hide();
+                            // Reload to show updated balances
+                            setTimeout(function(){
+                                location.reload();
+                            }, 1500);
+                        }else{
+                            alert(gy(res.data) || gy('Order submission failed'));
+                        }
+                    },
+                    error: function(error){
+                        console.error('Submit error:', error);
+                        alert(gy('Network error, please try again'));
+                    }
+                });
             }
 
         </script>

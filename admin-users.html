@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - User Management</title>
+    <script src="./admin_files/jquery.js.download" type="text/javascript" charset="utf-8"></script>
+    <script src="./js/config.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./admin_files/js.cookie.min.js.download"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 28px;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.3);
+            border: 1px solid white;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.5);
+        }
+
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-item {
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            background: #f9f9f9;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            background: #e8eaf6;
+            border-left-color: #667eea;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .content {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        h2 {
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input, .search-box select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            flex: 1;
+        }
+
+        .search-box button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-box button:hover {
+            background: #764ba2;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th {
+            background: #f0f0f0;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #ddd;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+            transition: opacity 0.3s;
+        }
+
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+
+        .edit-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .approve-btn {
+            background: #2196F3;
+            color: white;
+        }
+
+        .reject-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"], input[type="number"], input[type="email"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #000;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-submit {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: #764ba2;
+        }
+
+        .btn-cancel {
+            background: #ccc;
+            color: #333;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background: #bbb;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .coin-balance {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .coin-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+
+        .coin-item label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .coin-item input {
+            margin: 0;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Admin - User & Transaction Management</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </header>
+
+        <div class="admin-layout">
+            <div class="sidebar">
+                <div class="sidebar-item active" onclick="switchSection('users', this)">👥 Users</div>
+                <div class="sidebar-item" onclick="switchSection('balances', this)">💰 Manage Balances</div>
+                <div class="sidebar-item" onclick="switchSection('transactions', this)">📊 Transactions</div>
+                <div class="sidebar-item" onclick="switchSection('deposits', this)">📥 Deposits</div>
+                <div class="sidebar-item" onclick="switchSection('withdrawals', this)">📤 Withdrawals</div>
+                <div class="sidebar-item" onclick="switchSection('exchanges', this)">🔄 Exchanges</div>
+            </div>
+
+            <div class="content">
+                <!-- Users Section -->
+                <div id="users" class="content-section active">
+                    <h2>👥 Users Management</h2>
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 20px; font-weight: 600; margin-bottom: 5px;">Monitor and manage all registered users</div>
+                            <div style="font-size: 13px; opacity: 0.9;">View user information, balances, and manage their accounts</div>
+                        </div>
+                        <div id="totalUsersCount" style="text-align: right;">
+                            <div style="font-size: 32px; font-weight: bold;">0</div>
+                            <div style="font-size: 12px;">Total Users</div>
+                        </div>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" id="searchUser" placeholder="🔍 Search users...">
+                        <button onclick="searchUsers()" style="background: #667eea;">Search</button>
+                        <button onclick="loadAllUsers()" style="background: #666; margin-left: auto;">🔄 Refresh</button>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <select id="filterStatus" onchange="loadAllUsers()" style="padding: 10px; border: 1px solid #ddd; border-radius: 4px; background: white;">
+                            <option value="">Filter by Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>USER ID</th>
+                                <th>NAME</th>
+                                <th>EMAIL</th>
+                                <th>TOTAL BALANCE</th>
+                                <th>STATUS</th>
+                                <th>REGISTERED</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersList"></tbody>
+                    </table>
+                </div>
+
+                <!-- Balances Section -->
+                <div id="balances" class="content-section">
+                    <h2>Manage User Balances</h2>
+                    <div class="search-box">
+                        <input type="text" id="balanceSearchUser" placeholder="Enter User ID">
+                        <button onclick="searchUserBalance()">Load User</button>
+                    </div>
+                    <div id="balanceForm" style="display: none;">
+                        <div class="form-group">
+                            <label>User: <span id="selectedUserInfo"></span></label>
+                        </div>
+                        <div class="coin-balance">
+                            <div class="coin-item">
+                                <label>USDT Balance</label>
+                                <input type="number" id="balance_usdt" placeholder="0.00" step="0.01">
+                            </div>
+                            <div class="coin-item">
+                                <label>BTC Balance</label>
+                                <input type="number" id="balance_btc" placeholder="0.00" step="0.00000001">
+                            </div>
+                            <div class="coin-item">
+                                <label>ETH Balance</label>
+                                <input type="number" id="balance_eth" placeholder="0.00" step="0.00000001">
+                            </div>
+                            <div class="coin-item">
+                                <label>USDC Balance</label>
+                                <input type="number" id="balance_usdc" placeholder="0.00" step="0.01">
+                            </div>
+                            <div class="coin-item">
+                                <label>PYUSD Balance</label>
+                                <input type="number" id="balance_pyusd" placeholder="0.00" step="0.01">
+                            </div>
+                            <div class="coin-item">
+                                <label>SOL Balance</label>
+                                <input type="number" id="balance_sol" placeholder="0.00" step="0.01">
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button class="btn-submit" onclick="updateUserBalances()">Update Balances</button>
+                            <button class="btn-cancel" onclick="clearBalanceForm()">Clear</button>
+                        </div>
+                    </div>
+                    <div id="balanceNotice" style="display: none;">
+                        <p style="color: #666; text-align: center; padding: 40px;">Select a user above to manage their balances</p>
+                    </div>
+                </div>
+
+                <!-- Transactions Section -->
+                <div id="transactions" class="content-section">
+                    <h2>All Transactions</h2>
+                    <div class="search-box">
+                        <input type="text" id="transactionSearch" placeholder="Search by User ID">
+                        <select id="transactionType">
+                            <option value="">All Types</option>
+                            <option value="deposit">Deposit</option>
+                            <option value="withdraw">Withdrawal</option>
+                            <option value="exchange">Exchange</option>
+                        </select>
+                        <button onclick="searchTransactions()">Search</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>User ID</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsList"></tbody>
+                    </table>
+                </div>
+
+                <!-- Deposits Section -->
+                <div id="deposits" class="content-section">
+                    <h2>Pending Deposits</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Deposit ID</th>
+                                <th>User ID</th>
+                                <th>Coin</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="depositsList"></tbody>
+                    </table>
+                </div>
+
+                <!-- Withdrawals Section -->
+                <div id="withdrawals" class="content-section">
+                    <h2>Pending Withdrawals</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Withdrawal ID</th>
+                                <th>User ID</th>
+                                <th>Coin</th>
+                                <th>Amount</th>
+                                <th>Address</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="withdrawalsList"></tbody>
+                    </table>
+                </div>
+
+                <!-- Exchanges Section -->
+                <div id="exchanges" class="content-section">
+                    <h2>Exchange Transactions</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Exchange ID</th>
+                                <th>User ID</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="exchangesList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Detail Modal -->
+    <div id="transactionModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal('transactionModal')">&times;</span>
+            <div class="modal-title">Transaction Details</div>
+            <div id="transactionDetail"></div>
+            <div class="button-group">
+                <button class="btn-submit" onclick="approveTransaction()">Approve</button>
+                <button class="reject-btn" style="flex: 1; padding: 10px 20px;" onclick="rejectTransaction()">Reject</button>
+                <button class="btn-cancel" onclick="closeModal('transactionModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSelectedUser = null;
+        let currentTransaction = null;
+
+        function switchSection(sectionId, element) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            element.classList.add('active');
+
+            // Load data for selected section
+            if (sectionId === 'users') loadAllUsers();
+            else if (sectionId === 'deposits') loadPendingDeposits();
+            else if (sectionId === 'withdrawals') loadPendingWithdrawals();
+            else if (sectionId === 'exchanges') loadExchanges();
+            else if (sectionId === 'transactions') loadAllTransactions();
+        }
+
+        function loadAllUsers() {
+            $.ajax({
+                url: apiurl + '/Admin/getAllUsers',
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    if(res.code == 1) {
+                        displayUsers(res.data);
+                    } else {
+                        alert('Error loading users: ' + res.data);
+                    }
+                },
+                error: function(err) {
+                    console.error('Error:', err);
+                    $('#usersList').html('<tr><td colspan="6" class="no-data">Error loading users</td></tr>');
+                }
+            });
+        }
+
+        function displayUsers(users) {
+            let html = '';
+            if (!users || users.length === 0) {
+                html = '<tr><td colspan="8" class="no-data"><div style="padding: 40px;"><div style="font-size: 40px; margin-bottom: 10px;">👥</div>No users found</div></td></tr>';
+            } else {
+                // Update total users count
+                $('#totalUsersCount').html(`<div style="font-size: 32px; font-weight: bold;">${users.length}</div><div style="font-size: 12px;">Total Users</div>`);
+                
+                users.forEach((user, index) => {
+                    const registeredDate = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A';
+                    const userStatus = user.status || 'active';
+                    const statusClass = userStatus === 'active' ? 'status-approved' : 'status-rejected';
+                    const totalBalance = user.total_balance ? Number(user.total_balance).toFixed(2) : '0.00';
+                    
+                    html += `<tr>
+                        <td style="font-weight: 600; color: #667eea;">${index + 1}</td>
+                        <td><strong>${user.id || user.userid || 'N/A'}</strong></td>
+                        <td>${user.username || 'N/A'}</td>
+                        <td>${user.email || 'N/A'}</td>
+                        <td><strong>$${totalBalance}</strong></td>
+                        <td><span class="status-badge ${statusClass}">${userStatus.toUpperCase()}</span></td>
+                        <td><small>${registeredDate}</small></td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="editUserBalance('${user.id || user.userid}', '${user.username}')">💰 Balance</button>
+                            <button class="action-btn approve-btn" onclick="viewUserDetail('${user.id || user.userid}')">👁️ View</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            $('#usersList').html(html);
+        }
+
+        function searchUsers() {
+            const searchTerm = $('#searchUser').val();
+            if (!searchTerm) {
+                loadAllUsers();
+                return;
+            }
+            $.ajax({
+                url: apiurl + '/Admin/searchUsers',
+                type: 'POST',
+                data: { searchTerm: searchTerm },
+                dataType: 'json',
+                success: function(res) {
+                    if(res.code == 1) {
+                        displayUsers(res.data);
+                    } else {
+                        $('#usersList').html('<tr><td colspan="8" class="no-data">No matching users found</td></tr>');
+                    }
+                },
+                error: function(err) {
+                    console.error('Error:', err);
+                    $('#usersList').html('<tr><td colspan="8" class="no-data">Error searching users</td></tr>');
+                }
+            });
+        }
+
+        function viewUserDetail(userId) {
+            $.ajax({
+                url: apiurl + '/Admin/getUserInfo',
+                type: 'POST',
+                data: { userid: userId },
+                dataType: 'json',
+                success: function(res) {
+                    if(res.code == 1) {
+                        const user = res.data;
+                        alert(`
+User Details:
+─────────────────────
+ID: ${user.id || user.userid}
+Username: ${user.username}
+Email: ${user.email || 'N/A'}
+Total Balance: $${user.total_balance ? Number(user.total_balance).toFixed(2) : '0.00'}
+Status: ${user.status || 'Active'}
+Registered: ${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                        `);
+                    } else {
+                        alert('User not found');
+                    }
+                }
+            });
+        }
+
+        function editUserBalance(userId, username) {
+            currentSelectedUser = { id: userId, username: username };
+            $('#selectedUserInfo').text(username + ' (ID: ' + userId + ')');
+            $('#balanceForm').show();
+            $('#balanceNotice').hide();
+            
+            // Load current balances
+            $.ajax({
+                url: apiurl + '/Wallet/getbalance',
+                type: 'POST',
+                data: { userid: userId },
+                dataType: 'json',
+                success: function(res) {
+                    if(res.code == 1) {
+                        $('#balance_usdt').val(res.data.usdt || 0);
+                        $('#balance_btc').val(res.data.btc || 0);
+                        $('#balance_eth').val(res.data.eth || 0);
+                        $('#balance_usdc').val(res.data.usdc || 0);
+                        $('#balance_pyusd').val(res.data.pyusd || 0);
+                        $('#balance_sol').val(res.data.sol || 0);
+                    }
+                }
+            });
+        }
+
+        function searchUserBalance() {
+            const userId = $('#balanceSearchUser').val();
+            if (!userId) {
+                alert('Please enter a User ID');
+                return;
+            }
+            
+            $.ajax({
+                url: apiurl + '/Admin/getUserInfo',
+                type: 'POST',
+                data: { userid: userId },
+                dataType: 'json',
+                success: function(res) {
+                    if(res.code == 1) {
+                        editUserBalance(userId, res.data.username);
+                    } else {
+                        alert('User not found');
+                    }
+                }
+            });
+        }
+
+        function updateUserBalances() {
+            if (!currentSelectedUser) {
+                alert('Please select a user first');
+                return;
+            }
+
+            const data = {
+                userid: currentSelectedUser.id,
+                usdt: $('#balance_usdt').val() || 0,
+                btc: $('#balance_btc').val() || 0,
+                eth: $('#balance_eth').val() || 0,
+                usdc: $('#balance_usdc').val() || 0,
+                pyusd: $('#balance_pyusd').val() || 0,
+                sol: $('#balance_sol').val() || 0
+            };
+
+            $.ajax({
+                url: apiurl + '/Admin/updateUserBalance',
+                type: 'POST',
+                data: data,
+                dataType: 'json',
+                success: function(res) {
+                    if(res.code == 1) {
+                        alert('Balances updated successfully!');
+                        clearBalanceForm();
+                    } else {
+                        alert('Error: ' + res.data);
+                    }
+                },
+                error: function(err) {
+                    console.error('Error:', err);
+                    alert('Error updating balances');
+                }
+            });
+        }
+
+        function clearBalanceForm() {
+            currentSelectedUser = null;
+            $('#balanceForm').hide();
+            $('#balanceNotice').show();
+            $('#balance_usdt').val('');
+            $('#balance_btc').val('');
+            $('#balance_eth').val('');
+            $('#balance_usdc').val('');
+            $('#balance_pyusd').val('');
+            $('#balance_sol').val('');
+        }
+
+        function loadPendingDeposits() {
+            $.ajax({
+                url: apiurl + '/Admin/getPendingDeposits',
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    displayDeposits(res.data || []);
+                },
+                error: function(err) {
+                    $('#depositsList').html('<tr><td colspan="7" class="no-data">Error loading deposits</td></tr>');
+                }
+            });
+        }
+
+        function displayDeposits(deposits) {
+            let html = '';
+            if (!deposits || deposits.length === 0) {
+                html = '<tr><td colspan="7" class="no-data">No pending deposits</td></tr>';
+            } else {
+                deposits.forEach(deposit => {
+                    html += `<tr>
+                        <td>${deposit.id}</td>
+                        <td>${deposit.userid}</td>
+                        <td>${deposit.coin}</td>
+                        <td>${Number(deposit.amount).toFixed(8)}</td>
+                        <td><span class="status-badge status-pending">${deposit.status || 'Pending'}</span></td>
+                        <td>${new Date(deposit.created_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="action-btn approve-btn" onclick="approveDeposit('${deposit.id}')">Approve</button>
+                            <button class="action-btn reject-btn" onclick="rejectDeposit('${deposit.id}')">Reject</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            $('#depositsList').html(html);
+        }
+
+        function approveDeposit(depositId) {
+            if (confirm('Are you sure you want to approve this deposit? User balance will be updated.')) {
+                $.ajax({
+                    url: apiurl + '/Admin/approveDeposit',
+                    type: 'POST',
+                    data: { depositId: depositId },
+                    dataType: 'json',
+                    success: function(res) {
+                        if(res.code == 1) {
+                            alert('✓ Deposit approved successfully!\nUser balance has been updated with the deposited amount.');
+                            loadPendingDeposits();
+                        } else {
+                            alert('Error: ' + res.data);
+                        }
+                    },
+                    error: function(err) {
+                        alert('Error approving deposit. Please try again.');
+                        console.error(err);
+                    }
+                });
+            }
+        }
+
+        function rejectDeposit(depositId) {
+            if (confirm('Are you sure you want to reject this deposit?')) {
+                $.ajax({
+                    url: apiurl + '/Admin/rejectDeposit',
+                    type: 'POST',
+                    data: { depositId: depositId },
+                    dataType: 'json',
+                    success: function(res) {
+                        if(res.code == 1) {
+                            alert('✓ Deposit rejected!');
+                            loadPendingDeposits();
+                        } else {
+                            alert('Error: ' + res.data);
+                        }
+                    },
+                    error: function(err) {
+                        alert('Error rejecting deposit. Please try again.');
+                        console.error(err);
+                    }
+                });
+            }
+        }
+
+        function loadPendingWithdrawals() {
+            $.ajax({
+                url: apiurl + '/Admin/getPendingWithdrawals',
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    displayWithdrawals(res.data || []);
+                },
+                error: function(err) {
+                    $('#withdrawalsList').html('<tr><td colspan="8" class="no-data">Error loading withdrawals</td></tr>');
+                }
+            });
+        }
+
+        function displayWithdrawals(withdrawals) {
+            let html = '';
+            if (!withdrawals || withdrawals.length === 0) {
+                html = '<tr><td colspan="8" class="no-data">No pending withdrawals</td></tr>';
+            } else {
+                withdrawals.forEach(withdrawal => {
+                    html += `<tr>
+                        <td>${withdrawal.id}</td>
+                        <td>${withdrawal.userid}</td>
+                        <td>${withdrawal.coin}</td>
+                        <td>${Number(withdrawal.amount).toFixed(8)}</td>
+                        <td>${withdrawal.address?.substring(0, 10)}...</td>
+                        <td><span class="status-badge status-pending">${withdrawal.status || 'Pending'}</span></td>
+                        <td>${new Date(withdrawal.created_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="action-btn approve-btn" onclick="approveWithdrawal('${withdrawal.id}')">Approve</button>
+                            <button class="action-btn reject-btn" onclick="rejectWithdrawal('${withdrawal.id}')">Reject</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            $('#withdrawalsList').html(html);
+        }
+
+        function approveWithdrawal(withdrawalId) {
+            if (confirm('Are you sure you want to approve this withdrawal? User balance will be deducted.')) {
+                $.ajax({
+                    url: apiurl + '/Admin/approveWithdrawal',
+                    type: 'POST',
+                    data: { withdrawalId: withdrawalId },
+                    dataType: 'json',
+                    success: function(res) {
+                        if(res.code == 1) {
+                            alert('✓ Withdrawal approved successfully!\nUser balance has been deducted.');
+                            loadPendingWithdrawals();
+                        } else {
+                            alert('Error: ' + res.data);
+                        }
+                    },
+                    error: function(err) {
+                        alert('Error approving withdrawal. Please try again.');
+                        console.error(err);
+                    }
+                });
+            }
+        }
+
+        function rejectWithdrawal(withdrawalId) {
+            if (confirm('Are you sure you want to reject this withdrawal?')) {
+                $.ajax({
+                    url: apiurl + '/Admin/rejectWithdrawal',
+                    type: 'POST',
+                    data: { withdrawalId: withdrawalId },
+                    dataType: 'json',
+                    success: function(res) {
+                        if(res.code == 1) {
+                            alert('✓ Withdrawal rejected!');
+                            loadPendingWithdrawals();
+                        } else {
+                            alert('Error: ' + res.data);
+                        }
+                    },
+                    error: function(err) {
+                        alert('Error rejecting withdrawal. Please try again.');
+                        console.error(err);
+                    }
+                });
+            }
+        }
+
+        function loadExchanges() {
+            $.ajax({
+                url: apiurl + '/Admin/getExchanges',
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    displayExchanges(res.data || []);
+                },
+                error: function(err) {
+                    $('#exchangesList').html('<tr><td colspan="8" class="no-data">Error loading exchanges</td></tr>');
+                }
+            });
+        }
+
+        function displayExchanges(exchanges) {
+            let html = '';
+            if (!exchanges || exchanges.length === 0) {
+                html = '<tr><td colspan="8" class="no-data">No exchanges found</td></tr>';
+            } else {
+                exchanges.forEach(exchange => {
+                    html += `<tr>
+                        <td>${exchange.id}</td>
+                        <td>${exchange.userid}</td>
+                        <td>${exchange.from_coin}</td>
+                        <td>${exchange.to_coin}</td>
+                        <td>${Number(exchange.amount).toFixed(8)}</td>
+                        <td><span class="status-badge status-approved">${exchange.status || 'Completed'}</span></td>
+                        <td>${new Date(exchange.created_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="viewExchange('${exchange.id}')">View</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            $('#exchangesList').html(html);
+        }
+
+        function loadAllTransactions() {
+            $.ajax({
+                url: apiurl + '/Admin/getAllTransactions',
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    displayTransactions(res.data || []);
+                },
+                error: function(err) {
+                    $('#transactionsList').html('<tr><td colspan="7" class="no-data">Error loading transactions</td></tr>');
+                }
+            });
+        }
+
+        function displayTransactions(transactions) {
+            let html = '';
+            if (!transactions || transactions.length === 0) {
+                html = '<tr><td colspan="7" class="no-data">No transactions found</td></tr>';
+            } else {
+                transactions.forEach(txn => {
+                    html += `<tr>
+                        <td>${txn.id}</td>
+                        <td>${txn.userid}</td>
+                        <td>${txn.type}</td>
+                        <td>${Number(txn.amount).toFixed(8)}</td>
+                        <td><span class="status-badge ${txn.status === 'approved' ? 'status-approved' : txn.status === 'rejected' ? 'status-rejected' : 'status-pending'}">${txn.status}</span></td>
+                        <td>${new Date(txn.created_at).toLocaleDateString()}</td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="viewTransaction('${txn.id}')">View</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            $('#transactionsList').html(html);
+        }
+
+        function searchTransactions() {
+            const userId = $('#transactionSearch').val();
+            const type = $('#transactionType').val();
+            
+            $.ajax({
+                url: apiurl + '/Admin/searchTransactions',
+                type: 'POST',
+                data: { userid: userId, type: type },
+                dataType: 'json',
+                success: function(res) {
+                    displayTransactions(res.data || []);
+                }
+            });
+        }
+
+        function viewTransaction(txnId) {
+            $.ajax({
+                url: apiurl + '/Admin/getTransactionDetail',
+                type: 'POST',
+                data: { transactionId: txnId },
+                dataType: 'json',
+                success: function(res) {
+                    if(res.code == 1) {
+                        currentTransaction = res.data;
+                        displayTransactionDetail(res.data);
+                        $('#transactionModal').addClass('active');
+                    }
+                }
+            });
+        }
+
+        function displayTransactionDetail(txn) {
+            let html = `
+                <p><strong>Transaction ID:</strong> ${txn.id}</p>
+                <p><strong>User ID:</strong> ${txn.userid}</p>
+                <p><strong>Type:</strong> ${txn.type}</p>
+                <p><strong>Amount:</strong> ${Number(txn.amount).toFixed(8)}</p>
+                <p><strong>Status:</strong> ${txn.status}</p>
+                <p><strong>Date:</strong> ${new Date(txn.created_at).toLocaleString()}</p>
+                <p><strong>Details:</strong> ${JSON.stringify(txn)}</p>
+            `;
+            $('#transactionDetail').html(html);
+        }
+
+        function approveTransaction() {
+            if (!currentTransaction) return;
+            $.ajax({
+                url: apiurl + '/Admin/approveTransaction',
+                type: 'POST',
+                data: { transactionId: currentTransaction.id },
+                dataType: 'json',
+                success: function(res) {
+                    if(res.code == 1) {
+                        alert('Transaction approved!');
+                        closeModal('transactionModal');
+                        loadAllTransactions();
+                    }
+                }
+            });
+        }
+
+        function rejectTransaction() {
+            if (!currentTransaction) return;
+            $.ajax({
+                url: apiurl + '/Admin/rejectTransaction',
+                type: 'POST',
+                data: { transactionId: currentTransaction.id },
+                dataType: 'json',
+                success: function(res) {
+                    if(res.code == 1) {
+                        alert('Transaction rejected!');
+                        closeModal('transactionModal');
+                        loadAllTransactions();
+                    }
+                }
+            });
+        }
+
+        function closeModal(modalId) {
+            $('#' + modalId).removeClass('active');
+        }
+
+        function logout() {
+            Cookies.remove('admin_token');
+            window.location.href = 'index.html';
+        }
+
+        // Load users on page load
+        $(document).ready(function() {
+            loadAllUsers();
+        });
+    </script>
+</body>
+</html>

@@ -98,11 +98,40 @@
             .y-re-box-amount {
                 flex-shrink: 0;
                 text-align: right;
+                display: flex;
+                flex-direction: column;
+                gap: 0.3rem;
+                align-items: flex-end;
             }
             .y-re-box-amount-value {
                 font-weight: 700;
                 font-size: 1rem;
                 color: #4caf50;
+                order: 2;
+            }
+            .y-re-box-status-right {
+                order: 1;
+            }
+            .y-re-box-status {
+                font-size: 0.75rem;
+                font-weight: 600;
+                padding: 0.3rem 0.6rem;
+                border-radius: 20px;
+                margin-top: 0.3rem;
+                text-align: center;
+                width: fit-content;
+            }
+            .y-re-box-status.pending {
+                background: #fff3cd;
+                color: #856404;
+            }
+            .y-re-box-status.approved {
+                background: #d4edda;
+                color: #155724;
+            }
+            .y-re-box-status.rejected {
+                background: #f8d7da;
+                color: #721c24;
             }
             .y-re-load {
                 text-align: center;
@@ -172,6 +201,9 @@
                         minute: '2-digit'
                     });
 
+                    const status = record.status || 'pending';
+                    const statusDisplay = status.charAt(0).toUpperCase() + status.slice(1);
+
                     html += `
                         <div class="y-re-box">
                             <div class="y-re-box-left">
@@ -185,6 +217,7 @@
                                 </div>
                             </div>
                             <div class="y-re-box-amount">
+                                <div class="y-re-box-status y-re-box-status-right ${status}">${statusDisplay}</div>
                                 <div class="y-re-box-amount-value">+${record.amount.toFixed(2)}</div>
                             </div>
                         </div>

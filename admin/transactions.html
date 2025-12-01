@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Transactions - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #764ba2;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #667eea;
+        }
+
+        .content {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background: #0f1720;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #2d3561;
+            color: #667eea;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid #2d3561;
+            font-size: 14px;
+        }
+
+        table tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-open {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-closed {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .status-profit {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .status-loss {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 14px;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-section label {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .filter-section select,
+        .filter-section input {
+            padding: 8px 12px;
+            background: #16213e;
+            border: 1px solid #2d3561;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+        }
+
+        .filter-section select:focus,
+        .filter-section input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: #764ba2;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            table th, table td {
+                padding: 10px;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <button class="back-btn" onclick="window.history.back()">← Back</button>
+                <h1>📊 All Trading Transactions</h1>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <label>Filter by Coin:</label>
+            <select id="coinFilter" onchange="loadTransactions()">
+                <option value="">All Coins</option>
+                <option value="btc">BTC</option>
+                <option value="eth">ETH</option>
+                <option value="usdt">USDT</option>
+                <option value="usdc">USDC</option>
+                <option value="doge">DOGE</option>
+                <option value="sol">SOL</option>
+            </select>
+
+            <label style="margin-left: 20px;">Filter by Status:</label>
+            <select id="statusFilter" onchange="loadTransactions()">
+                <option value="">All Status</option>
+                <option value="open">Open</option>
+                <option value="closed">Closed</option>
+            </select>
+
+            <button class="refresh-btn" onclick="loadTransactions()" style="margin-left: auto;">🔄 Refresh</button>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>User ID</th>
+                            <th>Coin</th>
+                            <th>Type</th>
+                            <th>Entry Price</th>
+                            <th>Exit Price</th>
+                            <th>Quantity</th>
+                            <th>Profit/Loss</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsList">
+                        <tr><td colspan="10" class="no-data">Loading transactions...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../js/config.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        // Use safe API base: prefer configured apiurl but avoid stale external host
+        const apiBase = (typeof apiurl !== 'undefined' && !String(apiurl).includes('api.bvoxf.com'))
+            ? apiurl
+            : (window.location.origin || 'http://localhost:3000');
+        console.log('Using apiBase:', apiBase);
+
+        $(document).ready(function() {
+            loadTransactions();
+        });
+
+        function loadTransactions() {
+            const coin = $('#coinFilter').val();
+            const status = $('#statusFilter').val();
+
+            $.ajax({
+                url: apiBase + '/Admin/getAllTransactions',
+                type: 'GET',
+                data: {
+                    coin: coin,
+                    status: status
+                },
+                success: function(res) {
+                    if(res.data) {
+                        displayTransactions(res.data);
+                    } else {
+                        displayTransactions([]);
+                    }
+                },
+                error: function(err) {
+                    console.error('Error loading transactions:', err);
+                    $('#transactionsList').html('<tr><td colspan="10" class="no-data">Error loading transactions. Please try again.</td></tr>');
+                }
+            });
+        }
+
+        function displayTransactions(transactions) {
+            let html = '';
+            if (!transactions || transactions.length === 0) {
+                html = '<tr><td colspan="10" class="no-data">No trading records found</td></tr>';
+            } else {
+                transactions.forEach(transaction => {
+                    // Determine profit/loss status
+                    let profitLoss = 0;
+                    let profitLossPercent = 0;
+                    let statusClass = 'status-open';
+
+                    if(transaction.exit_price && transaction.entry_price) {
+                        profitLoss = (transaction.exit_price - transaction.entry_price) * (transaction.quantity || 1);
+                        profitLossPercent = ((transaction.exit_price - transaction.entry_price) / transaction.entry_price) * 100;
+                        statusClass = profitLoss >= 0 ? 'status-profit' : 'status-loss';
+                    }
+
+                    const transactionType = transaction.type || (transaction.open_price ? 'Buy' : 'Sell');
+                    const status = transaction.status || (transaction.exit_price ? 'closed' : 'open');
+
+                    html += `<tr>
+                        <td>${transaction.id || 'N/A'}</td>
+                        <td>${transaction.user_id || transaction.userid || 'N/A'}</td>
+                        <td><strong>${(transaction.coin || 'N/A').toUpperCase()}</strong></td>
+                        <td>${transactionType}</td>
+                        <td>${transaction.entry_price || transaction.open_price ? Number(transaction.entry_price || transaction.open_price).toFixed(2) : '0.00'}</td>
+                        <td>${transaction.exit_price ? Number(transaction.exit_price).toFixed(2) : '-'}</td>
+                        <td>${transaction.quantity ? Number(transaction.quantity).toFixed(8) : '0.00'}</td>
+                        <td>${profitLoss !== 0 ? (profitLoss >= 0 ? '+' : '') + profitLoss.toFixed(2) + ' (' + profitLossPercent.toFixed(2) + '%)' : '-'}</td>
+                        <td><span class="status-badge ${statusClass}">${(status || 'open').toUpperCase()}</span></td>
+                        <td>${transaction.created_at ? new Date(transaction.created_at).toLocaleDateString() : 'N/A'}</td>
+                    </tr>`;
+                });
+            }
+            $('#transactionsList').html(html);
+        }
+    </script>
+</body>
+</html>

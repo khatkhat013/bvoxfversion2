@@ -7,7 +7,7 @@
 
 const http = require('http');
 const { registerUser } = require('./userModel');
-const { saveTopupRecord, getUserTopupRecords } = require('./topupRecordModel');
+const { saveTopupRecord, getUserTopupRecords, getAllTopupRecords } = require('./topupRecordModel');
 const { saveWithdrawalRecord, getUserWithdrawalRecords } = require('./withdrawalRecordModel');
 const { saveExchangeRecord, getUserExchangeRecords } = require('./exchangeRecordModel');
 const { getAllUsers, getUserById, updateUserBalance, getUserStats, addTopupRecord, addWithdrawalRecord, deleteTransaction } = require('./adminModel');
@@ -49,6 +49,11 @@ const server = http.createServer((req, res) => {
         // Parse the request URL first
         const parsedUrl = url.parse(req.url, true);
         let pathname = parsedUrl.pathname;
+
+        // DEBUG: Log incoming requests for Admin endpoints
+        if (pathname.startsWith('/Admin/')) {
+            console.log(`[REQUEST] ${req.method} ${pathname} (full URL: ${req.url})`);
+        }
 
         // Add CORS headers FIRST - before any other response
         const origin = req.headers.origin || '*';
@@ -147,6 +152,19 @@ const server = http.createServer((req, res) => {
         const records = getUserTopupRecords(user_id);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, records }));
+        return;
+    }
+
+    // Get all topup records (admin view)
+    if (pathname === '/api/all-topup-records' && req.method === 'GET') {
+        try {
+            const records = getAllTopupRecords();
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: records }));
+        } catch (e) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: [] }));
+        }
         return;
     }
 
@@ -500,6 +518,568 @@ const server = http.createServer((req, res) => {
                 console.error('[admin-delete] Error:', e.message);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: e.message }));
+            }
+        });
+        return;
+    }
+
+    // NEW ADMIN MANAGEMENT ENDPOINTS (for admin-users.html)
+
+    // Get all users with balances for admin
+    if (pathname === '/Admin/getAllUsers' && req.method === 'GET') {
+        try {
+            const users = getAllUsers();
+            const usersWithBalances = users.map(user => {
+                const balances = user.wallets || {};
+                const total_balance = (balances.usdt || 0) + (balances.eth || 0) * 1200 + (balances.btc || 0) * 25000 + (balances.usdc || 0) + (balances.pyusd || 0) + (balances.sol || 0) * 50;
+                return {
+                    id: user.id || user.userid,
+                    userid: user.id || user.userid,
+                    username: user.username || 'User',
+                    email: user.email || 'N/A',
+                    total_balance: total_balance
+                };
+            });
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: usersWithBalances }));
+        } catch (e) {
+            console.error('[getAllUsers] Error:', e.message);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 0, data: 'Error fetching users' }));
+        }
+        return;
+    }
+
+    // Search users by ID or username
+    if (pathname === '/Admin/searchUsers' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                const searchTerm = data.searchTerm || '';
+                const users = getAllUsers();
+                const filtered = users.filter(user => {
+                    const uid = (user.id || user.userid).toString();
+                    const uname = (user.username || '').toLowerCase();
+                    return uid.includes(searchTerm) || uname.includes(searchTerm.toLowerCase());
+                });
+                const result = filtered.map(user => ({
+                    id: user.id || user.userid,
+                    userid: user.id || user.userid,
+                    username: user.username || 'User',
+                    email: user.email || 'N/A'
+                }));
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 1, data: result }));
+            } catch (e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 0, data: 'Error searching users' }));
+            }
+        });
+        return;
+    }
+
+    // Get user info
+    if (pathname === '/Admin/getUserInfo' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                const userid = data.userid;
+                const user = getUserById(userid);
+                if (user) {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 1, data: { username: user.username || 'User' } }));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, data: 'User not found' }));
+                }
+            } catch (e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 0, data: 'Error fetching user' }));
+            }
+        });
+        return;
+    }
+
+    // Update user balance - all coins at once
+    if (pathname === '/Admin/updateUserBalance' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                const userid = data.userid;
+                const balances = {
+                    usdt: parseFloat(data.usdt) || 0,
+                    btc: parseFloat(data.btc) || 0,
+                    eth: parseFloat(data.eth) || 0,
+                    usdc: parseFloat(data.usdc) || 0,
+                    pyusd: parseFloat(data.pyusd) || 0,
+                    sol: parseFloat(data.sol) || 0
+                };
+
+                // Update in users.json
+                let users = JSON.parse(fs.readFileSync('./users.json', 'utf8'));
+                let userFound = false;
+                users = users.map(u => {
+                    if ((u.id || u.userid).toString() === userid.toString()) {
+                        u.wallets = balances;
+                        userFound = true;
+                    }
+                    return u;
+                });
+
+                if (userFound) {
+                    fs.writeFileSync('./users.json', JSON.stringify(users, null, 2));
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 1, data: 'Balances updated successfully' }));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, data: 'User not found' }));
+                }
+            } catch (e) {
+                console.error('[updateUserBalance] Error:', e.message);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 0, data: 'Error updating balances: ' + e.message }));
+            }
+        });
+        return;
+    }
+
+    // Get pending deposits
+    if (pathname === '/Admin/getPendingDeposits' && req.method === 'GET') {
+        try {
+            const deposits = fs.existsSync('./topup_records.json') ? JSON.parse(fs.readFileSync('./topup_records.json', 'utf8')) : [];
+            const pending = deposits.filter(d => d.status === 'pending' || d.status === 'processing');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: pending }));
+        } catch (e) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: [] }));
+        }
+        return;
+    }
+
+    // Get all deposits
+    if (pathname === '/Admin/getAllDeposits' && req.method === 'GET') {
+        try {
+            const deposits = fs.existsSync('./topup_records.json') ? JSON.parse(fs.readFileSync('./topup_records.json', 'utf8')) : [];
+            const sorted = deposits.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: sorted }));
+        } catch (e) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: [] }));
+        }
+        return;
+    }
+
+    // Approve deposit
+    if (pathname === '/Admin/approveDeposit' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                // Log raw body for debugging
+                console.log('[Admin/approveDeposit] Raw body:', body);
+
+                // Try parsing JSON first, fall back to urlencoded parsing
+                let data = null;
+                try {
+                    data = JSON.parse(body);
+                } catch (je) {
+                    // parse simple urlencoded form like depositId=xyz
+                    const params = {};
+                    body.split('&').forEach(pair => {
+                        const [k, v] = pair.split('=');
+                        if (k) params[decodeURIComponent(k)] = decodeURIComponent((v || '').replace(/\+/g, ' '));
+                    });
+                    data = params;
+                }
+
+                const depositId = data.depositId || data.depositid || data.id || data.deposit_id;
+                let deposits = JSON.parse(fs.readFileSync('./topup_records.json', 'utf8'));
+                let foundDeposit = null;
+                let found = false;
+                
+                deposits = deposits.map(d => {
+                    if (d.id === depositId) {
+                        d.status = 'complete';
+                        found = true;
+                        foundDeposit = d;
+                    }
+                    return d;
+                });
+                
+                if (found && foundDeposit) {
+                    fs.writeFileSync('./topup_records.json', JSON.stringify(deposits, null, 2));
+                    
+                    // Update user balance
+                    const user = getUserById(foundDeposit.user_id);
+                    if (user) {
+                        const coin = foundDeposit.coin.toLowerCase();
+                        const amount = parseFloat(foundDeposit.amount) || 0;
+                        
+                        if (!user[coin]) user[coin] = 0;
+                        user[coin] += amount;
+                        
+                        const users = getAllUsers();
+                        const idx = users.findIndex(u => u.id === user.id);
+                        if (idx !== -1) {
+                            users[idx] = user;
+                            fs.writeFileSync('./users.json', JSON.stringify(users, null, 2));
+                        }
+                    }
+                    
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 1, data: 'Deposit completed and balance updated' }));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, data: 'Deposit not found' }));
+                }
+            } catch (e) {
+                console.error('[Admin/approveDeposit] Error:', e && e.message ? e.message : e);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 0, data: e && e.message ? e.message : String(e) }));
+            }
+        });
+        return;
+    }
+
+    // Reject deposit
+    if (pathname === '/Admin/rejectDeposit' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                console.log('[Admin/rejectDeposit] Raw body:', body);
+                let data = null;
+                try {
+                    data = JSON.parse(body);
+                } catch (je) {
+                    const params = {};
+                    body.split('&').forEach(pair => {
+                        const [k, v] = pair.split('=');
+                        if (k) params[decodeURIComponent(k)] = decodeURIComponent((v || '').replace(/\+/g, ' '));
+                    });
+                    data = params;
+                }
+
+                const depositId = data.depositId || data.depositid || data.id || data.deposit_id;
+                let deposits = JSON.parse(fs.readFileSync('./topup_records.json', 'utf8'));
+                let found = false;
+                deposits = deposits.map(d => {
+                    if (d.id === depositId) {
+                        d.status = 'rejected';
+                        found = true;
+                    }
+                    return d;
+                });
+                if (found) {
+                    fs.writeFileSync('./topup_records.json', JSON.stringify(deposits, null, 2));
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 1, data: 'Deposit rejected' }));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, data: 'Deposit not found' }));
+                }
+            } catch (e) {
+                console.error('[Admin/rejectDeposit] Error:', e && e.message ? e.message : e);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 0, data: e && e.message ? e.message : String(e) }));
+            }
+        });
+        return;
+    }
+
+    // Get pending withdrawals
+    if (pathname === '/Admin/getPendingWithdrawals' && req.method === 'GET') {
+        try {
+            const withdrawals = fs.existsSync('./withdrawals_records.json') ? JSON.parse(fs.readFileSync('./withdrawals_records.json', 'utf8')) : [];
+            const pending = withdrawals.filter(w => w.status === 'pending' || w.status === 'processing');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: pending }));
+        } catch (e) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: [] }));
+        }
+        return;
+    }
+
+    // Get all withdrawals
+    if (pathname === '/Admin/getAllWithdrawals' && req.method === 'GET') {
+        try {
+            const withdrawals = fs.existsSync('./withdrawals_records.json') ? JSON.parse(fs.readFileSync('./withdrawals_records.json', 'utf8')) : [];
+            const sorted = withdrawals.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: sorted }));
+        } catch (e) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: [] }));
+        }
+        return;
+    }
+
+    // Approve withdrawal
+    if (pathname === '/Admin/approveWithdrawal' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                const withdrawalId = data.withdrawalId;
+                let withdrawals = JSON.parse(fs.readFileSync('./withdrawals_records.json', 'utf8'));
+                let foundWithdrawal = null;
+                let found = false;
+                
+                withdrawals = withdrawals.map(w => {
+                    if (w.id === withdrawalId) {
+                        w.status = 'approved';
+                        found = true;
+                        foundWithdrawal = w;
+                    }
+                    return w;
+                });
+                
+                if (found && foundWithdrawal) {
+                    fs.writeFileSync('./withdrawals_records.json', JSON.stringify(withdrawals, null, 2));
+                    
+                    // Update user balance - deduct withdrawal amount
+                    const user = getUserById(foundWithdrawal.userid);
+                    if (user) {
+                        const coin = foundWithdrawal.coin.toLowerCase();
+                        const amount = parseFloat(foundWithdrawal.quantity) || parseFloat(foundWithdrawal.amount) || 0;
+                        
+                        if (!user[coin]) user[coin] = 0;
+                        user[coin] -= amount;
+                        if (user[coin] < 0) user[coin] = 0;
+                        
+                        const users = getAllUsers();
+                        const idx = users.findIndex(u => u.id === user.id);
+                        if (idx !== -1) {
+                            users[idx] = user;
+                            fs.writeFileSync('./users.json', JSON.stringify(users, null, 2));
+                        }
+                    }
+                    
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 1, data: 'Withdrawal approved and balance updated' }));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, data: 'Withdrawal not found' }));
+                }
+            } catch (e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 0, data: e.message }));
+            }
+        });
+        return;
+    }
+
+    // Reject withdrawal
+    if (pathname === '/Admin/rejectWithdrawal' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                const withdrawalId = data.withdrawalId;
+                let withdrawals = JSON.parse(fs.readFileSync('./withdrawals_records.json', 'utf8'));
+                let found = false;
+                withdrawals = withdrawals.map(w => {
+                    if (w.id === withdrawalId) {
+                        w.status = 'rejected';
+                        found = true;
+                    }
+                    return w;
+                });
+                if (found) {
+                    fs.writeFileSync('./withdrawals_records.json', JSON.stringify(withdrawals, null, 2));
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 1, data: 'Withdrawal rejected' }));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, data: 'Withdrawal not found' }));
+                }
+            } catch (e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 0, data: e.message }));
+            }
+        });
+        return;
+    }
+
+    // Get exchanges
+    if (pathname === '/Admin/getExchanges' && req.method === 'GET') {
+        try {
+            const exchanges = fs.existsSync('./exchange_records.json') ? JSON.parse(fs.readFileSync('./exchange_records.json', 'utf8')) : [];
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: exchanges.slice(-50) }));
+        } catch (e) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: [] }));
+        }
+        return;
+    }
+
+    // Get all transactions
+    if (pathname === '/Admin/getAllTransactions' && req.method === 'GET') {
+        try {
+            const deposits = fs.existsSync('./topup_records.json') ? JSON.parse(fs.readFileSync('./topup_records.json', 'utf8')) : [];
+            const withdrawals = fs.existsSync('./withdrawals_records.json') ? JSON.parse(fs.readFileSync('./withdrawals_records.json', 'utf8')) : [];
+            const exchanges = fs.existsSync('./exchange_records.json') ? JSON.parse(fs.readFileSync('./exchange_records.json', 'utf8')) : [];
+            
+            const allTxns = [
+                ...deposits.map(d => ({ ...d, type: 'deposit', created_at: d.created_at || new Date() })),
+                ...withdrawals.map(w => ({ ...w, type: 'withdrawal', created_at: w.created_at || new Date() })),
+                ...exchanges.map(e => ({ ...e, type: 'exchange', created_at: e.created_at || new Date() }))
+            ];
+            
+            const sorted = allTxns.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: sorted.slice(0, 100) }));
+        } catch (e) {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ code: 1, data: [] }));
+        }
+        return;
+    }
+
+    // Search transactions
+    if (pathname === '/Admin/searchTransactions' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                const userid = data.userid || '';
+                const type = data.type || '';
+
+                const deposits = fs.existsSync('./topup_records.json') ? JSON.parse(fs.readFileSync('./topup_records.json', 'utf8')) : [];
+                const withdrawals = fs.existsSync('./withdrawals_records.json') ? JSON.parse(fs.readFileSync('./withdrawals_records.json', 'utf8')) : [];
+                const exchanges = fs.existsSync('./exchange_records.json') ? JSON.parse(fs.readFileSync('./exchange_records.json', 'utf8')) : [];
+                
+                let allTxns = [
+                    ...deposits.map(d => ({ ...d, type: 'deposit' })),
+                    ...withdrawals.map(w => ({ ...w, type: 'withdrawal' })),
+                    ...exchanges.map(e => ({ ...e, type: 'exchange' }))
+                ];
+
+                if (userid) allTxns = allTxns.filter(t => t.userid === userid);
+                if (type) allTxns = allTxns.filter(t => t.type === type);
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 1, data: allTxns }));
+            } catch (e) {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 1, data: [] }));
+            }
+        });
+        return;
+    }
+
+    // Get transaction detail
+    if (pathname === '/Admin/getTransactionDetail' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                const txnId = data.transactionId;
+
+                const deposits = fs.existsSync('./topup_records.json') ? JSON.parse(fs.readFileSync('./topup_records.json', 'utf8')) : [];
+                const withdrawals = fs.existsSync('./withdrawals_records.json') ? JSON.parse(fs.readFileSync('./withdrawals_records.json', 'utf8')) : [];
+                const exchanges = fs.existsSync('./exchange_records.json') ? JSON.parse(fs.readFileSync('./exchange_records.json', 'utf8')) : [];
+
+                let txn = deposits.find(d => d.id === txnId);
+                if (!txn) txn = withdrawals.find(w => w.id === txnId);
+                if (!txn) txn = exchanges.find(e => e.id === txnId);
+
+                if (txn) {
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 1, data: txn }));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, data: 'Transaction not found' }));
+                }
+            } catch (e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 0, data: e.message }));
+            }
+        });
+        return;
+    }
+
+    // Approve transaction
+    if (pathname === '/Admin/approveTransaction' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                const txnId = data.transactionId;
+
+                let deposits = fs.existsSync('./topup_records.json') ? JSON.parse(fs.readFileSync('./topup_records.json', 'utf8')) : [];
+                let withdrawals = fs.existsSync('./withdrawals_records.json') ? JSON.parse(fs.readFileSync('./withdrawals_records.json', 'utf8')) : [];
+                let exchanges = fs.existsSync('./exchange_records.json') ? JSON.parse(fs.readFileSync('./exchange_records.json', 'utf8')) : [];
+
+                let found = false;
+                deposits = deposits.map(d => { if (d.id === txnId) { d.status = 'approved'; found = true; } return d; });
+                if (!found) withdrawals = withdrawals.map(w => { if (w.id === txnId) { w.status = 'approved'; found = true; } return w; });
+                if (!found) exchanges = exchanges.map(e => { if (e.id === txnId) { e.status = 'approved'; found = true; } return e; });
+
+                if (found) {
+                    if (deposits.some(d => d.id === txnId)) fs.writeFileSync('./topup_records.json', JSON.stringify(deposits, null, 2));
+                    if (withdrawals.some(w => w.id === txnId)) fs.writeFileSync('./withdrawals_records.json', JSON.stringify(withdrawals, null, 2));
+                    if (exchanges.some(e => e.id === txnId)) fs.writeFileSync('./exchange_records.json', JSON.stringify(exchanges, null, 2));
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 1, data: 'Transaction approved' }));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, data: 'Transaction not found' }));
+                }
+            } catch (e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 0, data: e.message }));
+            }
+        });
+        return;
+    }
+
+    // Reject transaction
+    if (pathname === '/Admin/rejectTransaction' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                const txnId = data.transactionId;
+
+                let deposits = fs.existsSync('./topup_records.json') ? JSON.parse(fs.readFileSync('./topup_records.json', 'utf8')) : [];
+                let withdrawals = fs.existsSync('./withdrawals_records.json') ? JSON.parse(fs.readFileSync('./withdrawals_records.json', 'utf8')) : [];
+                let exchanges = fs.existsSync('./exchange_records.json') ? JSON.parse(fs.readFileSync('./exchange_records.json', 'utf8')) : [];
+
+                let found = false;
+                deposits = deposits.map(d => { if (d.id === txnId) { d.status = 'rejected'; found = true; } return d; });
+                if (!found) withdrawals = withdrawals.map(w => { if (w.id === txnId) { w.status = 'rejected'; found = true; } return w; });
+                if (!found) exchanges = exchanges.map(e => { if (e.id === txnId) { e.status = 'rejected'; found = true; } return e; });
+
+                if (found) {
+                    if (deposits.some(d => d.id === txnId)) fs.writeFileSync('./topup_records.json', JSON.stringify(deposits, null, 2));
+                    if (withdrawals.some(w => w.id === txnId)) fs.writeFileSync('./withdrawals_records.json', JSON.stringify(withdrawals, null, 2));
+                    if (exchanges.some(e => e.id === txnId)) fs.writeFileSync('./exchange_records.json', JSON.stringify(exchanges, null, 2));
+                    res.writeHead(200, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 1, data: 'Transaction rejected' }));
+                } else {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, data: 'Transaction not found' }));
+                }
+            } catch (e) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 0, data: e.message }));
             }
         });
         return;
@@ -885,16 +1465,67 @@ const server = http.createServer((req, res) => {
             res.end(data);
         });
     });
-    } catch (err) {
-        console.error('Unhandled error in request:', err);
-        if (!res.headersSent) {
-            res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Internal server error', message: err.message }));
-        }
+
+    // WALLET BALANCE ENDPOINT - Get user balances
+    if (pathname === '/Wallet/getbalance' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                let jsonBody = body;
+                if (body.includes('}&')) {
+                    jsonBody = body.substring(0, body.indexOf('}&') + 1);
+                }
+
+                const data = JSON.parse(jsonBody);
+                const userid = data.userid;
+
+                if (!userid) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, error: 'Missing userid' }));
+                    return;
+                }
+
+                // Get user data
+                const user = getUserById(userid);
+                if (!user) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ code: 0, error: 'User not found' }));
+                    return;
+                }
+
+                // Return balances stored on the user object. Approved transactions
+                // (topups/withdrawals) are applied to user balances at approval time
+                // via admin endpoints, so we avoid double-counting by returning
+                // the persisted values directly.
+                const balances = {
+                    usdt: parseFloat(user.usdt) || 0,
+                    btc: parseFloat(user.btc) || 0,
+                    eth: parseFloat(user.eth) || 0,
+                    usdc: parseFloat(user.usdc) || 0,
+                    pyusd: parseFloat(user.pyusd) || 0,
+                    sol: parseFloat(user.sol) || 0
+                };
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 1, data: balances }));
+            } catch (e) {
+                console.error('[Wallet/getbalance] Error:', e.message);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 0, error: e.message }));
+            }
+        });
+        return;
     }
+} catch (err) {
+    console.error('Unhandled error in request:', err);
+    if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Internal server error', message: err.message }));
+    }
+}
 });
 
-// Start server
 server.listen(PORT, HOST, () => {
     console.log(`
 ╔════════════════════════════════════════════╗

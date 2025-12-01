@@ -205,7 +205,7 @@
             var dqyue;
 
             $(document).ready(function() {
-                $('#y-extnum').attr('placeholder', gy('请输入数量'));
+                $('#y-extnum').attr('placeholder', gy('Enter Amount'));
 
                 getyue('usdt');
                 getxianjia('btc');
@@ -365,21 +365,30 @@
             });
 
             $('.y-ex-tj').click(function(){
-                
-
                 var dhjes = $('#y-extnum').val();
                 var dhmzs = $('#shangming').text();
                 var dhhoum = $('#y-dhbm').text();
                 var dhhouj = $('#y-jgzs').text();
+                var currentBalance = parseFloat($('#y-yue').text()) || 0;
+                var inputAmount = parseFloat(dhjes) || 0;
 
-                if(Number(dhjes) > Number($('#y-yue').text())){
-                    alert(gy('余额不足'));
+                // Validation checks
+                if(!dhjes || dhjes === ''){
+                    alert(gy('Please enter an amount'));
+                    return;
+                }
+
+                if(inputAmount <= 0){
+                    alert(gy('Please enter a valid amount'));
+                    return;
+                }
+
+                if(inputAmount > currentBalance){
+                    alert(gy('Insufficient balance'));
                     return;
                 }
 
                 if(dhjes!=0 && dhjes!=null){
-                    
-
                     var zdbm;
                     var smfx;
                     if(dhmzs == 'USDT'){
@@ -401,7 +410,7 @@
                     $('.y-ex-dqrz').show();
                     $('.y-ex-duih').show();
 
-                    $('#y-ybdsl').text(gy('计算中..'));
+                    $('#y-ybdsl').text(gy('Calculating..'));
 
                     // Use mock exchange rates for preview
                     const mockRates = {

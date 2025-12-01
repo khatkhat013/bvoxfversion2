@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdrawals - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #764ba2;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #667eea;
+        }
+
+        .content {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background: #0f1720;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #2d3561;
+            color: #667eea;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid #2d3561;
+            font-size: 14px;
+        }
+
+        table tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-approved {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .status-rejected {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            margin-right: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .approve-btn {
+            background: #4caf50;
+            color: white;
+        }
+
+        .approve-btn:hover {
+            background: #45a049;
+        }
+
+        .reject-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .reject-btn:hover {
+            background: #da190b;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            table th, table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <button class="back-btn" onclick="window.history.back()">← Back</button>
+                <h1>📤 All User Withdrawals</h1>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Withdrawal ID</th>
+                            <th>User ID</th>
+                            <th>Coin</th>
+                            <th>Amount</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="withdrawalsList">
+                        <tr><td colspan="8" class="no-data">Loading withdrawals...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../js/config.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        // Use safe API base: prefer configured apiurl but avoid stale external host
+        const apiBase = (typeof apiurl !== 'undefined' && !String(apiurl).includes('api.bvoxf.com'))
+            ? apiurl
+            : (window.location.origin || 'http://localhost:3000');
+        console.log('Using apiBase:', apiBase);
+
+        $(document).ready(function() {
+            loadPendingWithdrawals();
+        });
+
+        function loadPendingWithdrawals() {
+            $.ajax({
+                url: apiBase + '/Admin/getAllWithdrawals',
+                type: 'GET',
+                success: function(res) {
+                    if(res.data) {
+                        displayWithdrawals(res.data);
+                    } else {
+                        displayWithdrawals([]);
+                    }
+                },
+                error: function() {
+                    // Fallback: try to get pending withdrawals if getAllWithdrawals endpoint doesn't exist
+                    $.ajax({
+                        url: apiBase + '/Admin/getPendingWithdrawals',
+                        type: 'GET',
+                        success: function(res) {
+                            displayWithdrawals(res.data || []);
+                        }
+                    });
+                }
+            });
+        }
+
+        function displayWithdrawals(withdrawals) {
+            let html = '';
+            if (!withdrawals || withdrawals.length === 0) {
+                html = '<tr><td colspan="8" class="no-data">No withdrawal records found</td></tr>';
+            } else {
+                withdrawals.forEach(withdrawal => {
+                    const statusClass = withdrawal.status === 'approved' ? 'status-approved' : 
+                                       withdrawal.status === 'rejected' ? 'status-rejected' : 'status-pending';
+                    // Support multiple possible user id field names coming from different record formats
+                    const userId = withdrawal.user_id || withdrawal.userid || withdrawal.userId || withdrawal.user || 'N/A';
+                    // Normalize amount/quantity
+                    const rawAmount = (typeof withdrawal.amount !== 'undefined' && withdrawal.amount !== null) ? withdrawal.amount : (typeof withdrawal.quantity !== 'undefined' ? withdrawal.quantity : 0);
+                    const amountStr = Number(rawAmount || 0).toFixed(8);
+
+                    html += `<tr>
+                        <td>${withdrawal.id || 'N/A'}</td>
+                        <td>${userId}</td>
+                        <td>${withdrawal.coin || 'N/A'}</td>
+                        <td>${amountStr}</td>
+                        <td>${withdrawal.address ? withdrawal.address.substring(0, 20) + '...' : 'N/A'}</td>
+                        <td><span class="status-badge ${statusClass}">${(withdrawal.status || 'Pending').toUpperCase()}</span></td>
+                        <td>${withdrawal.created_at ? new Date(withdrawal.created_at).toLocaleDateString() : 'N/A'}</td>
+                        <td>
+                            <button class="action-btn approve-btn" onclick="approveWithdrawal('${withdrawal.id}')" ${withdrawal.status === 'approved' ? 'disabled' : ''}>Approve</button>
+                            <button class="action-btn reject-btn" onclick="rejectWithdrawal('${withdrawal.id}')" ${withdrawal.status === 'rejected' ? 'disabled' : ''}>Reject</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            $('#withdrawalsList').html(html);
+        }
+
+        function approveWithdrawal(withdrawalId) {
+            if (confirm('Are you sure you want to approve this withdrawal? User balance will be deducted.')) {
+                $.ajax({
+                    url: apiBase + '/Admin/approveWithdrawal',
+                    type: 'POST',
+                    data: { withdrawalId: withdrawalId },
+                    success: function(res) {
+                        if(res.code == 1) {
+                            alert('✓ Withdrawal approved successfully!\nUser balance has been deducted.');
+                            loadPendingWithdrawals();
+                        } else {
+                            alert('Error: ' + res.data);
+                        }
+                    }
+                });
+            }
+        }
+
+        function rejectWithdrawal(withdrawalId) {
+            if (confirm('Are you sure you want to reject this withdrawal?')) {
+                $.ajax({
+                    url: apiBase + '/Admin/rejectWithdrawal',
+                    type: 'POST',
+                    data: { withdrawalId: withdrawalId },
+                    success: function(res) {
+                        if(res.code == 1) {
+                            alert('✓ Withdrawal rejected!');
+                            loadPendingWithdrawals();
+                        } else {
+                            alert('Error: ' + res.data);
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposits - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #764ba2;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #667eea;
+        }
+
+        .content {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background: #0f1720;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #2d3561;
+            color: #667eea;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid #2d3561;
+            font-size: 14px;
+        }
+
+        table tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-approved {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+
+        .status-rejected {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            margin-right: 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .approve-btn {
+            background: #4caf50;
+            color: white;
+        }
+
+        .approve-btn:hover {
+            background: #45a049;
+        }
+
+        .approve-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .reject-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .reject-btn:hover {
+            background: #da190b;
+        }
+
+        .reject-btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            table th, table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <button class="back-btn" onclick="window.history.back()">← Back</button>
+                <h1>📥 All User Deposits</h1>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Deposit ID</th>
+                            <th>User ID</th>
+                            <th>Coin</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Proof</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="depositsList">
+                        <tr><td colspan="8" class="no-data">Loading deposits...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../js/config.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        // Ensure we use a safe API base (avoid stale external config overrides)
+        const apiBase = (typeof apiurl !== 'undefined' && !String(apiurl).includes('api.bvoxf.com'))
+            ? apiurl
+            : (window.location.origin || 'http://localhost:3000');
+        console.log('Using apiBase:', apiBase);
+
+        $(document).ready(function() {
+            loadPendingDeposits();
+        });
+
+        function loadPendingDeposits() {
+            $.ajax({
+                url: apiBase + '/Admin/getAllDeposits',
+                type: 'GET',
+                success: function(res) {
+                    if(res.data) {
+                        displayDeposits(res.data);
+                    } else {
+                        displayDeposits([]);
+                    }
+                },
+                error: function() {
+                    // Fallback: try to get all topup records
+                    $.ajax({
+                        url: apiBase + '/api/all-topup-records',
+                        type: 'GET',
+                        success: function(res) {
+                            if(res.data) {
+                                displayDeposits(res.data);
+                            } else {
+                                displayDeposits([]);
+                            }
+                        },
+                        error: function() {
+                            $('#depositsList').html('<tr><td colspan="8" class="no-data">Error loading deposits</td></tr>');
+                        }
+                    });
+                }
+            });
+        }
+
+        function displayDeposits(deposits) {
+            let html = '';
+            if (!deposits || deposits.length === 0) {
+                html = '<tr><td colspan="8" class="no-data">No deposit records found</td></tr>';
+            } else {
+                deposits.forEach(deposit => {
+                    const statusClass = deposit.status === 'complete' ? 'status-approved' : 
+                                       deposit.status === 'rejected' ? 'status-rejected' : 'status-pending';
+                    
+                    // Handle both topup records and deposit records
+                    const depositAmount = deposit.amount || deposit.quantity || '0.00';
+                    const depositCoin = deposit.coin || 'N/A';
+                    const depositDate = deposit.created_at || deposit.timestamp;
+                    const userId = deposit.user_id || deposit.userid || 'N/A';
+                    const photoUrl = deposit.photo_url || deposit.proof_url || 'N/A';
+                    
+                    // Format status display text
+                    let statusText = 'Pending';
+                    if (deposit.status === 'complete') statusText = 'Complete';
+                    else if (deposit.status === 'rejected') statusText = 'Reject';
+                    
+                    html += `<tr>
+                        <td>${deposit.id || 'N/A'}</td>
+                        <td>${userId}</td>
+                        <td>${depositCoin}</td>
+                        <td>${Number(depositAmount).toFixed(8)}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>${depositDate ? new Date(depositDate).toLocaleDateString() : 'N/A'}</td>
+                        <td>
+                            ${photoUrl !== 'N/A' ? `<button class="action-btn approve-btn" onclick="viewProof('${photoUrl}')">👁️ Proof</button>` : ''}
+                        </td>
+                        <td>
+                            <button class="action-btn approve-btn" onclick="approveDeposit('${deposit.id}')" ${deposit.status === 'complete' || deposit.status === 'rejected' ? 'disabled' : ''}>Approve</button>
+                            <button class="action-btn reject-btn" onclick="rejectDeposit('${deposit.id}')" ${deposit.status === 'complete' || deposit.status === 'rejected' ? 'disabled' : ''}>Reject</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            $('#depositsList').html(html);
+        }
+
+        function viewProof(photoUrl) {
+            // Open proof image in a new tab or display in modal
+            if(photoUrl && photoUrl !== 'N/A') {
+                window.open(photoUrl, '_blank');
+            } else {
+                alert('No proof image available');
+            }
+        }
+
+        function approveDeposit(depositId) {
+            if (confirm('Are you sure you want to approve this deposit? User balance will be updated.')) {
+                $.ajax({
+                    url: apiBase + '/Admin/approveDeposit',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ depositId: depositId }),
+                    success: function(res) {
+                        if(res.code == 1) {
+                            alert('✓ Deposit completed successfully!\nUser balance has been updated.');
+                            loadPendingDeposits();
+                        } else {
+                            alert('Error: ' + res.data);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Request failed: ' + error + '\nStatus: ' + xhr.status);
+                        console.error('Approve error:', xhr, status, error);
+                    }
+                });
+            }
+        }
+
+        function rejectDeposit(depositId) {
+            if (confirm('Are you sure you want to reject this deposit?')) {
+                $.ajax({
+                    url: apiBase + '/Admin/rejectDeposit',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ depositId: depositId }),
+                    success: function(res) {
+                        if(res.code == 1) {
+                            alert('✓ Deposit rejected!');
+                            loadPendingDeposits();
+                        } else {
+                            alert('Error: ' + res.data);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Request failed: ' + error + '\nStatus: ' + xhr.status);
+                        console.error('Reject error:', xhr, status, error);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

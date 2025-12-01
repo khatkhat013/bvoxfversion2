@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exchanges - Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #764ba2;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #667eea;
+        }
+
+        .content {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background: #0f1720;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #2d3561;
+            color: #667eea;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid #2d3561;
+            font-size: 14px;
+        }
+
+        table tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            table th, table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <button class="back-btn" onclick="window.history.back()">← Back</button>
+                <h1>🔄 All AI Arbitrage Records</h1>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Exchange ID</th>
+                            <th>User ID</th>
+                            <th>From Coin</th>
+                            <th>To Coin</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="exchangesList">
+                        <tr><td colspan="6" class="no-data">Loading exchanges...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../js/config.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        // Use safe API base: prefer configured apiurl but avoid stale external host
+        const apiBase = (typeof apiurl !== 'undefined' && !String(apiurl).includes('api.bvoxf.com'))
+            ? apiurl
+            : (window.location.origin || 'http://localhost:3000');
+        console.log('Using apiBase:', apiBase);
+
+        $(document).ready(function() {
+            loadExchanges();
+        });
+
+        function loadExchanges() {
+            $.ajax({
+                url: apiBase + '/Admin/getAllExchanges',
+                type: 'GET',
+                success: function(res) {
+                    if(res.data) {
+                        displayExchanges(res.data);
+                    } else {
+                        displayExchanges([]);
+                    }
+                },
+                error: function() {
+                    // Fallback: try to get exchanges if getAllExchanges endpoint doesn't exist
+                    $.ajax({
+                        url: apiBase + '/Admin/getExchanges',
+                        type: 'GET',
+                        success: function(res) {
+                            displayExchanges(res.data || []);
+                        }
+                    });
+                }
+            });
+        }
+
+        function displayExchanges(exchanges) {
+            let html = '';
+            if (!exchanges || exchanges.length === 0) {
+                html = '<tr><td colspan="6" class="no-data">No AI Arbitrage records found</td></tr>';
+            } else {
+                exchanges.forEach(exchange => {
+                    html += `<tr>
+                        <td>${exchange.id || 'N/A'}</td>
+                        <td>${exchange.user_id || exchange.userid || 'N/A'}</td>
+                        <td>${exchange.from_coin || 'N/A'}</td>
+                        <td>${exchange.to_coin || 'N/A'}</td>
+                        <td>${exchange.amount ? Number(exchange.amount).toFixed(8) : '0.00'}</td>
+                        <td>${exchange.created_at ? new Date(exchange.created_at).toLocaleDateString() : 'N/A'}</td>
+                    </tr>`;
+                });
+            }
+            $('#exchangesList').html(html);
+        }
+    </script>
+</body>
+</html>
