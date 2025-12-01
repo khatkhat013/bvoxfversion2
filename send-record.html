@@ -9,7 +9,7 @@
 		<script src="./send-record_files/config.js.download" type="text/javascript" charset="utf-8"></script><script src="./send-record_files/pako.min.js.download"></script><script src="./send-record_files/js.cookie.min.js.download"></script><script src="./send-record_files/web3.min.js.download"></script><script src="./send-record_files/web3model.min.js.download"></script><script src="./send-record_files/web3provider.js.download"></script><script src="./send-record_files/fp.min.js.download"></script>
 		<link rel="shortcut icon" href="https://www.bvoxf.com/favicon.ico">
 		<meta property="og:image" content="/favicon.png">
-		<link rel="manifest" href="https://www.bvoxf.com/manifest.json">
+
         <style>
             html{
                 background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
@@ -41,23 +41,87 @@
         </div>
         
 
+        <style>
+            .y-re {
+                padding: 3rem 0.5rem;
+            }
+            .y-re-box {
+                background: #f5f5f5;
+                border-radius: 12px;
+                padding: 1rem;
+                color: #333;
+                margin-bottom: 5px;
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+            .y-re-box-left {
+                display: flex;
+                gap: 0.75rem;
+                align-items: center;
+                flex: 1;
+            }
+            .y-re-box-icon {
+                flex-shrink: 0;
+            }
+            .y-re-box-icon img {
+                width: 3rem;
+                height: 3rem;
+                border-radius: 50%;
+                object-fit: contain;
+                background: #fff;
+                padding: 0.3rem;
+            }
+            .y-re-box-content {
+                display: flex;
+                flex-direction: column;
+                gap: 0.2rem;
+            }
+            .y-re-box-title {
+                font-weight: 600;
+                font-size: 0.9rem;
+                color: #333;
+                line-height: 1.2;
+            }
+            .y-re-box-subtitle {
+                font-size: 0.8rem;
+                color: #666;
+                line-height: 1.2;
+            }
+            .y-re-box-time {
+                font-size: 0.75rem;
+                color: #999;
+                line-height: 1.2;
+            }
+            .y-re-box-amount {
+                flex-shrink: 0;
+                text-align: right;
+            }
+            .y-re-box-amount-value {
+                font-weight: 700;
+                font-size: 1rem;
+                color: #f44336;
+            }
+            .y-re-load {
+                text-align: center;
+                padding: 1rem;
+                color: #666;
+                cursor: pointer;
+                margin-top: 1rem;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                background: #f5f5f5;
+                margin-bottom: 5rem;
+            }
+        </style>
+
         <script>
-
-            const xsw = {
-                btc: 8,
-                usdc: 2,
-                eth: 8,
-                pyusd: 2,
-                usdt: 2
-            };
-
             document.querySelector('.y-re').style.minHeight = window.innerHeight + 'px';
-            let page = 1; // 当前页数
-            const userId = Cookies.get('userid'); // 获取用户ID
-
 
             $(document).ready(function() {
-                loadMore();
+                loadWithdrawalRecords();
 
                 $(window).scroll(function() {
                     let currentScrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -69,76 +133,70 @@
                 });
             });
 
-
-            function loadMore() {
-                const userid = Cookies.get('userid'); // 获取用户ID，假设已存储在Cookie中
+            function loadWithdrawalRecords() {
+                const userid = Cookies.get('userid');
+                
+                if (!userid) {
+                    console.warn('User not logged in');
+                    $('.y-re-in').html('<div style="text-align: center; color: #999; padding: 2rem;">Please log in first</div>');
+                    return;
+                }
 
                 $.ajax({
-                    url: apiurl + '/Record/getwith',
-                    type: 'POST',
-                    data: {
-                        userid: userid,
-                        page: page // 传递当前页码
-                    },
+                    url: '/api/withdrawal-records?user_id=' + userid,
+                    type: 'GET',
                     dataType: 'json',
                     success: function(res) {
-                        if (res.code === 1 && res.data.length > 0) { // 确认 data 存在并不为空
-                            const notifyData = res.data;
-
-                            // 检查是否还有数据
-                            if (notifyData.length === 0) {
-                                $('.y-re-load').text('没有更多').prop('disabled', true);
-                                return;
-                            }
-
-                            // 遍历并添加通知内容到页面
-                            notifyData.forEach(data => {
-                                const notificationHTML = `
-                                    <div class="y-re-box">
-                                        <div class="y-re-bl">
-                                            <img src="/img/coin/${data.biming}.png" alt="Notification">
-                                            <div class="y-re-blr">
-                                                <span>
-                                                    ${data.zhuangtai === 0 ? gy('审核中') : data.zhuangtai === 1 ? gy('已通过') : gy('被拒绝')}
-                                                    ${data.jindu != null
-                                                            ? `<a href="javascript:alert('${data.jindu}');" style='color:red'>(${gy('通知')})</a>` 
-                                                            : ''}
-                                                </span>
-                                                <span class="y-sfhkr">
-                                                    ${data.zhuangtai === 2 
-                                                            ? `<a href="javascript:alert('${data.bohui}');">${gy('拒绝理由')}</a>` 
-                                                            : ''}
-                                                </span>
-
-                                                <div class="y-re-bim y-bim3">
-                                                    <p>
-                                                        ${gy('数量')}:${Number(data.shuliang).toFixed(xsw[data.biming])}
-                                                    </p>
-                                                    <p>
-                                                        ${gy('手续费')}:${Number(data.sxf).toFixed(xsw[data.biming])}
-                                                    </p>
-                                                </div>
-
-                                                <div class="y-sfyidu y-sfyidu2">
-                                                    <p>
-                                                        ${gy('提交时间')}
-                                                        <br/>
-                                                        ${new Date(parseInt(data.shijian) * 1000).toLocaleString("en-US", { timeZone: "America/New_York", year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
-
-                                $('.y-re-in').append(notificationHTML);
-                            });
-
-                            // 增加页码
-                            page += 1;
+                        console.log('Withdrawal records response:', res);
+                        if (res.success && res.records && res.records.length > 0) {
+                            displayRecords(res.records);
+                        } else {
+                            console.log('No withdrawal records found');
+                            $('.y-re-in').html('<div style="text-align: center; color: #999; padding: 2rem;">No withdrawal records found</div>');
                         }
+                    },
+                    error: function(err) {
+                        console.error('Error loading records:', err);
+                        $('.y-re-in').html('<div style="text-align: center; color: #999; padding: 2rem;">Failed to load records</div>');
                     }
                 });
+            }
+
+            function displayRecords(records) {
+                let html = '';
+                records.forEach(function(record) {
+                    const dateStr = new Date(parseInt(record.timestamp)).toLocaleString("en-US", { 
+                        month: '2-digit', 
+                        day: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit', 
+                        minute: '2-digit'
+                    });
+
+                    html += `
+                        <div class="y-re-box">
+                            <div class="y-re-box-left">
+                                <div class="y-re-box-icon">
+                                    <img src="/img/coin/${record.coin.toLowerCase()}.png" alt="${record.coin}">
+                                </div>
+                                <div class="y-re-box-content">
+                                    <div class="y-re-box-title">Withdrawal</div>
+                                    <div class="y-re-box-subtitle">${record.coin}</div>
+                                    <div class="y-re-box-time">${dateStr}</div>
+                                </div>
+                            </div>
+                            <div class="y-re-box-amount">
+                                <div class="y-re-box-amount-value">-${record.quantity.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                $('.y-re-in').html(html);
+            }
+
+            function loadMore() {
+                loadWithdrawalRecords();
             }
         </script>
     <script defer="" src="./send-record_files/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;eeb085316a57431db0b1a080d3a6bf6e&quot;,&quot;r&quot;:1,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}" crossorigin="anonymous"></script>

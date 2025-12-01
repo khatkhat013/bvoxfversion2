@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" style="font-size: 20px;">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Bvox - Withdrawal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <link rel="stylesheet" href="./topup_files/style.css">
+    <script src="./topup_files/jquery.js.download" type="text/javascript" charset="utf-8"></script>
+    <script src="./topup_files/config.js.download" type="text/javascript" charset="utf-8"></script>
+    <script src="./topup_files/js.cookie.min.js.download"></script>
+    <link rel="shortcut icon" href="https://www.bvoxf.com/favicon.ico">
+    <meta property="og:image" content="/favicon.png">
+    <style>
+        html {
+            background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
+        }
+        body {
+            background: url(/img/leaf-bg.png);
+            background-size: 180vw;
+            background-position-x: -80vw;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+        }
+        .y-hd {
+            height: 4rem !important;
+            background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
+        }
+        .yc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            color: #fff;
+        }
+        .y-title {
+            flex: 1;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .y-fanhui {
+            cursor: pointer;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .y-fanhui img {
+            width: 100%;
+            height: 100%;
+        }
+        .withdrawal-container {
+            padding: 1rem;
+            padding-bottom: 6rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #2b5279;
+            box-shadow: 0 0 5px rgba(43, 82, 121, 0.3);
+        }
+        .coin-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .coin-option {
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fff;
+        }
+        .coin-option:hover {
+            border-color: #2b5279;
+            background: #f0f4f8;
+        }
+        .coin-option.active {
+            border-color: #2b5279;
+            background: #2b5279;
+            color: #fff;
+        }
+        .coin-icon {
+            width: 2rem;
+            height: 2rem;
+            margin: 0 auto 0.25rem;
+        }
+        .coin-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .withdraw-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .withdraw-btn:hover {
+            opacity: 0.9;
+        }
+        .withdraw-btn:active {
+            opacity: 0.8;
+        }
+        .withdraw-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .y-foo {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid #ddd;
+            padding: 0.5rem;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .y-tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.75rem;
+            gap: 0.25rem;
+        }
+        .y-tab-item img {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="y-hd">
+        <div class="yc-header">
+            <a href="assets.html" class="y-fanhui">
+                <img src="./topup_files/fanhui.png" alt="Back">
+            </a>
+            <div class="y-title">Withdrawal</div>
+        </div>
+    </div>
+
+    <div class="withdrawal-container">
+        <div class="success-message" id="successMsg">Withdrawal request submitted successfully!</div>
+        <div class="error-message" id="errorMsg"></div>
+
+        <form id="withdrawalForm">
+            <div class="form-group">
+                <label class="form-label">Select Coin</label>
+                <div class="coin-selector" id="coinSelector">
+                    <div class="coin-option" data-coin="BTC">
+                        <img src="/img/coin/btc.png" alt="BTC" class="coin-icon">
+                        <div class="coin-name">BTC</div>
+                    </div>
+                    <div class="coin-option" data-coin="USDT">
+                        <img src="/img/coin/usdt.png" alt="USDT" class="coin-icon">
+                        <div class="coin-name">USDT</div>
+                    </div>
+                    <div class="coin-option" data-coin="ETH">
+                        <img src="/img/coin/eth.png" alt="ETH" class="coin-icon">
+                        <div class="coin-name">ETH</div>
+                    </div>
+                </div>
+                <input type="hidden" id="selectedCoin" name="coin" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Withdrawal Address</label>
+                <input type="text" id="withdrawalAddress" name="address" class="form-control" placeholder="Enter withdrawal address" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Amount</label>
+                <input type="number" id="withdrawalAmount" name="quantity" class="form-control" placeholder="Enter amount" min="0" step="0.01" required>
+            </div>
+
+            <button type="submit" class="withdraw-btn">Submit Withdrawal</button>
+            <a href="withdrawal-record.html" style="display: block; margin-top: 1rem; text-align: center; color: #2b5279; text-decoration: none; font-weight: 600;">View Withdrawal History</a>
+        </form>
+    </div>
+
+    <div class="y-foo">
+        <a href="index.html" class="y-tab-item">
+            <img src="./topup_files/6.png" alt="Home">
+            <span>Home</span>
+        </a>
+        <a href="contract.html?market=btc" class="y-tab-item">
+            <img src="./topup_files/5.png" alt="Contract">
+            <span>Contract</span>
+        </a>
+        <a href="assets.html" class="y-tab-item">
+            <img src="./topup_files/16-a.png" alt="Assets">
+            <span>Assets</span>
+        </a>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Handle coin selection
+            $('.coin-option').on('click', function() {
+                $('.coin-option').removeClass('active');
+                $(this).addClass('active');
+                $('#selectedCoin').val($(this).data('coin'));
+            });
+
+            // Handle form submission
+            $('#withdrawalForm').on('submit', function(e) {
+                e.preventDefault();
+                submitWithdrawal();
+            });
+        });
+
+        function submitWithdrawal() {
+            const coin = $('#selectedCoin').val();
+            const address = $('#withdrawalAddress').val();
+            const quantity = $('#withdrawalAmount').val();
+            const user_id = Cookies.get('userid');
+
+            if (!coin) {
+                showError('Please select a coin');
+                return;
+            }
+            if (!address) {
+                showError('Please enter withdrawal address');
+                return;
+            }
+            if (!quantity || parseFloat(quantity) <= 0) {
+                showError('Please enter valid amount');
+                return;
+            }
+            if (!user_id) {
+                showError('Please log in first');
+                return;
+            }
+
+            const postData = {
+                user_id: user_id,
+                coin: coin,
+                address: address,
+                quantity: parseFloat(quantity)
+            };
+
+            console.log('Submitting withdrawal:', postData);
+
+            $.ajax({
+                url: '/api/withdrawal-record',
+                type: 'POST',
+                data: JSON.stringify(postData),
+                contentType: 'application/json',
+                success: function(res) {
+                    console.log('Withdrawal submitted:', res);
+                    if (res.success) {
+                        showSuccess('Withdrawal request submitted successfully!');
+                        // Clear form
+                        $('#withdrawalForm')[0].reset();
+                        $('.coin-option').removeClass('active');
+                        $('#selectedCoin').val('');
+                        // Redirect after 2 seconds
+                        setTimeout(function() {
+                            window.location.href = 'withdrawal-record.html';
+                        }, 2000);
+                    } else {
+                        showError(res.error || 'Failed to submit withdrawal');
+                    }
+                },
+                error: function(err) {
+                    console.error('Error:', err);
+                    try {
+                        const response = JSON.parse(err.responseText);
+                        showError(response.error || 'Failed to submit withdrawal');
+                    } catch (e) {
+                        showError('Failed to submit withdrawal. Please try again.');
+                    }
+                }
+            });
+        }
+
+        function showSuccess(message) {
+            $('#successMsg').text(message).show();
+            $('#errorMsg').hide();
+            setTimeout(function() {
+                $('#successMsg').fadeOut();
+            }, 5000);
+        }
+
+        function showError(message) {
+            $('#errorMsg').text(message).show();
+            $('#successMsg').hide();
+        }
+    </script>
+</body>
+</html>

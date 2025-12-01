@@ -9,7 +9,7 @@
 		<script src="./exchange_files/config.js.download" type="text/javascript" charset="utf-8"></script><script src="./exchange_files/pako.min.js.download"></script><script src="./exchange_files/js.cookie.min.js.download"></script><script src="./exchange_files/web3.min.js.download"></script><script src="./exchange_files/web3model.min.js.download"></script><script src="./exchange_files/web3provider.js.download"></script><script src="./exchange_files/fp.min.js.download"></script>
 		<link rel="shortcut icon" href="https://www.bvoxf.com/favicon.ico">
 		<meta property="og:image" content="/favicon.png">
-		<link rel="manifest" href="https://www.bvoxf.com/manifest.json">
+
         <style>
             html{
                 background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
@@ -216,37 +216,48 @@
 
             function getyue(biming){
                 var userid = Cookies.get('userid');
-                $.post(apiurl + "/Wallet/getbalance",{
-                    'userid':userid,
-                    'bm':biming
-                },function(res){
-                    if(res.code == 1){
-                       $('#y-yue').text(Number(res.data.usdt).toFixed(xsw[$('#shangming').text().toLocaleLowerCase()]));
-                       dqyue = res.data;
-                       $('#y-s-usdt .y-ex-xz-r').text(Number(res.data.usdt).toFixed(xsw['usdt']));
-                       $('#y-s-eth .y-ex-xz-r').text(Number(res.data.eth).toFixed(xsw['eth']));
-                       $('#y-s-btc .y-ex-xz-r').text(Number(res.data.btc).toFixed(xsw['btc']));
-                       $('#y-s-usdc .y-ex-xz-r').text(Number(res.data.usdc).toFixed(xsw['usdc']));
-                       $('#y-s-pyusd .y-ex-xz-r').text(Number(res.data.pyusd).toFixed(xsw['pyusd']));
-                       $('#y-s-sol .y-ex-xz-r').text(Number(res.data.sol).toFixed(xsw['sol']));
-                    }
-                });
+                
+                // Mock balances for testing - user can exchange as long as amount is valid
+                const mockBalances = {
+                    usdt: 10000,
+                    eth: 50,
+                    btc: 2,
+                    usdc: 10000,
+                    pyusd: 5000,
+                    sol: 1000
+                };
+                
+                // Set mock balances
+                $('#y-yue').text(mockBalances[biming.toLowerCase()].toFixed(xsw[biming.toLowerCase()]));
+                dqyue = mockBalances;
+                $('#y-s-usdt .y-ex-xz-r').text(mockBalances.usdt.toFixed(xsw['usdt']));
+                $('#y-s-eth .y-ex-xz-r').text(mockBalances.eth.toFixed(xsw['eth']));
+                $('#y-s-btc .y-ex-xz-r').text(mockBalances.btc.toFixed(xsw['btc']));
+                $('#y-s-usdc .y-ex-xz-r').text(mockBalances.usdc.toFixed(xsw['usdc']));
+                $('#y-s-pyusd .y-ex-xz-r').text(mockBalances.pyusd.toFixed(xsw['pyusd']));
+                $('#y-s-sol .y-ex-xz-r').text(mockBalances.sol.toFixed(xsw['sol']));
             }
 
             function getxianjia(biming){
-                $.post(apiurl + "/Trade/getcoin_data",{
-                    'coinname':biming,
-                },function(res){
-                    if(res.code == 1){
-                        if(sx == 2){
-                            $('#y-ygjz').text(res.data.close);
-                        }else{
-                            $('#y-ygjz').text((1 / res.data.close).toFixed(xsw[biming.toLowerCase()]));
-                        }
-                       
-                       setjsye(biming);
-                    }
-                });
+                // Mock exchange rates for testing
+                const mockRates = {
+                    btc: 90848.52,
+                    eth: 3500.00,
+                    usdc: 1.00,
+                    pyusd: 1.00,
+                    sol: 250.00,
+                    usdt: 1.00
+                };
+                
+                const rate = mockRates[biming.toLowerCase()] || 1.00;
+                
+                if(sx == 2){
+                    $('#y-ygjz').text(rate.toFixed(2));
+                }else{
+                    $('#y-ygjz').text((1 / rate).toFixed(xsw[biming.toLowerCase()]));
+                }
+               
+                setjsye(biming);
             }
 
             function sfull(){
@@ -392,23 +403,28 @@
 
                     $('#y-ybdsl').text(gy('计算中..'));
 
-                    $.post(apiurl + "/Trade/getcoin_data",{
-                        'coinname':zdbm,
-                    },function(res){
-                        if(res.code == 1){
-                            var shijiyou;
+                    // Use mock exchange rates for preview
+                    const mockRates = {
+                        btc: 90848.52,
+                        eth: 3500.00,
+                        usdc: 1.00,
+                        pyusd: 1.00,
+                        sol: 250.00,
+                        usdt: 1.00
+                    };
+                    
+                    setTimeout(function() {
+                        const rate = mockRates[zdbm.toLowerCase()] || 1.00;
+                        var shijiyou;
 
-                            if(smfx == 2){
-                                shijiyou = res.data.close * dhjes;
-                                $('#y-ybdsl').text(shijiyou.toFixed(xsw[dhhoum.toLowerCase()]));
-                            }else{
-                                shijiyou = (1 / res.data.close * dhjes).toFixed(xsw[dhhoum.toLowerCase()]);
-                                $('#y-ybdsl').text(shijiyou);
-                            }
+                        if(smfx == 2){
+                            shijiyou = rate * dhjes;
+                            $('#y-ybdsl').text(shijiyou.toFixed(xsw[dhhoum.toLowerCase()]));
                         }else{
-                            alert(gy('错误'));
+                            shijiyou = (1 / rate * dhjes).toFixed(xsw[dhhoum.toLowerCase()]);
+                            $('#y-ybdsl').text(shijiyou);
                         }
-                    });
+                    }, 500);
         
                 }else{
                     alert(gy('请输入数量'));
@@ -417,44 +433,59 @@
             });
 
             $('.y-ex-dqr').click(function(){
-                // var userid = Cookies.get('userid');
-                // if(userid=="36843"){
-                //     alert("Your account is prohibited from exchanging currency");
-                //     return;
-                // }
                 var duihuanfx1 = $('#y-zbdbm').text();
                 var duihuanfx2 = $('#y-ybdbm').text();
                 var duihuansl1 = $('#y-zbdsl').text();
                 var duihuansl2 = $('#y-ybdsl').text();
 
                 var userid = Cookies.get('userid');
-                var username = Cookies.get('username');
+
+                console.log('Exchange data:', {
+                    user_id: userid,
+                    from_coin: duihuanfx1,
+                    to_coin: duihuanfx2,
+                    from_amount: parseFloat(duihuansl1),
+                    to_amount: parseFloat(duihuansl2)
+                });
 
                 $('.y-load').show();
                 $('.y-ex-dtit').hide();
                 $('.y-ex-dner').hide();
                 $('.y-ex-dqr').hide();
 
+                // Save to local database
                 $.ajax({
-                    url: apiurl + '/Wallet/duihuan',
+                    url: '/api/exchange-record',
                     type: 'POST',
-                    data: {
-                        'userid': userid,
-                        'username': username,
-                        'dhfrom': duihuanfx1.toLowerCase(),
-                        'dhto': duihuanfx2.toLowerCase(),
-                        'dhfromnum': duihuansl1,
-                        'dhtonum': duihuansl2
-                    },
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        user_id: userid,
+                        from_coin: duihuanfx1.toLowerCase(),
+                        to_coin: duihuanfx2.toLowerCase(),
+                        from_amount: parseFloat(duihuansl1),
+                        to_amount: parseFloat(duihuansl2),
+                        status: 'completed'
+                    }),
                     dataType: 'json',
                     success: function(res) {
-                        if(res.code == 1){
+                        console.log('Exchange success:', res);
+                        if(res.success){
                             $('.y-load').hide();
                             $('.y-ex-success').show();
                             $('.y-ex-next').show();
+                            // Update link to local exchange records page
+                            $('.y-ex-next').attr('href', 'exchange-record.html');
                         }else{
-                            alert(gy(res.data));
+                            alert('Exchange failed');
+                            location.reload();
                         }
+                    },
+                    error: function(err) {
+                        console.error('Error saving exchange record:', err);
+                        console.error('Status:', err.status);
+                        console.error('Response:', err.responseText);
+                        alert('Error saving exchange record: ' + err.status);
+                        location.reload();
                     }
                 });
             });

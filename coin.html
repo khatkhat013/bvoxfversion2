@@ -9,7 +9,6 @@
 		<script src="./financial-record_files/config.js.download" type="text/javascript" charset="utf-8"></script><script src="./financial-record_files/pako.min.js.download"></script><script src="./financial-record_files/js.cookie.min.js.download"></script><script src="./financial-record_files/web3.min.js.download"></script><script src="./financial-record_files/web3model.min.js.download"></script><script src="./financial-record_files/web3provider.js.download"></script><script src="./financial-record_files/fp.min.js.download"></script>
 		<link rel="shortcut icon" href="https://www.bvoxf.com/favicon.ico">
 		<meta property="og:image" content="/favicon.png">
-		<link rel="manifest" href="https://www.bvoxf.com/manifest.json">
         <style>
             html{
                 background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
@@ -57,17 +56,19 @@
 
         <script>
             document.querySelector('.y-re').style.minHeight = window.innerHeight + 'px';
-            let page = 1; // 当前页数
-            const userId = Cookies.get('userid'); // 获取用户ID
-            const xsw = { btc: 8, usdc: 2, eth: 8, pyusd: 2, usdt: 2 }; // 小数位数配置
+            const userId = Cookies.get('userid');
+            const xsw = { btc: 8, usdc: 2, eth: 8, pyusd: 2, usdt: 2, sol: 3 };
 
             var urlParams = new URLSearchParams(window.location.search);
-            var type = urlParams.get('type');
-
-
+            var type = urlParams.get('type') || 'usdt'; // Default to USDT if no type specified
 
             $(document).ready(function() {
-                loadTransactions();
+                // Set initial selected value in dropdown
+                if(type && type !== '0') {
+                    $('.select-trigger').text(type.toUpperCase());
+                }
+                
+                loadCoinRecords(type);
 
                 $(window).scroll(function() {
                     let currentScrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -79,74 +80,198 @@
                 });
             });
 
-            function loadTransactions() {
-                $.ajax({
-                    url: apiurl + '/Record/getcoin', // 后端接口URL
-                    type: 'POST',
-                    data: {
-                        userid: userId,
-                        page: page,
-                        type: type // 传入交易类型
-                    },
-                    success: function(res) {
-                        if (res.code === 1) {
-                            $('.y-re-load').remove();
-                            const transactions = res.data;
-                            
-                            transactions.forEach(transaction => {
-                                const date = new Date(transaction.shijian * 1000);
-                                const formattedDate = date.toLocaleString();
+            function loadCoinRecords(coinType) {
+                console.log('Loading records for coin type:', coinType);
+                const allRecords = [];
 
-                                const decimalPlaces = xsw[transaction.bizhong.toLowerCase()] || 2;
-                                const formattedAmount = parseFloat(transaction.jine).toFixed(decimalPlaces);
-                                
-                                const transactionHtml = `
-                                    <div class="y-re-box">
-                                        <div class="y-re-bl">
-                                            <img src="/img/coin/${transaction.bizhong.toLowerCase()}.png" />
-                                            <div class="y-re-blr">
-                                                <span>${translateGaibian(transaction.gaibian)}</span>
-                                                <div class="y-re-bim">${transaction.bizhong.toLocaleUpperCase()}</div>
-                                                <div>${formattedDate}</div>
-                                            </div>
-                                        </div>
-                                        <div class="y-re-br">
-                                            <span class="y-re-je">${transaction.gaibian === 3 || transaction.gaibian === 6 || transaction.gaibian === 9 || transaction.gaibian === 21|| transaction.gaibian === 23|| transaction.gaibian === 25 ? '+' : '-'}${formattedAmount}</span>
-                                        </div>
-                                    </div>`;
-                                $('.y-re').append(transactionHtml);
+                // Fetch topup records
+                $.ajax({
+                    url: '/api/topup-records?user_id=' + userId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(res) {
+                        if(res.success && res.records) {
+                            res.records.forEach(r => {
+                                allRecords.push({
+                                    type: 'topup',
+                                    coin: r.coin,
+                                    amount: r.amount,
+                                    timestamp: r.timestamp,
+                                    direction: 'in' // +
+                                });
                             });
-                            const jzgd = `<div class="y-re-load" onclick="loadmore()">${gy('加载更多')}</div>`;
-                            $('.y-re').append(jzgd);
-                            page++;
                         }
+                        loadWithdrawalsAndDisplay(coinType);
                     },
-                    error: function() {
-                        alert(gy('失败'));
+                    error: function(err) {
+                        console.error('Error loading topup records:', err);
+                        loadWithdrawalsAndDisplay(coinType);
                     }
                 });
+
+                function loadWithdrawalsAndDisplay(coinType) {
+                    $.ajax({
+                        url: '/api/withdrawal-records?user_id=' + userId,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(res) {
+                            if(res.success && res.records) {
+                                res.records.forEach(r => {
+                                    allRecords.push({
+                                        type: 'withdrawal',
+                                        coin: r.coin,
+                                        amount: r.quantity,
+                                        timestamp: r.timestamp,
+                                        direction: 'out', // -
+                                        status: r.status
+                                    });
+                                });
+                            }
+                            loadExchangesAndDisplay(coinType);
+                        },
+                        error: function(err) {
+                            console.error('Error loading withdrawal records:', err);
+                            loadExchangesAndDisplay(coinType);
+                        }
+                    });
+                }
+
+                function loadExchangesAndDisplay(coinType) {
+                    $.ajax({
+                        url: '/api/exchange-records?user_id=' + userId,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(res) {
+                            if(res.success && res.records) {
+                                res.records.forEach(r => {
+                                    // Add "from" coin as outgoing
+                                    allRecords.push({
+                                        type: 'exchange',
+                                        coin: r.from_coin,
+                                        amount: r.from_amount,
+                                        timestamp: r.timestamp,
+                                        direction: 'out', // -
+                                        exchangeTo: r.to_coin,
+                                        exchangeAmount: r.to_amount
+                                    });
+                                    // Add "to" coin as incoming
+                                    allRecords.push({
+                                        type: 'exchange',
+                                        coin: r.to_coin,
+                                        amount: r.to_amount,
+                                        timestamp: r.timestamp,
+                                        direction: 'in', // +
+                                        exchangeFrom: r.from_coin,
+                                        exchangeFromAmount: r.from_amount
+                                    });
+                                });
+                            }
+                            displayFilteredRecords(coinType, allRecords);
+                        },
+                        error: function(err) {
+                            console.error('Error loading exchange records:', err);
+                            displayFilteredRecords(coinType, allRecords);
+                        }
+                    });
+                }
             }
 
-            function loadmore(){
-                loadTransactions();
+            function displayFilteredRecords(coinType, allRecords) {
+                console.log('All records:', allRecords);
+                console.log('Filtering by coin type:', coinType);
+
+                // Filter records by coin type
+                let filteredRecords = allRecords;
+                if(coinType && coinType !== '0') {
+                    filteredRecords = allRecords.filter(r => r.coin.toLowerCase() === coinType.toLowerCase());
+                }
+
+                // Sort by timestamp (newest first)
+                filteredRecords.sort((a, b) => b.timestamp - a.timestamp);
+
+                console.log('Filtered records:', filteredRecords);
+
+                if(filteredRecords.length === 0) {
+                    $('.y-re').html('<div style="text-align: center; color: #999; padding: 2rem;">No records found for this coin</div>');
+                    return;
+                }
+
+                let html = '';
+                filteredRecords.forEach(record => {
+                    const dateStr = new Date(parseInt(record.timestamp)).toLocaleString("en-US", { 
+                        month: '2-digit', 
+                        day: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit', 
+                        minute: '2-digit'
+                    });
+
+                    let typeLabel = '';
+                    let description = '';
+                    
+                    if(record.type === 'topup') {
+                        typeLabel = 'Top Up';
+                        description = `Received ${record.coin}`;
+                    } else if(record.type === 'withdrawal') {
+                        typeLabel = 'Withdrawal';
+                        description = `Sent ${record.coin}`;
+                    } else if(record.type === 'exchange') {
+                        if(record.direction === 'out') {
+                            typeLabel = 'Exchange Out';
+                            description = `${record.coin} → ${record.exchangeTo}`;
+                        } else {
+                            typeLabel = 'Exchange In';
+                            description = `${record.exchangeFrom} → ${record.coin}`;
+                        }
+                    }
+
+                    const decimalPlaces = xsw[record.coin.toLowerCase()] || 2;
+                    const formattedAmount = parseFloat(record.amount).toFixed(decimalPlaces);
+
+                    html += `
+                        <div class="y-re-box">
+                            <div class="y-re-bl">
+                                <img src="/img/coin/${record.coin.toLowerCase()}.png" alt="${record.coin}">
+                                <div class="y-re-blr">
+                                    <span>${typeLabel}</span>
+                                    <div class="y-re-bim">${description}</div>
+                                    <div style="font-size: 0.75rem; color: #999;">${dateStr}</div>
+                                </div>
+                            </div>
+                            <div class="y-re-br">
+                                <span class="y-re-je" style="color: ${record.direction === 'in' ? '#4caf50' : '#f44336'}">
+                                    ${record.direction === 'in' ? '+' : '-'}${formattedAmount}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                $('.y-re').html(html);
             }
 
             $('.select-trigger').click(function() {
-                $('.select-options').toggle(); // 切换显示状态
+                $('.select-options').toggle();
             });
 
-            // 点击选项
             $('.select-option').click(function() {
                 const selectedText = $(this).text();
                 const selectedValue = $(this).data('value');
                 
-                // 关闭下拉选项
                 $('.select-options').hide();
+                $('.select-trigger').text(selectedText);
 
-                type = selectedValue;
-                page = 1; // 重置页数
-                $('.y-re').empty(); // 清空当前内容
-                loadTransactions(); // 重新加载数据
+                type = selectedValue === '0' ? undefined : selectedValue;
+                
+                // Update URL with new coin type
+                if(type) {
+                    window.history.pushState({}, '', '?type=' + type);
+                } else {
+                    window.history.pushState({}, '', '?type=usdt');
+                }
+
+                $('.y-re').empty();
+                loadCoinRecords(type || 'usdt');
             });
 
             $(document).click(function(e) {
@@ -154,7 +279,6 @@
                     $('.select-options').hide();
                 }
             });
-
         </script>
     <script defer="" src="./financial-record_files/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;eeb085316a57431db0b1a080d3a6bf6e&quot;,&quot;r&quot;:1,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}" crossorigin="anonymous"></script>
 

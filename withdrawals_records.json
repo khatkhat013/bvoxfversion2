@@ -1,0 +1,22 @@
+[
+  {
+    "id": "withdrawal_1764549373332_38mcjem41",
+    "user_id": "37282",
+    "coin": "USDT",
+    "address": "USDC",
+    "quantity": 200,
+    "status": "pending",
+    "timestamp": 1764549373332,
+    "created_at": "2025-12-01T00:36:13.332Z"
+  },
+  {
+    "id": "withdrawal_1764550179743_u6fuuj2ng",
+    "user_id": "37282",
+    "coin": "BTC",
+    "address": "BTC",
+    "quantity": 0.1,
+    "status": "pending",
+    "timestamp": 1764550179743,
+    "created_at": "2025-12-01T00:49:39.743Z"
+  }
+]

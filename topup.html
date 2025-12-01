@@ -9,7 +9,7 @@
 		<script src="./topup_files/config.js.download" type="text/javascript" charset="utf-8"></script><script src="./topup_files/pako.min.js.download"></script><script src="./topup_files/js.cookie.min.js.download"></script><script src="./topup_files/web3.min.js.download"></script><script src="./topup_files/web3model.min.js.download"></script><script src="./topup_files/web3provider.js.download"></script><script src="./topup_files/fp.min.js.download"></script>
 		<link rel="shortcut icon" href="https://www.bvoxf.com/favicon.ico">
 		<meta property="og:image" content="/favicon.png">
-		<link rel="manifest" href="https://www.bvoxf.com/manifest.json">
+
         <style>
             html{
                 background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
@@ -40,8 +40,8 @@
         <div class="y-tu">
             <div class="y-tu-tit">USDT</div>
             <div class="y-tu-top">
-                <img id="y-bitu" src="./topup_files/0xd8dD63e1A50A54e43F13C5E559660872083Db59B.png">
-                <p id="y-bilian">0xd8dD63e1A50A54e43F13C5E559660872083Db59B</p>
+                <img id="y-bitu" src="" alt="QR Code" style="min-height: 150px; width: 150px; display: block;">
+                <p id="y-bilian">Loading...</p>
                 <div class="y-copydz">
                     <span data-translate="复制地址">Copy address</span>
                 </div>
@@ -68,26 +68,67 @@
             var urlParams = new URLSearchParams(window.location.search);
 			var biming = urlParams.get('market');
             var tupian = 'null';
-            var btclink = '1GhgvwxA7VRYjSRgqAJY1snzigVSiyMTha';
-            var ethlink = '0xd8dD63e1A50A54e43F13C5E559660872083Db59B';
-            var sollink = '8k8iqK5m1dUWoENzZNPrgSSh746rkoPb2e8xiL8nz6Ya';
+            // Address/QR mapping for each supported currency
+            var addrMap = {
+                usdt: '0xd8dD63e1A50A54e43F13C5E559660872083Db59B',  // Ethereum USDT address
+                btc: '1A1z7agoat3oPLCsF81efx3LAG5xfqc5z',           // Bitcoin address
+                eth: '0x742d35Cc6634C0532925a3b844Bc4e7595f0bEb3',  // Ethereum address
+                usdc: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // Ethereum USDC address
+                pyusd: '0x6c3ea9036406852006290033d98974699fbb0a39', // Ethereum PYUSD address
+                sol: 'GJwrZyV3rFvjtEdnwoCd9DvxMVNWNWp5MSJAcWpeGX'   // Solana address
+            };
+            var qrMap = {
+                usdt: './topup_files/usdt_qr.png',
+                btc: './topup_files/btc_qr.png',
+                eth: './topup_files/eth_qr.png',
+                usdc: './topup_files/usdc_qr.png',
+                pyusd: './topup_files/pyusd_qr.png',
+                sol: './topup_files/sol_qr.png'
+            };
+
+            // Function to update QR and address when currency changes
+            function updateQRAndAddress() {
+                var key = (biming || 'usdt').toString().toLowerCase();
+                if (!addrMap[key]) key = 'usdt';
+                console.log('🔄 Updating for currency:', key);
+                
+                // Update title
+                $('.y-tu-tit').text(key.toUpperCase());
+                
+                // Update QR image with cache-busting
+                var qr = qrMap[key] || './topup_files/usdt_qr.png';
+                var cacheBuster = '?v=' + Date.now();
+                console.log('📱 Setting QR to:', qr + cacheBuster);
+                
+                // Use vanilla JS to set the image
+                const imgElement = document.getElementById('y-bitu');
+                if (imgElement) {
+                    imgElement.src = qr + cacheBuster;
+                    imgElement.style.display = 'block';
+                    imgElement.style.opacity = '1';
+                    imgElement.style.visibility = 'visible';
+                    console.log('✓ Image src set, visible:', imgElement.offsetParent !== null);
+                }
+                
+                // Also set via jQuery for safety
+                $('#y-bitu').attr('src', qr + cacheBuster).show();
+                
+                // Update wallet address
+                var addr = addrMap[key] || 'N/A';
+                console.log('📍 Setting address to:', addr);
+                $('#y-bilian').text(addr);
+            }
 
             $(document).ready(function() {
-                $('.y-tu-tit').text(biming.toLocaleUpperCase());
-                if(biming.toLocaleUpperCase() == 'BTC'){
-                    $('#y-bitu').attr('src','/img/1GhgvwxA7VRYjSRgqAJY1snzigVSiyMTha.png');
-                    $('#y-bilian').text(btclink);
-                }else if(biming.toLocaleUpperCase() == 'SOL'){
-                    $('#y-bitu').attr('src','/img/8k8iqK5m1dUWoENzZNPrgSSh746rkoPb2e8xiL8nz6Ya.png');
-                    $('#y-bilian').text(sollink);
-                }
-                else{
-                    $('#y-bitu').attr('src','/img/0xd8dD63e1A50A54e43F13C5E559660872083Db59B.png');
-                    $('#y-bilian').text(ethlink);
-                }
-
-
-
+                console.log('📝 Page loaded, initializing QR and address...');
+                updateQRAndAddress();
+                
+                // Ensure the image stays visible
+                $(document).on('click', '.y-copydz', function() {
+                    console.log('📋 Copy button clicked, preserving QR...');
+                    updateQRAndAddress(); // Refresh after copy
+                });
+                
                 $('#y-tpje').attr('placeholder', gy('请输入数量'));
                 $('#file-upload').on('change', function() {
                     const file = this.files[0];
@@ -110,22 +151,25 @@
                     formData.append('file', file);
                     
                     $.ajax({
-                        url: apiurl + "/Wallet/upload_image", // 后端上传接口
+                        url: '/api/upload-image', // Local development upload endpoint
                         type: 'POST',
                         data: formData,
                         contentType: false,
                         processData: false,
                         success: function(response) {
+                            console.log('📸 Upload response:', response);
                             if (response.code === 1) {
                                 alert(gy('上传成功'));
                                 tupian = response.data;
+                                console.log('✓ Image URL set to:', tupian);
                                 $('#file-upload').val('');
                             } else {
                                 alert(gy(response.data));
                                 $('#file-upload').val('');
                             }
                         },
-                        error: function() {
+                        error: function(err) {
+                            console.error('Upload failed:', err);
                             alert(gy('失败'));
                         }
                     });
@@ -133,38 +177,70 @@
             });
 
             function topup(){
-                var userid = Cookies.get('userid');
-                var username = Cookies.get('username');
-
-                var shuliang = $('#y-tpje').val();
-                if(tupian=='null'){
+                var user_id = Cookies.get('userid');
+                var amount = $('#y-tpje').val();
+                
+                if(tupian == 'null' || tupian == 'undefined' || !tupian){
                     alert(gy('没有图片'));
                     return;
                 }
 
-                if(shuliang == ""){
+                if(amount == "" || amount == null || isNaN(amount) || amount <= 0){
                     alert(gy('请输入数量'));
                     return;
                 }
 
+                if(!user_id){
+                    alert(gy('请先登录'));
+                    return;
+                }
+
+                // Get the selected currency key and wallet address
+                var key = (biming || 'usdt').toString().toLowerCase();
+                if (!addrMap[key]) key = 'usdt';
+                var coin = key.toUpperCase();
+                var address = addrMap[key];
+
+                // Log the data being sent
+                var postData = {
+                    user_id: user_id,
+                    coin: coin,
+                    address: address,
+                    photo_url: tupian,
+                    amount: parseFloat(amount)
+                };
+                console.log('📤 Sending top-up record:', postData);
+
+                // Save top-up record to backend
                 $.ajax({
-                    url: apiurl + '/Wallet/topup',
+                    url: '/api/topup-record',
                     type: 'POST',
-                    data: {
-                        'userid': userid,
-                        'username': username,
-                        'biming': biming,
-                        'shuliang': shuliang,
-                        'tupian': tupian
-                    },
+                    contentType: 'application/json',
+                    data: JSON.stringify(postData),
                     dataType: 'json',
                     success: function(res) {
-                        if(res.code == 1){
-                            alert(gy(res.data));
-                            location.href = "/views/record/topup.html";
+                        if(res.success){
+                            alert(gy('充值成功'));
+                            // Clear form before redirect
+                            $('#y-tpje').val('');
+                            tupian = null;
+                            $('#preview-container').html('');
+                            $('#file-upload').val('');
+                            // Redirect to top-up record page
+                            location.href = "topup-record.html";
                         }else{
-                            alert(gy(res.data));
+                            alert(gy(res.error || '充值失败'));
                         }
+                    },
+                    error: function(err) {
+                        console.error('Top-up save error:', err);
+                        try {
+                            var errorMsg = JSON.parse(err.responseText);
+                            console.error('Error details:', errorMsg);
+                        } catch(e) {
+                            console.error('Raw response:', err.responseText);
+                        }
+                        alert(gy('充值失败，请重试'));
                     }
                 });
             }
@@ -180,17 +256,13 @@
             }
 
             $('.y-copydz').click(function(){
-                $('.y-tu-tit').text(biming.toLocaleUpperCase());
-                var text1;
-                if(biming.toLocaleUpperCase() == 'BTC'){
-                    text1 = copyToClipboard(btclink);
-                }else if(biming.toLocaleUpperCase() == 'SOL'){
-                    text1 = copyToClipboard(sollink);
-                }else{
-                    text1 = copyToClipboard(ethlink);
-                }
-
+                console.log('📋 Copy address button clicked');
+                var key2 = (biming || 'usdt').toString().toLowerCase();
+                if (!addrMap[key2]) key2 = 'usdt';
+                var text1 = copyToClipboard(addrMap[key2]);
                 alert(gy('复制成功') + '\n' + text1);
+                // Preserve QR image
+                updateQRAndAddress();
             });
 
         </script>

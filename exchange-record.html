@@ -9,7 +9,7 @@
 		<script src="./exchange-record_files/config.js.download" type="text/javascript" charset="utf-8"></script><script src="./exchange-record_files/pako.min.js.download"></script><script src="./exchange-record_files/js.cookie.min.js.download"></script><script src="./exchange-record_files/web3.min.js.download"></script><script src="./exchange-record_files/web3model.min.js.download"></script><script src="./exchange-record_files/web3provider.js.download"></script><script src="./exchange-record_files/fp.min.js.download"></script>
 		<link rel="shortcut icon" href="https://www.bvoxf.com/favicon.ico">
 		<meta property="og:image" content="/favicon.png">
-		<link rel="manifest" href="https://www.bvoxf.com/manifest.json">
+
         <style>
             html{
                 background: linear-gradient(to bottom, #2b5279 5%, #6485a4 60%);
@@ -37,19 +37,88 @@
 
         <div class="y-re" style="min-height: 832px;"></div>
 
+        <style>
+            .y-re {
+                padding: 3.5rem 0.5rem;
+            }
+            .y-re-box {
+                background: #f5f5f5;
+                border-radius: 12px;
+                padding: 1rem;
+                color: #333;
+                margin-bottom: 2.5rem;
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+                justify-content: space-between;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+            .y-re-box-left {
+                display: flex;
+                gap: 0.75rem;
+                align-items: center;
+                flex: 1;
+            }
+            .y-re-box-icon {
+                flex-shrink: 0;
+            }
+            .y-re-box-icon img {
+                width: 3rem;
+                height: 3rem;
+                border-radius: 50%;
+                object-fit: contain;
+                background: #fff;
+                padding: 0.3rem;
+            }
+            .y-re-box-content {
+                display: flex;
+                flex-direction: column;
+                gap: 0.2rem;
+            }
+            .y-re-box-title {
+                font-weight: 600;
+                font-size: 0.9rem;
+                color: #333;
+                line-height: 1.2;
+            }
+            .y-re-box-subtitle {
+                font-size: 0.8rem;
+                color: #666;
+                line-height: 1.2;
+            }
+            .y-re-box-time {
+                font-size: 0.75rem;
+                color: #999;
+                line-height: 1.2;
+            }
+            .y-re-box-amount {
+                flex-shrink: 0;
+                text-align: right;
+            }
+            .y-re-box-amount-value {
+                font-weight: 700;
+                font-size: 1rem;
+                color: #2196f3;
+            }
+            .y-re-load {
+                text-align: center;
+                padding: 1rem;
+                color: #666;
+                cursor: pointer;
+                margin-top: 1rem;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                background: #f5f5f5;
+                margin-bottom: 5rem;
+            }
+        </style>
 
         <script>
             document.querySelector('.y-re').style.minHeight = window.innerHeight + 'px';
-            let page = 1; // 当前页数
-            const userId = Cookies.get('userid'); // 获取用户ID
-            const xsw = { btc: 8, usdc: 2, eth: 8, pyusd: 2, usdt: 2 }; // 小数位数配置
-
-            var urlParams = new URLSearchParams(window.location.search);
-            var type = urlParams.get('type');
-
+            const xsw = { btc: 8, usdc: 2, eth: 8, pyusd: 2, sol: 3, usdt: 2 };
 
             $(document).ready(function() {
-                loadTransactions();
+                loadExchangeRecords();
 
                 $(window).scroll(function() {
                     let currentScrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -61,82 +130,71 @@
                 });
             });
 
-            function loadTransactions() {
-                $.ajax({
-                    url: apiurl + '/Record/getduihuan', // 后端接口URL
-                    type: 'POST',
-                    data: {
-                        userid: userId,
-                        page: page,
-                        type: type // 传入交易类型
-                    },
-                    success: function(res) {
-                        if (res.code === 1) {
-                            $('.y-re-load').remove();
-                            const transactions = res.data;
-                            
-                            transactions.forEach(transaction => {
-                                const date = new Date(transaction.shijian * 1000);
-                                const formattedDate = date.toLocaleString();
+            function loadExchangeRecords() {
+                const userid = Cookies.get('userid');
+                
+                if (!userid) {
+                    console.warn('User not logged in');
+                    $('.y-re').html('<div style="text-align: center; color: #999; padding: 2rem;">Please log in first</div>');
+                    return;
+                }
 
-                                const decimalPlaces = xsw[transaction.bizhong.toLowerCase()] || 2;
-                                const formattedAmount = parseFloat(transaction.jine).toFixed(decimalPlaces);
-                                
-                                const transactionHtml = `
-                                    <div class="y-re-box">
-                                        <div class="y-re-bl">
-                                            <img src="/img/coin/${transaction.bizhong.toLowerCase()}.png" />
-                                            <div class="y-re-blr">
-                                                <span>${translateGaibian(transaction.gaibian)}</span>
-                                                <div class="y-re-bim">${transaction.bizhong.toLocaleUpperCase()}</div>
-                                                <div>${formattedDate}</div>
-                                            </div>
-                                        </div>
-                                        <div class="y-re-br">
-                                            <span class="y-re-je">${transaction.gaibian === 9 ? '+' : '-'}${formattedAmount}</span>
-                                        </div>
-                                    </div>`;
-                                $('.y-re').append(transactionHtml);
-                            });
-                            const jzgd = `<div class="y-re-load" onclick="loadmore()">${gy('加载更多')}</div>`;
-                            $('.y-re').append(jzgd);
-                            page++;
+                $.ajax({
+                    url: '/api/exchange-records?user_id=' + userid,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(res) {
+                        console.log('Exchange records response:', res);
+                        if (res.success && res.records && res.records.length > 0) {
+                            displayRecords(res.records);
+                        } else {
+                            console.log('No exchange records found');
+                            $('.y-re').html('<div style="text-align: center; color: #999; padding: 2rem;">No exchange records found</div>');
                         }
                     },
-                    error: function() {
-                        alert(gy('失败'));
+                    error: function(err) {
+                        console.error('Error loading records:', err);
+                        $('.y-re').html('<div style="text-align: center; color: #999; padding: 2rem;">Failed to load records</div>');
                     }
                 });
             }
 
-            function loadmore(){
-                loadTransactions();
+            function displayRecords(records) {
+                let html = '';
+                records.forEach(function(record) {
+                    const dateStr = new Date(parseInt(record.timestamp)).toLocaleString("en-US", { 
+                        month: '2-digit', 
+                        day: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit', 
+                        minute: '2-digit'
+                    });
+
+                    html += `
+                        <div class="y-re-box">
+                            <div class="y-re-box-left">
+                                <div class="y-re-box-icon">
+                                    <img src="/img/coin/${record.from_coin.toLowerCase()}.png" alt="${record.from_coin}">
+                                </div>
+                                <div class="y-re-box-content">
+                                    <div class="y-re-box-title">Exchange</div>
+                                    <div class="y-re-box-subtitle">${record.from_coin} → ${record.to_coin}</div>
+                                    <div class="y-re-box-time">${dateStr}</div>
+                                </div>
+                            </div>
+                            <div class="y-re-box-amount">
+                                <div class="y-re-box-amount-value">${record.from_amount.toFixed(xsw[record.from_coin.toLowerCase()])} → ${record.to_amount.toFixed(xsw[record.to_coin.toLowerCase()])}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                $('.y-re').html(html);
             }
 
-            $('.select-trigger').click(function() {
-                $('.select-options').toggle(); // 切换显示状态
-            });
-
-            // 点击选项
-            $('.select-option').click(function() {
-                const selectedText = $(this).text();
-                const selectedValue = $(this).data('value');
-                
-                // 关闭下拉选项
-                $('.select-options').hide();
-
-                type = selectedValue;
-                page = 1; // 重置页数
-                $('.y-re').empty(); // 清空当前内容
-                loadTransactions(); // 重新加载数据
-            });
-
-            $(document).click(function(e) {
-                if (!$(e.target).closest('#custom-select').length) {
-                    $('.select-options').hide();
-                }
-            });
-
+            function loadMore() {
+                loadExchangeRecords();
+            }
         </script>
     <script defer="" src="./exchange-record_files/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;eeb085316a57431db0b1a080d3a6bf6e&quot;,&quot;r&quot;:1,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}" crossorigin="anonymous"></script>
 

@@ -7,6 +7,9 @@
 
 const http = require('http');
 const { registerUser } = require('./userModel');
+const { saveTopupRecord, getUserTopupRecords } = require('./topupRecordModel');
+const { saveWithdrawalRecord, getUserWithdrawalRecords } = require('./withdrawalRecordModel');
+const { saveExchangeRecord, getUserExchangeRecords } = require('./exchangeRecordModel');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
@@ -38,6 +41,25 @@ const mimeTypes = {
 
 // Create HTTP Server
 const server = http.createServer((req, res) => {
+    try {
+        // Parse the request URL first
+        const parsedUrl = url.parse(req.url, true);
+        let pathname = parsedUrl.pathname;
+
+        // Add CORS headers FIRST - before any other response
+        const origin = req.headers.origin || '*';
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+        // Handle preflight requests
+        if (req.method === 'OPTIONS') {
+            res.writeHead(200);
+            res.end();
+            return;
+        }
+
         // Handle user registration (wallet connect)
         if (pathname === '/api/register' && req.method === 'POST') {
             let body = '';
@@ -66,21 +88,240 @@ const server = http.createServer((req, res) => {
             });
             return;
         }
-    // Add CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-        res.writeHead(200);
-        res.end();
+    // Handle top-up record save (POST)
+    if (pathname === '/api/topup-record' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                // Remove any query parameters appended by jQuery beforeSend
+                // e.g., "&yanzheng=...", "&token=...", "&address=...", "&sid=..."
+                let jsonBody = body;
+                if (body.includes('}&')) {
+                    // JSON ends at the first '}', extract it
+                    jsonBody = body.substring(0, body.indexOf('}&') + 1);
+                }
+                
+                console.error('[topup-record] Raw body:', body.substring(0, 200));
+                console.error('[topup-record] Cleaned body:', jsonBody.substring(0, 200));
+                
+                const data = JSON.parse(jsonBody);
+                console.error('[topup-record] ✓ Parsed:', JSON.stringify(data).substring(0, 100));
+                const { user_id, coin, address, photo_url, amount } = data;
+                
+                if (!user_id || !coin || !address || !photo_url || !amount) {
+                    console.error('[topup-record] ✗ Missing field');
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing required fields' }));
+                    return;
+                }
+                
+                console.error('[topup-record] ✓ Saving record...');
+                const record = saveTopupRecord({ user_id, coin, address, photo_url, amount });
+                console.error('[topup-record] ✓ Saved:', record.id);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true, record }));
+            } catch (e) {
+                console.error('[topup-record] ✗ Error:', e.message);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: e.message }));
+            }
+        });
         return;
     }
 
-    // Parse the request URL
-    const parsedUrl = url.parse(req.url, true);
-    let pathname = parsedUrl.pathname;
+    // Get user's top-up records (GET)
+    if (pathname === '/api/topup-records' && req.method === 'GET') {
+        const queryParams = url.parse(req.url, true).query;
+        const user_id = queryParams.user_id;
+        if (!user_id) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing user_id parameter' }));
+            return;
+        }
+        const records = getUserTopupRecords(user_id);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, records }));
+        return;
+    }
+
+    // Handle withdrawal record save (POST)
+    if (pathname === '/api/withdrawal-record' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                // Remove any query parameters appended by jQuery beforeSend
+                let jsonBody = body;
+                if (body.includes('}&')) {
+                    jsonBody = body.substring(0, body.indexOf('}&') + 1);
+                }
+                
+                console.error('[withdrawal-record] Raw body:', body.substring(0, 200));
+                console.error('[withdrawal-record] Cleaned body:', jsonBody.substring(0, 200));
+                
+                const data = JSON.parse(jsonBody);
+                console.error('[withdrawal-record] ✓ Parsed:', JSON.stringify(data).substring(0, 100));
+                const { user_id, coin, address, quantity } = data;
+                
+                if (!user_id || !coin || !address || !quantity) {
+                    console.error('[withdrawal-record] ✗ Missing field');
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing required fields' }));
+                    return;
+                }
+                
+                console.error('[withdrawal-record] ✓ Saving record...');
+                const record = saveWithdrawalRecord({ user_id, coin, address, quantity, status: 'pending' });
+                console.error('[withdrawal-record] ✓ Saved:', record.id);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true, record }));
+            } catch (e) {
+                console.error('[withdrawal-record] ✗ Error:', e.message);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: e.message }));
+            }
+        });
+        return;
+    }
+
+    // Get user's withdrawal records (GET)
+    if (pathname === '/api/withdrawal-records' && req.method === 'GET') {
+        const queryParams = url.parse(req.url, true).query;
+        const user_id = queryParams.user_id;
+        if (!user_id) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing user_id parameter' }));
+            return;
+        }
+        const records = getUserWithdrawalRecords(user_id);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, records }));
+        return;
+    }
+
+    // Handle exchange record save (POST)
+    if (pathname === '/api/exchange-record' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                // Remove any query parameters appended by jQuery beforeSend
+                let jsonBody = body;
+                if (body.includes('}&')) {
+                    jsonBody = body.substring(0, body.indexOf('}&') + 1);
+                }
+                
+                console.error('[exchange-record] Raw body:', body.substring(0, 200));
+                console.error('[exchange-record] Cleaned body:', jsonBody.substring(0, 200));
+                
+                const data = JSON.parse(jsonBody);
+                console.error('[exchange-record] ✓ Parsed:', JSON.stringify(data).substring(0, 100));
+                const { user_id, from_coin, to_coin, from_amount, to_amount, status } = data;
+                
+                if (!user_id || !from_coin || !to_coin || !from_amount || !to_amount) {
+                    console.error('[exchange-record] ✗ Missing field');
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing required fields' }));
+                    return;
+                }
+                
+                console.error('[exchange-record] ✓ Saving record...');
+                const record = saveExchangeRecord({ user_id, from_coin, to_coin, from_amount, to_amount, status: status || 'completed' });
+                console.error('[exchange-record] ✓ Saved:', record.id);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true, record }));
+            } catch (e) {
+                console.error('[exchange-record] ✗ Error:', e.message);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: e.message }));
+            }
+        });
+        return;
+    }
+
+    // Get user's exchange records (GET)
+    if (pathname === '/api/exchange-records' && req.method === 'GET') {
+        const queryParams = url.parse(req.url, true).query;
+        const user_id = queryParams.user_id;
+        if (!user_id) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing user_id parameter' }));
+            return;
+        }
+        const records = getUserExchangeRecords(user_id);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, records }));
+        return;
+    }
+
+    // Handle image upload for top-up proof
+    if (pathname === '/api/upload-image' && req.method === 'POST') {
+        let chunks = [];
+        
+        req.on('data', chunk => {
+            chunks.push(chunk);
+        });
+        
+        req.on('end', () => {
+            try {
+                const buffer = Buffer.concat(chunks);
+                // Generate a simple filename based on timestamp and random
+                const filename = 'proof_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9) + '.png';
+                const uploadPath = path.join(__dirname, 'uploads', filename);
+                
+                // Create uploads directory if it doesn't exist
+                const uploadsDir = path.join(__dirname, 'uploads');
+                if (!fs.existsSync(uploadsDir)) {
+                    fs.mkdirSync(uploadsDir, { recursive: true });
+                }
+                
+                // Save file to disk
+                fs.writeFileSync(uploadPath, buffer);
+                
+                // Return just the filename/path
+                const fileUrl = '/uploads/' + filename;
+                
+                console.error('[upload] Saved file:', filename, 'Size:', buffer.length, 'bytes');
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ 
+                    code: 1, 
+                    data: fileUrl,
+                    message: 'Image uploaded successfully'
+                }));
+            } catch (e) {
+                console.error('[upload] Error:', e.message);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ code: 0, data: e.message }));
+            }
+        });
+        return;
+    }
+
+    // Handle uploads directory - serve uploaded files
+    if (pathname.startsWith('/uploads/')) {
+        const filename = path.basename(pathname);
+        const uploadPath = path.join(__dirname, 'uploads', filename);
+        
+        // Security: ensure the file is in the uploads directory
+        if (!uploadPath.startsWith(path.join(__dirname, 'uploads'))) {
+            res.writeHead(403, { 'Content-Type': 'text/plain' });
+            res.end('Forbidden');
+            return;
+        }
+        
+        if (fs.existsSync(uploadPath)) {
+            const data = fs.readFileSync(uploadPath);
+            res.setHeader('Cache-Control', 'public, max-age=3600');
+            res.writeHead(200, { 'Content-Type': 'image/png' });
+            res.end(data);
+        } else {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end('File not found');
+        }
+        return;
+    }
 
     // Handle Cloudflare RUM (Real User Monitoring) - suppress these requests locally
     if (pathname && pathname.startsWith('/cdn-cgi/')) {
@@ -241,6 +482,13 @@ const server = http.createServer((req, res) => {
             res.end(data);
         });
     });
+    } catch (err) {
+        console.error('Unhandled error in request:', err);
+        if (!res.headersSent) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal server error', message: err.message }));
+        }
+    }
 });
 
 // Start server
