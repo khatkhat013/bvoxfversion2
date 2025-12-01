@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - BVOX Finance</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>👨‍💼 Admin Dashboard</h1>
+                    <p>Manage users, balances, and transactions</p>
+                </div>
+                <button id="logoutBtn" style="background: #ff6b6b; padding: 10px 20px; border-radius: 6px;">Logout</button>
+            </div>
+        </header>
+
+        <div class="admin-grid">
+            <!-- Left Panel: User List -->
+            <div class="panel">
+                <h2>Users</h2>
+                <div class="search-box">
+                    <input type="text" id="userSearch" placeholder="Search by User ID...">
+                </div>
+                <div class="user-list" id="userList">
+                    <div class="no-user">Loading users...</div>
+                </div>
+            </div>
+
+            <!-- Right Panel: User Management -->
+            <div class="panel">
+                <div id="noUserSelected" class="no-user">
+                    <h3>Select a user to view details</h3>
+                </div>
+
+                <div id="userDetails" style="display: none;">
+                    <div class="message" id="message"></div>
+
+                    <div class="stats">
+                        <div class="stat-box">
+                            <strong>User ID</strong>
+                            <div class="value" id="detailUserId">-</div>
+                        </div>
+                        <div class="stat-box">
+                            <strong>Status</strong>
+                            <div class="value" id="detailStatus">Active</div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 20px; margin-bottom: 10px; color: #667eea;">Balances</h3>
+                    <div class="balance-display" id="balanceDisplay"></div>
+
+                    <!-- Tabs -->
+                    <div class="tabs">
+                        <div class="tab active" data-tab="update">Update Balance</div>
+                        <div class="tab" data-tab="topup">Add Top-up</div>
+                        <div class="tab" data-tab="withdrawal">Add Withdrawal</div>
+                        <div class="tab" data-tab="history">History</div>
+                    </div>
+
+                    <!-- Tab: Update Balance -->
+                    <div class="tab-content active" id="tab-update">
+                        <form id="updateBalanceForm">
+                            <div class="form-group">
+                                <label>Select Coin</label>
+                                <select id="coinSelect" required>
+                                    <option value="">-- Select Coin --</option>
+                                    <option value="USDT">USDT</option>
+                                    <option value="BTC">BTC</option>
+                                    <option value="ETH">ETH</option>
+                                    <option value="USDC">USDC</option>
+                                    <option value="PYUSD">PYUSD</option>
+                                    <option value="SOL">SOL</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>New Amount</label>
+                                <input type="number" id="newAmount" placeholder="Enter amount" step="0.01" required>
+                            </div>
+                            <button type="submit">Update Balance</button>
+                        </form>
+                    </div>
+
+                    <!-- Tab: Add Top-up -->
+                    <div class="tab-content" id="tab-topup">
+                        <form id="addTopupForm">
+                            <div class="form-group">
+                                <label>Select Coin</label>
+                                <select id="topupCoin" required>
+                                    <option value="">-- Select Coin --</option>
+                                    <option value="USDT">USDT</option>
+                                    <option value="BTC">BTC</option>
+                                    <option value="ETH">ETH</option>
+                                    <option value="USDC">USDC</option>
+                                    <option value="PYUSD">PYUSD</option>
+                                    <option value="SOL">SOL</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Amount</label>
+                                <input type="number" id="topupAmount" placeholder="Enter amount" step="0.01" required>
+                            </div>
+                            <button type="submit">Add Top-up</button>
+                        </form>
+                    </div>
+
+                    <!-- Tab: Add Withdrawal -->
+                    <div class="tab-content" id="tab-withdrawal">
+                        <form id="addWithdrawalForm">
+                            <div class="form-group">
+                                <label>Select Coin</label>
+                                <select id="withdrawalCoin" required>
+                                    <option value="">-- Select Coin --</option>
+                                    <option value="USDT">USDT</option>
+                                    <option value="BTC">BTC</option>
+                                    <option value="ETH">ETH</option>
+                                    <option value="USDC">USDC</option>
+                                    <option value="PYUSD">PYUSD</option>
+                                    <option value="SOL">SOL</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Wallet Address</label>
+                                <input type="text" id="withdrawalAddress" placeholder="Enter wallet address" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Quantity</label>
+                                <input type="number" id="withdrawalQuantity" placeholder="Enter quantity" step="0.01" required>
+                            </div>
+                            <button type="submit">Add Withdrawal</button>
+                        </form>
+                    </div>
+
+                    <!-- Tab: History -->
+                    <div class="tab-content" id="tab-history">
+                        <div class="stats" style="margin-bottom: 15px;">
+                            <div class="stat-box">
+                                <strong>Total Top-ups</strong>
+                                <div class="value" id="statTopups">0</div>
+                            </div>
+                            <div class="stat-box">
+                                <strong>Total Withdrawals</strong>
+                                <div class="value" id="statWithdrawals">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Register - BVOX Finance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background: #c8e6c9;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+            display: block;
+        }
+
+        .message.error {
+            background: #ffcdd2;
+            color: #c62828;
+            border-left: 4px solid #f44336;
+            display: block;
+        }
+
+        .message.info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-left: 4px solid #2196f3;
+            display: block;
+        }
+
+        .password-requirements {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .requirement:last-child {
+            margin-bottom: 0;
+        }
+
+        .requirement-check {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 16px;
+            font-size: 12px;
+            color: white;
+        }
+
+        .requirement-check.met {
+            background: #4caf50;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo">
+            <h1>👨‍💼 Admin Register</h1>
+            <p>Create Your Admin Account</p>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Choose a username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Create a strong password" required>
+            </div>
+
+            <div class="password-requirements">
+                <strong>Password Requirements:</strong>
+                <div class="requirement">
+                    <span class="requirement-check" id="reqLength">✓</span>
+                    <span>At least 8 characters</span>
+                </div>
+                <div class="requirement">
+                    <span class="requirement-check" id="reqUppercase">✓</span>
+                    <span>One uppercase letter</span>
+                </div>
+                <div class="requirement">
+                    <span class="requirement-check" id="reqNumber">✓</span>
+                    <span>One number</span>
+                </div>
+                <div class="requirement">
+                    <span class="requirement-check" id="reqSpecial">✓</span>
+                    <span>One special character (!@#$%)</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+            </div>
+
+            <button type="submit" id="submitBtn">Create Account</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="loader"></div>
+            <p>Creating account...</p>
+        </div>
+
+        <div class="login-link">
+            Already have an account? <a href="login.html">Login here</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Password validation
+        $('#password').on('keyup', function() {
+            const password = $(this).val();
+            
+            // Check length
+            $('#reqLength').toggleClass('met', password.length >= 8);
+            
+            // Check uppercase
+            $('#reqUppercase').toggleClass('met', /[A-Z]/.test(password));
+            
+            // Check number
+            $('#reqNumber').toggleClass('met', /[0-9]/.test(password));
+            
+            // Check special character
+            $('#reqSpecial').toggleClass('met', /[!@#$%^&*]/.test(password));
+        });
+
+        $('#registerForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const fullname = $('#fullname').val();
+            const username = $('#username').val();
+            const email = $('#email').val();
+            const password = $('#password').val();
+            const confirmPassword = $('#confirmPassword').val();
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error');
+                return;
+            }
+
+            // Validate password strength
+            if (!/[A-Z]/.test(password) || !/[0-9]/.test(password) || !/[!@#$%^&*]/.test(password) || password.length < 8) {
+                showMessage('Password does not meet requirements', 'error');
+                return;
+            }
+
+            $('#loading').show();
+            $('#registerForm').hide();
+
+            $.ajax({
+                url: '/api/admin/register',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    fullname: fullname,
+                    username: username,
+                    email: email,
+                    password: password
+                }),
+                success: function(response) {
+                    if (response.success) {
+                        showMessage('Account created successfully! Redirecting to login...', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 2000);
+                    }
+                },
+                error: function(err) {
+                    $('#loading').hide();
+                    $('#registerForm').show();
+                    const response = err.responseJSON || {};
+                    showMessage(response.error || 'Registration failed', 'error');
+                }
+            });
+        });
+
+        function showMessage(message, type) {
+            const messageBox = $('#message');
+            messageBox.removeClass('success error info');
+            messageBox.addClass(type);
+            messageBox.text(message).show();
+        }
+
+        // Check if already logged in
+        $(document).ready(function() {
+            const token = localStorage.getItem('adminToken') || sessionStorage.getItem('adminToken');
+            if (token) {
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>

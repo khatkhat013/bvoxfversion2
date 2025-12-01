@@ -1,0 +1,47 @@
+[
+  {
+    "userid": "37282",
+    "username": "user37282",
+    "email": "user@example.com",
+    "created_at": "2024-01-15T10:30:00Z",
+    "balances": {
+      "usdt": 10000,
+      "btc": 2.5,
+      "eth": 50,
+      "usdc": 5000,
+      "pyusd": 3000,
+      "sol": 1000
+    },
+    "status": "active"
+  },
+  {
+    "userid": "37283",
+    "username": "user37283",
+    "email": "user2@example.com",
+    "created_at": "2024-02-20T14:15:00Z",
+    "balances": {
+      "usdt": 5000,
+      "btc": 1,
+      "eth": 25,
+      "usdc": 2000,
+      "pyusd": 1500,
+      "sol": 500
+    },
+    "status": "active"
+  },
+  {
+    "userid": "37284",
+    "username": "user37284",
+    "email": "user3@example.com",
+    "created_at": "2024-03-10T08:45:00Z",
+    "balances": {
+      "usdt": 15000,
+      "btc": 3,
+      "eth": 75,
+      "usdc": 8000,
+      "pyusd": 5000,
+      "sol": 2000
+    },
+    "status": "active"
+  }
+]

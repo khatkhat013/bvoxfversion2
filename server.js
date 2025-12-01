@@ -10,6 +10,8 @@ const { registerUser } = require('./userModel');
 const { saveTopupRecord, getUserTopupRecords } = require('./topupRecordModel');
 const { saveWithdrawalRecord, getUserWithdrawalRecords } = require('./withdrawalRecordModel');
 const { saveExchangeRecord, getUserExchangeRecords } = require('./exchangeRecordModel');
+const { getAllUsers, getUserById, updateUserBalance, getUserStats, addTopupRecord, addWithdrawalRecord, deleteTransaction } = require('./adminModel');
+const { registerAdmin, loginAdmin, getAdminById, verifyToken } = require('./authModel');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
@@ -253,6 +255,251 @@ const server = http.createServer((req, res) => {
         const records = getUserExchangeRecords(user_id);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, records }));
+        return;
+    }
+
+    // ADMIN AUTHENTICATION ENDPOINTS
+
+    // Admin Login
+    if (pathname === '/api/admin/login' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                let jsonBody = body;
+                if (body.includes('}&')) {
+                    jsonBody = body.substring(0, body.indexOf('}&') + 1);
+                }
+
+                const data = JSON.parse(jsonBody);
+                const { username, password } = data;
+
+                if (!username || !password) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Username and password required' }));
+                    return;
+                }
+
+                const result = loginAdmin(username, password);
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true, ...result }));
+            } catch (e) {
+                console.error('[admin-login] Error:', e.message);
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: e.message }));
+            }
+        });
+        return;
+    }
+
+    // Admin Register
+    if (pathname === '/api/admin/register' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                let jsonBody = body;
+                if (body.includes('}&')) {
+                    jsonBody = body.substring(0, body.indexOf('}&') + 1);
+                }
+
+                const data = JSON.parse(jsonBody);
+                const { fullname, username, email, password } = data;
+
+                if (!fullname || !username || !email || !password) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'All fields required' }));
+                    return;
+                }
+
+                const admin = registerAdmin(fullname, username, email, password);
+                res.writeHead(201, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true, message: 'Admin registered successfully', admin: { id: admin.id, username: admin.username, email: admin.email } }));
+            } catch (e) {
+                console.error('[admin-register] Error:', e.message);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: e.message }));
+            }
+        });
+        return;
+    }
+
+    // ADMIN API ENDPOINTS
+    
+    // Get all users (admin)
+    if (pathname === '/api/admin/users' && req.method === 'GET') {
+        const users = getAllUsers();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, users }));
+        return;
+    }
+
+    // Get user details and stats (admin)
+    if (pathname === '/api/admin/user-stats' && req.method === 'GET') {
+        const queryParams = url.parse(req.url, true).query;
+        const userId = queryParams.user_id;
+        
+        if (!userId) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing user_id parameter' }));
+            return;
+        }
+
+        const user = getUserById(userId);
+        const stats = getUserStats(userId);
+
+        if (!user) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'User not found' }));
+            return;
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, user, stats }));
+        return;
+    }
+
+    // Update user balance (admin)
+    if (pathname === '/api/admin/update-balance' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                let jsonBody = body;
+                if (body.includes('}&')) {
+                    jsonBody = body.substring(0, body.indexOf('}&') + 1);
+                }
+
+                const data = JSON.parse(jsonBody);
+                const { user_id, coin, amount } = data;
+
+                if (!user_id || !coin || amount === undefined) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing required fields' }));
+                    return;
+                }
+
+                const updatedUser = updateUserBalance(user_id, coin, amount);
+
+                if (!updatedUser) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'User not found' }));
+                    return;
+                }
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true, user: updatedUser }));
+            } catch (e) {
+                console.error('[admin-update-balance] Error:', e.message);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: e.message }));
+            }
+        });
+        return;
+    }
+
+    // Add topup record for user (admin)
+    if (pathname === '/api/admin/add-topup' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                let jsonBody = body;
+                if (body.includes('}&')) {
+                    jsonBody = body.substring(0, body.indexOf('}&') + 1);
+                }
+
+                const data = JSON.parse(jsonBody);
+                const { user_id, coin, amount } = data;
+
+                if (!user_id || !coin || !amount) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing required fields' }));
+                    return;
+                }
+
+                const record = addTopupRecord(user_id, coin, amount);
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true, record }));
+            } catch (e) {
+                console.error('[admin-add-topup] Error:', e.message);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: e.message }));
+            }
+        });
+        return;
+    }
+
+    // Add withdrawal record for user (admin)
+    if (pathname === '/api/admin/add-withdrawal' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                let jsonBody = body;
+                if (body.includes('}&')) {
+                    jsonBody = body.substring(0, body.indexOf('}&') + 1);
+                }
+
+                const data = JSON.parse(jsonBody);
+                const { user_id, coin, address, quantity } = data;
+
+                if (!user_id || !coin || !address || !quantity) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing required fields' }));
+                    return;
+                }
+
+                const record = addWithdrawalRecord(user_id, coin, address, quantity);
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true, record }));
+            } catch (e) {
+                console.error('[admin-add-withdrawal] Error:', e.message);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: e.message }));
+            }
+        });
+        return;
+    }
+
+    // Delete transaction (admin)
+    if (pathname === '/api/admin/delete-transaction' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+            try {
+                let jsonBody = body;
+                if (body.includes('}&')) {
+                    jsonBody = body.substring(0, body.indexOf('}&') + 1);
+                }
+
+                const data = JSON.parse(jsonBody);
+                const { transaction_type, transaction_id } = data;
+
+                if (!transaction_type || !transaction_id) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Missing required fields' }));
+                    return;
+                }
+
+                const success = deleteTransaction(transaction_type, transaction_id);
+
+                if (!success) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Transaction not found' }));
+                    return;
+                }
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true, message: 'Transaction deleted' }));
+            } catch (e) {
+                console.error('[admin-delete] Error:', e.message);
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: e.message }));
+            }
+        });
         return;
     }
 
