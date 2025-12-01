@@ -39,6 +39,7 @@ const CRYPTOCURRENCIES = {
 
 // API URL Helper Function
 const apiurl = API_CONFIG.baseURL;
+window.apiurl = apiurl; // Make it globally accessible
 
 // Helper: Get cookie value
 function getCookie(name) {

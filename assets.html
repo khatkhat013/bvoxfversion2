@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 		<link rel="stylesheet" href="./assets_files/style.css">
 		<script src="./assets_files/jquery.js.download" type="text/javascript" charset="utf-8"></script>
-		<script src="./assets_files/config.js.download" type="text/javascript" charset="utf-8"></script><script src="./assets_files/pako.min.js.download"></script><script src="./assets_files/js.cookie.min.js.download"></script><script src="./assets_files/web3.min.js.download"></script><script src="./assets_files/web3model.min.js.download"></script><script src="./assets_files/web3provider.js.download"></script><script src="./assets_files/fp.min.js.download"></script>
+		<script src="../js/config.js" type="text/javascript" charset="utf-8"></script><script src="./assets_files/pako.min.js.download"></script><script src="./assets_files/js.cookie.min.js.download"></script><script src="./assets_files/web3.min.js.download"></script><script src="./assets_files/web3model.min.js.download"></script><script src="./assets_files/web3provider.js.download"></script><script src="./assets_files/fp.min.js.download"></script>
 		<link rel="shortcut icon" href="https://www.bvoxf.com/favicon.ico">
 		<meta property="og:image" content="/favicon.png">
 		<!--<link rel="manifest" href="https://www.bvoxf.com/manifest.json">-->
@@ -276,6 +276,13 @@
 	<script defer="" src="./assets_files/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;eeb085316a57431db0b1a080d3a6bf6e&quot;,&quot;r&quot;:1,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}" crossorigin="anonymous"></script>
 
 	<script>
+        // Ensure we use a safe API base
+        if (typeof apiurl === 'undefined' || !apiurl || String(apiurl).includes('api.bvoxf.com')) {
+            window.apiurl = 'http://localhost:3000';
+        }
+        console.log('Using apiurl:', apiurl);
+        console.log('Userid from cookie:', Cookies.get('userid'));
+
         const xsw = {
             btc: 8,
             usdc: 2,
@@ -293,6 +300,7 @@
 
         
 		$(document).ready(function() {
+            console.log('Assets page ready');
             updateje();
             setInterval(() => updateje(), 5000);
     	});
@@ -304,55 +312,68 @@
 
         function updateje(){
             var userid = Cookies.get('userid');
+            console.log('Updating balance for userid:', userid);
             $.post(apiurl + "/Wallet/getbalance",{
                 'userid':userid,
             },function(res){
+                console.log('Balance response:', res);
                 var zc_usdt;
                 var zc_btc;
                 var zc_eth;
                 var zc_usdc;
                 var zc_pyusd;
                 var zc_sol;
-                if(res.code == 1){
-                    $('#y-wa-usdt1').text(Number(res.data.usdt).toFixed(xsw['usdt']));
-                    $('#y-wa-eth1').text(Number(res.data.eth).toFixed(xsw['eth']));
-                    $('#y-wa-btc1').text(Number(res.data.btc).toFixed(xsw['btc']));
-                    $('#y-wa-usdc1').text(Number(res.data.usdc).toFixed(xsw['usdc']));
-                    $('#y-wa-pyusd1').text(Number(res.data.pyusd).toFixed(xsw['pyusd']));
-                    $('#y-wa-sol1').text(Number(res.data.sol).toFixed(xsw['sol']));
+                if(res.code == 1 && res.data){
+                    $('#y-wa-usdt1').text(Number(res.data.usdt || 0).toFixed(xsw['usdt']));
+                    $('#y-wa-eth1').text(Number(res.data.eth || 0).toFixed(xsw['eth']));
+                    $('#y-wa-btc1').text(Number(res.data.btc || 0).toFixed(xsw['btc']));
+                    $('#y-wa-usdc1').text(Number(res.data.usdc || 0).toFixed(xsw['usdc']));
+                    $('#y-wa-pyusd1').text(Number(res.data.pyusd || 0).toFixed(xsw['pyusd']));
+                    $('#y-wa-sol1').text(Number(res.data.sol || 0).toFixed(xsw['sol']));
 
-                    $('#y-wa-usdt2').text(Number(res.data.usdt).toFixed(xsw['usdt']));
-                    zc_usdt = Number(res.data.usdt).toFixed(xsw['usdt']);
+                    $('#y-wa-usdt2').text(Number(res.data.usdt || 0).toFixed(xsw['usdt']));
+                    zc_usdt = Number(res.data.usdt || 0).toFixed(xsw['usdt']);
 
-
+                    // Try to get coin prices, but show balance even if this fails
                     $.post(apiurl + "/Wallet/getcoin_all_data",{},function(res){
-                        if(res.code == 1){
-                            const data = res.data.data;
+                        console.log('Coin data response:', res);
+                        if(res && res.code == 1 && res.data && res.data.data){
+                            try {
+                                const data = res.data.data;
 
-                            btcusdt = findSymbol(data, "btcusdt");
-                            ethusdt = findSymbol(data, "ethusdt");
-                            usdc = findSymbol(data, "usdcusdt");
-                            pyusd = findSymbol(data, "pyusdusdt");
-                            sol = findSymbol(data, "solusdt");
+                                btcusdt = findSymbol(data, "btcusdt");
+                                ethusdt = findSymbol(data, "ethusdt");
+                                usdc = findSymbol(data, "usdcusdt");
+                                pyusd = findSymbol(data, "pyusdusdt");
+                                sol = findSymbol(data, "solusdt");
 
-                            zc_btc = ($('#y-wa-btc1').text() * btcusdt.close).toFixed(2);
-                            zc_eth = ($('#y-wa-eth1').text() * ethusdt.close).toFixed(2);
-                            zc_usdc = ($('#y-wa-usdc1').text() * usdc.close).toFixed(2);
-                            zc_pyusd = ($('#y-wa-pyusd1').text() * pyusd.close).toFixed(2);
-                            zc_sol = ($('#y-wa-sol1').text() * sol.close).toFixed(2);
-                            $('#y-wa-eth2').text(zc_eth);
-                            $('#y-wa-btc2').text(zc_btc);
-                            $('#y-wa-usdc2').text(zc_usdc);
-                            $('#y-wa-pyusd2').text(zc_pyusd);
-                            $('#y-wa-sol2').text(zc_sol);
+                                if(btcusdt) zc_btc = ($('#y-wa-btc1').text() * btcusdt.close).toFixed(2);
+                                if(ethusdt) zc_eth = ($('#y-wa-eth1').text() * ethusdt.close).toFixed(2);
+                                if(usdc) zc_usdc = ($('#y-wa-usdc1').text() * usdc.close).toFixed(2);
+                                if(pyusd) zc_pyusd = ($('#y-wa-pyusd1').text() * pyusd.close).toFixed(2);
+                                if(sol) zc_sol = ($('#y-wa-sol1').text() * sol.close).toFixed(2);
+                                
+                                if(zc_btc) $('#y-wa-btc2').text(zc_btc);
+                                if(zc_eth) $('#y-wa-eth2').text(zc_eth);
+                                if(zc_usdc) $('#y-wa-usdc2').text(zc_usdc);
+                                if(zc_pyusd) $('#y-wa-pyusd2').text(zc_pyusd);
+                                if(zc_sol) $('#y-wa-sol2').text(zc_sol);
 
-                            $('#y-zzczh').text(
-                                '≈ ' + (Number(zc_usdt) + Number(zc_eth) + Number(zc_btc) + Number(zc_usdc) + Number(zc_pyusd) + Number(zc_sol)).toFixed(2)
-                            );
+                                $('#y-zzczh').text(
+                                    '≈ ' + (Number(zc_usdt) + Number(zc_eth || 0) + Number(zc_btc || 0) + Number(zc_usdc || 0) + Number(zc_pyusd || 0) + Number(zc_sol || 0)).toFixed(2)
+                                );
+                            } catch(e) {
+                                console.error('Error processing coin data:', e);
+                            }
                         }
+                    }).fail(function(err) {
+                        console.log('Coin data call failed, but balance is shown:', err);
                     });
-
+                } else {
+                    console.log('Balance fetch failed or empty data:', res);
                 }
+            }).fail(function(err) {
+                console.error('Balance API call failed:', err);
             });
         }
 

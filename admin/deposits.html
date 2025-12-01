@@ -225,10 +225,20 @@
     <script src="../js/config.js" type="text/javascript" charset="utf-8"></script>
     <script>
         // Ensure we use a safe API base (avoid stale external config overrides)
-        const apiBase = (typeof apiurl !== 'undefined' && !String(apiurl).includes('api.bvoxf.com'))
-            ? apiurl
-            : (window.location.origin || 'http://localhost:3000');
+        let apiBase = 'http://localhost:3000';
+        
+        // Only use apiurl if it's not the external API
+        if (typeof apiurl !== 'undefined' && !String(apiurl).includes('api.bvoxf.com') && apiurl.trim() !== '') {
+            apiBase = apiurl;
+        } else if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            // If accessed remotely, use the server's origin
+            apiBase = window.location.origin;
+        }
+        
         console.log('Using apiBase:', apiBase);
+        console.log('Window origin:', window.location.origin);
+        console.log('Current URL:', window.location.href);
+        console.log('Hostname:', window.location.hostname);
 
         $(document).ready(function() {
             loadPendingDeposits();
@@ -316,6 +326,8 @@
         }
 
         function approveDeposit(depositId) {
+            console.log('Approving deposit:', depositId);
+            console.log('Sending to URL:', apiBase + '/Admin/approveDeposit');
             if (confirm('Are you sure you want to approve this deposit? User balance will be updated.')) {
                 $.ajax({
                     url: apiBase + '/Admin/approveDeposit',
@@ -323,6 +335,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify({ depositId: depositId }),
                     success: function(res) {
+                        console.log('Approve success:', res);
                         if(res.code == 1) {
                             alert('✓ Deposit completed successfully!\nUser balance has been updated.');
                             loadPendingDeposits();
@@ -331,8 +344,13 @@
                         }
                     },
                     error: function(xhr, status, error) {
-                        alert('Request failed: ' + error + '\nStatus: ' + xhr.status);
-                        console.error('Approve error:', xhr, status, error);
+                        console.error('Approve error details:', {
+                            url: apiBase + '/Admin/approveDeposit',
+                            status: xhr.status,
+                            error: error,
+                            response: xhr.responseText
+                        });
+                        alert('Request failed: ' + error + '\nStatus: ' + xhr.status + '\nURL: ' + apiBase + '/Admin/approveDeposit');
                     }
                 });
             }

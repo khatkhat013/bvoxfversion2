@@ -214,10 +214,17 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="../js/config.js" type="text/javascript" charset="utf-8"></script>
     <script>
-        // Use safe API base: prefer configured apiurl but avoid stale external host
-        const apiBase = (typeof apiurl !== 'undefined' && !String(apiurl).includes('api.bvoxf.com'))
-            ? apiurl
-            : (window.location.origin || 'http://localhost:3000');
+        // Ensure we use a safe API base (avoid stale external config overrides)
+        let apiBase = 'http://localhost:3000';
+        
+        // Only use apiurl if it's not the external API
+        if (typeof apiurl !== 'undefined' && !String(apiurl).includes('api.bvoxf.com') && apiurl.trim() !== '') {
+            apiBase = apiurl;
+        } else if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            // If accessed remotely, use the server's origin
+            apiBase = window.location.origin;
+        }
+        
         console.log('Using apiBase:', apiBase);
 
         $(document).ready(function() {
@@ -254,13 +261,18 @@
                 html = '<tr><td colspan="8" class="no-data">No withdrawal records found</td></tr>';
             } else {
                 withdrawals.forEach(withdrawal => {
-                    const statusClass = withdrawal.status === 'approved' ? 'status-approved' : 
+                    const statusClass = withdrawal.status === 'complete' ? 'status-approved' : 
                                        withdrawal.status === 'rejected' ? 'status-rejected' : 'status-pending';
                     // Support multiple possible user id field names coming from different record formats
                     const userId = withdrawal.user_id || withdrawal.userid || withdrawal.userId || withdrawal.user || 'N/A';
                     // Normalize amount/quantity
                     const rawAmount = (typeof withdrawal.amount !== 'undefined' && withdrawal.amount !== null) ? withdrawal.amount : (typeof withdrawal.quantity !== 'undefined' ? withdrawal.quantity : 0);
                     const amountStr = Number(rawAmount || 0).toFixed(8);
+                    
+                    // Format status display text
+                    let statusText = 'Pending';
+                    if (withdrawal.status === 'complete') statusText = 'Complete';
+                    else if (withdrawal.status === 'rejected') statusText = 'Reject';
 
                     html += `<tr>
                         <td>${withdrawal.id || 'N/A'}</td>
@@ -268,11 +280,11 @@
                         <td>${withdrawal.coin || 'N/A'}</td>
                         <td>${amountStr}</td>
                         <td>${withdrawal.address ? withdrawal.address.substring(0, 20) + '...' : 'N/A'}</td>
-                        <td><span class="status-badge ${statusClass}">${(withdrawal.status || 'Pending').toUpperCase()}</span></td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                         <td>${withdrawal.created_at ? new Date(withdrawal.created_at).toLocaleDateString() : 'N/A'}</td>
                         <td>
-                            <button class="action-btn approve-btn" onclick="approveWithdrawal('${withdrawal.id}')" ${withdrawal.status === 'approved' ? 'disabled' : ''}>Approve</button>
-                            <button class="action-btn reject-btn" onclick="rejectWithdrawal('${withdrawal.id}')" ${withdrawal.status === 'rejected' ? 'disabled' : ''}>Reject</button>
+                            <button class="action-btn approve-btn" onclick="approveWithdrawal('${withdrawal.id}')" ${withdrawal.status === 'complete' || withdrawal.status === 'rejected' ? 'disabled' : ''}>Approve</button>
+                            <button class="action-btn reject-btn" onclick="rejectWithdrawal('${withdrawal.id}')" ${withdrawal.status === 'complete' || withdrawal.status === 'rejected' ? 'disabled' : ''}>Reject</button>
                         </td>
                     </tr>`;
                 });
@@ -281,36 +293,61 @@
         }
 
         function approveWithdrawal(withdrawalId) {
+            console.log('Approving withdrawal:', withdrawalId);
+            console.log('Sending to URL:', apiBase + '/Admin/approveWithdrawal');
             if (confirm('Are you sure you want to approve this withdrawal? User balance will be deducted.')) {
                 $.ajax({
                     url: apiBase + '/Admin/approveWithdrawal',
                     type: 'POST',
-                    data: { withdrawalId: withdrawalId },
+                    contentType: 'application/json',
+                    data: JSON.stringify({ withdrawalId: withdrawalId }),
                     success: function(res) {
+                        console.log('Approve success:', res);
                         if(res.code == 1) {
-                            alert('✓ Withdrawal approved successfully!\nUser balance has been deducted.');
+                            alert('✓ Withdrawal completed successfully!\nUser balance has been deducted.');
                             loadPendingWithdrawals();
                         } else {
                             alert('Error: ' + res.data);
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Approve error details:', {
+                            url: apiBase + '/Admin/approveWithdrawal',
+                            status: xhr.status,
+                            error: error,
+                            response: xhr.responseText
+                        });
+                        alert('Request failed: ' + error + '\nStatus: ' + xhr.status + '\nURL: ' + apiBase + '/Admin/approveWithdrawal');
                     }
                 });
             }
         }
 
         function rejectWithdrawal(withdrawalId) {
+            console.log('Rejecting withdrawal:', withdrawalId);
             if (confirm('Are you sure you want to reject this withdrawal?')) {
                 $.ajax({
                     url: apiBase + '/Admin/rejectWithdrawal',
                     type: 'POST',
-                    data: { withdrawalId: withdrawalId },
+                    contentType: 'application/json',
+                    data: JSON.stringify({ withdrawalId: withdrawalId }),
                     success: function(res) {
+                        console.log('Reject success:', res);
                         if(res.code == 1) {
                             alert('✓ Withdrawal rejected!');
                             loadPendingWithdrawals();
                         } else {
                             alert('Error: ' + res.data);
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Reject error details:', {
+                            url: apiBase + '/Admin/rejectWithdrawal',
+                            status: xhr.status,
+                            error: error,
+                            response: xhr.responseText
+                        });
+                        alert('Request failed: ' + error + '\nStatus: ' + xhr.status);
                     }
                 });
             }

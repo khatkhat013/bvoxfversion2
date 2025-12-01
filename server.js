@@ -829,15 +829,28 @@ const server = http.createServer((req, res) => {
         req.on('data', chunk => { body += chunk; });
         req.on('end', () => {
             try {
-                const data = JSON.parse(body);
-                const withdrawalId = data.withdrawalId;
+                console.log('[Admin/approveWithdrawal] Raw body:', body);
+                let data = null;
+                try {
+                    data = JSON.parse(body);
+                } catch (je) {
+                    // parse simple urlencoded form like withdrawalId=xyz
+                    const params = {};
+                    body.split('&').forEach(pair => {
+                        const [k, v] = pair.split('=');
+                        if (k) params[decodeURIComponent(k)] = decodeURIComponent((v || '').replace(/\+/g, ' '));
+                    });
+                    data = params;
+                }
+                
+                const withdrawalId = data.withdrawalId || data.withdrawalid || data.id || data.withdrawal_id;
                 let withdrawals = JSON.parse(fs.readFileSync('./withdrawals_records.json', 'utf8'));
                 let foundWithdrawal = null;
                 let found = false;
                 
                 withdrawals = withdrawals.map(w => {
                     if (w.id === withdrawalId) {
-                        w.status = 'approved';
+                        w.status = 'complete';
                         found = true;
                         foundWithdrawal = w;
                     }
@@ -848,7 +861,7 @@ const server = http.createServer((req, res) => {
                     fs.writeFileSync('./withdrawals_records.json', JSON.stringify(withdrawals, null, 2));
                     
                     // Update user balance - deduct withdrawal amount
-                    const user = getUserById(foundWithdrawal.userid);
+                    const user = getUserById(foundWithdrawal.user_id || foundWithdrawal.userid);
                     if (user) {
                         const coin = foundWithdrawal.coin.toLowerCase();
                         const amount = parseFloat(foundWithdrawal.quantity) || parseFloat(foundWithdrawal.amount) || 0;
@@ -858,7 +871,7 @@ const server = http.createServer((req, res) => {
                         if (user[coin] < 0) user[coin] = 0;
                         
                         const users = getAllUsers();
-                        const idx = users.findIndex(u => u.id === user.id);
+                        const idx = users.findIndex(u => u.userid === user.userid || u.id === user.id);
                         if (idx !== -1) {
                             users[idx] = user;
                             fs.writeFileSync('./users.json', JSON.stringify(users, null, 2));
@@ -866,14 +879,15 @@ const server = http.createServer((req, res) => {
                     }
                     
                     res.writeHead(200, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ code: 1, data: 'Withdrawal approved and balance updated' }));
+                    res.end(JSON.stringify({ code: 1, data: 'Withdrawal completed and balance updated' }));
                 } else {
                     res.writeHead(404, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({ code: 0, data: 'Withdrawal not found' }));
                 }
             } catch (e) {
+                console.error('[Admin/approveWithdrawal] Error:', e && e.message ? e.message : e);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ code: 0, data: e.message }));
+                res.end(JSON.stringify({ code: 0, data: e && e.message ? e.message : String(e) }));
             }
         });
         return;
@@ -885,13 +899,25 @@ const server = http.createServer((req, res) => {
         req.on('data', chunk => { body += chunk; });
         req.on('end', () => {
             try {
-                const data = JSON.parse(body);
-                const withdrawalId = data.withdrawalId;
+                console.log('[Admin/rejectWithdrawal] Raw body:', body);
+                let data = null;
+                try {
+                    data = JSON.parse(body);
+                } catch (je) {
+                    // parse simple urlencoded form like withdrawalId=xyz
+                    const params = {};
+                    body.split('&').forEach(pair => {
+                        const [k, v] = pair.split('=');
+                        if (k) params[decodeURIComponent(k)] = decodeURIComponent((v || '').replace(/\+/g, ' '));
+                    });
+                    data = params;
+                }
+                const withdrawalId = data.withdrawalId || data.withdrawalid || data.id || data.withdrawal_id;
                 let withdrawals = JSON.parse(fs.readFileSync('./withdrawals_records.json', 'utf8'));
                 let found = false;
                 withdrawals = withdrawals.map(w => {
                     if (w.id === withdrawalId) {
-                        w.status = 'rejected';
+                        w.status = 'reject';
                         found = true;
                     }
                     return w;
@@ -905,8 +931,9 @@ const server = http.createServer((req, res) => {
                     res.end(JSON.stringify({ code: 0, data: 'Withdrawal not found' }));
                 }
             } catch (e) {
+                console.error('[Admin/rejectWithdrawal] Error:', e && e.message ? e.message : e);
                 res.writeHead(400, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ code: 0, data: e.message }));
+                res.end(JSON.stringify({ code: 0, data: e && e.message ? e.message : String(e) }));
             }
         });
         return;
